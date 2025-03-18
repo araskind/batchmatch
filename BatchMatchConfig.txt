@@ -1,0 +1,7 @@
+#FilePreferences
+#Mon Mar 17 17:48:28 EDT 2025
+edu.umich.mrc2.batchmatch.main.BatchMatch.VERSION=0.05
+edu.umich.mrc2.batchmatch.gui.panels.BatchMatchTestFileSelectorPanel.openTsv.SELECTED_FILE=E\:\\Eclipse\\git2copy\\batchmatch\\BatchMatchConfig.txt
+edu.umich.mrc2.batchmatch.gui.panels.BatchMatchTestFileSelectorPanel.openCsv.BASE_DIRECTORY=Y\:\\DataAnalysis\\_Reports\\EX01010 - EX01089 - EX01235 - EX01283 - EX01392 - Starr County Metabolomics I-V\\Unnamed\\POS\\Positive_unnamed_Goo_Jun_normalized
+edu.umich.mrc2.batchmatch.gui.panels.BatchMatchTestFileSelectorPanel.openTsv.BASE_DIRECTORY=E\:\\Eclipse\\git2copy\\batchmatch
+edu.umich.mrc2.batchmatch.gui.panels.BatchMatchTestFileSelectorPanel.openCsv.SELECTED_FILE=Y\:\\DataAnalysis\\_Reports\\EX01010 - EX01089 - EX01235 - EX01283 - EX01392 - Starr County Metabolomics I-V\\Unnamed\\POS\\Positive_unnamed_Goo_Jun_normalized\\datainfo_untar1.csv

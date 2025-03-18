@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.umich.mrc2</groupId>
-	<artifactId>batchmatch.2023</artifactId>
+	<artifactId>batchmatch</artifactId>
 	<name>BatchMatch</name>
 	<version>0.0.4</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<native.maven.plugin.version>0.9.28</native.maven.plugin.version>
-		<mainClass>edu.umich.batchmatch.main.BatchMatch</mainClass>
+		<mainClass>edu.umich.mrc2.batchmatch.main.BatchMatch</mainClass>
 		<project.build.directory>./target</project.build.directory>
 	</properties>
   <profiles>
@@ -166,7 +166,13 @@
 		    <artifactId>jackson-databind</artifactId>
 		    <version>2.9.4</version>
 		</dependency>
-        
+		<!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
+		<dependency>
+		    <groupId>net.java.dev.jna</groupId>
+		    <artifactId>jna</artifactId>
+		    <version>5.17.0</version>
+		</dependency>
+     
         
 	</dependencies>
 <!--
