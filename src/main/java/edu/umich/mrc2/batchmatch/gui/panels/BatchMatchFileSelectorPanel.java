@@ -61,7 +61,7 @@ public abstract class BatchMatchFileSelectorPanel extends BatchMatchInputPanel {
 			JnaFileChooser.Mode selectionMode,
 			CommonFileTypes fileType,
 			FileChooserAction fcAction) {
-		super(panelId, panelTitle);
+		super(panelId, panelTitle, true);
 		preferencesNode  = this.getClass().getName() + "." + panelId;
 		this.fcAction = fcAction;
 		

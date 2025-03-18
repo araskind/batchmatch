@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 
 import org.apache.poi.ss.formula.eval.NotImplementedException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.ExcelStyleDateFormatter;
@@ -139,7 +140,8 @@ public class MyDataFormatter {
 	 * A regex to match the colour formattings rules. Allowed colours are: Black,
 	 * Blue, Cyan, Green, Magenta, Red, White, Yellow, "Color n" (1<=n<=56)
 	 */
-	private static final Pattern colorPattern = Pattern.compile("(\\[BLACK\\])|(\\[BLUE\\])|(\\[CYAN\\])|(\\[GREEN\\])|"
+	private static final Pattern colorPattern = 
+			Pattern.compile("(\\[BLACK\\])|(\\[BLUE\\])|(\\[CYAN\\])|(\\[GREEN\\])|"
 			+ "(\\[MAGENTA\\])|(\\[RED\\])|(\\[WHITE\\])|(\\[YELLOW\\])|"
 			+ "(\\[COLOR\\s*\\d\\])|(\\[COLOR\\s*[0-5]\\d\\])", Pattern.CASE_INSENSITIVE);
 
@@ -793,34 +795,37 @@ public class MyDataFormatter {
 	 */
 	public String formatCellValue(Cell cell, FormulaEvaluator evaluator) {
 
-		if (cell == null) {
+		if (cell == null)
 			return "";
-		}
-
-		int cellType = cell.getCellType();
-		if (cellType == Cell.CELL_TYPE_FORMULA) {
-			if (evaluator == null) {
+		
+		CellType cellType = cell.getCellType();
+		if (cellType.equals(CellType.FORMULA)) {
+			
+			if (evaluator == null)
 				return cell.getCellFormula();
-			}
+			
 			cellType = evaluator.evaluateFormulaCell(cell);
 		}
 		switch (cellType) {
-		case Cell.CELL_TYPE_NUMERIC:
-
-			if (DateUtil.isCellDateFormatted(cell)) {
-				return getFormattedDateString(cell);
-			}
-			return getFormattedNumberString(cell);
-
-		case Cell.CELL_TYPE_STRING:
-			return cell.getRichStringCellValue().getString();
-
-		case Cell.CELL_TYPE_BOOLEAN:
-			return String.valueOf(cell.getBooleanCellValue());
-		case Cell.CELL_TYPE_BLANK:
-			return "";
+			case NUMERIC:
+	
+				if (DateUtil.isCellDateFormatted(cell))
+					return getFormattedDateString(cell);
+				else
+					return getFormattedNumberString(cell);
+	
+			case STRING:
+				return cell.getRichStringCellValue().getString();
+	
+			case BOOLEAN:
+				return String.valueOf(cell.getBooleanCellValue());
+				
+			case BLANK:
+				return "";
+				
+			default:
+				return "";
 		}
-		throw new RuntimeException("Unexpected celltype (" + cellType + ")");
 	}
 
 	/**

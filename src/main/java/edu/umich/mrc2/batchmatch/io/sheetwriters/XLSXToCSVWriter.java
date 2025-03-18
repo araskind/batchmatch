@@ -48,7 +48,7 @@ public class XLSXToCSVWriter {
 					if (fe != null)
 						cell = fe.evaluateInCell(cell);
 					String value = formatter.formatCellValue(cell);
-					if (cell.getCellTypeEnum() == CellType.FORMULA) {
+					if (cell.getCellType().equals(CellType.FORMULA)) {
 						value = "=" + value;
 					}
 					out.print(encodeValue(value));

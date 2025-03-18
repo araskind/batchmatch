@@ -27,27 +27,25 @@ import javax.swing.TransferHandler;
 import edu.umich.mrc2.batchmatch.gui.LayoutGrid;
 import edu.umich.mrc2.batchmatch.gui.LayoutItem;
 import edu.umich.mrc2.batchmatch.gui.LayoutUtils;
+import edu.umich.mrc2.batchmatch.gui.WhiteYellowCellRenderer;
 
 public abstract class DraggableListViewPanel extends JPanel {
 
-	Boolean enableDrag = true;
-	Boolean centerText = false;
+	private boolean enableDrag = true;
+	private boolean centerText = false;
 
 	private DefaultListModel<String> strings;
 	// private ArrayList<String> fileNames;
 
 	public DraggableListViewPanel() {
-		// setupPanel(new ArrayList<String>());
-		// fileNames = new ArrayList<String>();
-		// for (int i = 0; i < 10; i++)
-		// fileNames.add(new String("File " + i));
+
 	}
 
-	public DraggableListViewPanel(Boolean enableDrag) {
+	public DraggableListViewPanel(boolean enableDrag) {
 		this.enableDrag = enableDrag;
 	}
 
-	public DraggableListViewPanel(Boolean enableDrag, Boolean centerText) {
+	public DraggableListViewPanel(boolean enableDrag, boolean centerText) {
 		this.enableDrag = enableDrag;
 		this.centerText = centerText;
 	}
@@ -164,7 +162,7 @@ public abstract class DraggableListViewPanel extends JPanel {
 	}
 
 	// Auto
-	protected Boolean reportOnNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
+	protected boolean reportOnNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
 		System.out.println("\nShuffle done on index" + newSelection);
 		if (strings != null)
 			for (int i = 0; i < strings.getSize(); i++) {
@@ -182,21 +180,5 @@ public abstract class DraggableListViewPanel extends JPanel {
 		return strStrings;
 	}
 
-	protected abstract Boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection);
-}
-
-class WhiteYellowCellRenderer extends DefaultListCellRenderer {
-
-	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
-			boolean cellHasFocus) {
-		Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		if (index % 2 == 0) {
-			c.setBackground(Color.LIGHT_GRAY); // yellow every even row
-		} else {
-			c.setBackground(Color.LIGHT_GRAY);
-		}
-		c.setForeground(Color.blue);
-		return c;
-	}
-
+	protected abstract boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection);
 }

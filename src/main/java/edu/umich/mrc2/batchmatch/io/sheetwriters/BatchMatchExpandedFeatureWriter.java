@@ -25,7 +25,7 @@ public class BatchMatchExpandedFeatureWriter extends BatchMatchFeatureWriter {
 
 	private static final long serialVersionUID = -2361568255632647473L;
 
-	private Boolean usingGrey = true;
+	private boolean usingGrey = true;
 	private int nNonIntensityHeaders = 0;
 	private Map<String, String> derivedColNameMapping;
 	private Map<String, Double> featureNameToOldRtMap;
@@ -42,7 +42,7 @@ public class BatchMatchExpandedFeatureWriter extends BatchMatchFeatureWriter {
 	}
 
 	public void writeExpandedFeatureSheet(List<String> nonStandardHeaders, List<String> intensityHeaders,
-			List<FeatureFromFile> features, List<XSSFCellStyle> styleList, Boolean useAmbiguousFormat)
+			List<FeatureFromFile> features, List<XSSFCellStyle> styleList, boolean useAmbiguousFormat)
 			throws Exception {
 
 		Sheet sheet = createEmptySheet(getSheetName() == null ? "All Features" : getSheetName(), workBook);
@@ -55,8 +55,10 @@ public class BatchMatchExpandedFeatureWriter extends BatchMatchFeatureWriter {
 		XSSFCellStyle styleNumericGrey = grabStyleNumeric(workBook, true);
 		XSSFCellStyle styleBoringLeft = grabStyleBoringLeft(workBook);
 		XSSFCellStyle styleBoringLeftGrey = grabStyleBoringLeftGrey(workBook);
-		XSSFCellStyle styleToClone = styleList.get(BinnerConstants.STYLE_BORING_GREY);
-		XSSFCellStyle styleBoringBlueGrey = (XSSFCellStyle) styleToClone.clone();
+		
+		XSSFCellStyle styleBoringBlueGrey = (XSSFCellStyle)workBook.createCellStyle();
+		styleBoringBlueGrey.cloneStyleFrom(styleList.get(BinnerConstants.STYLE_BORING_GREY));
+		
 		XSSFCellStyle styleBlankBoring = this.grabStyleBlankBoring(workBook);
 		XSSFCellStyle styleHeader = this.grabStyleBatchMatchHeader(workBook);
 		XSSFCellStyle styleBoringUnderlinedEntry = this.grabStyleBoringUnderlined(workBook);
@@ -109,50 +111,97 @@ public class BatchMatchExpandedFeatureWriter extends BatchMatchFeatureWriter {
 			XSSFCellStyle styleBoring, XSSFCellStyle styleInteger, XSSFCellStyle styleIntegerGrey,
 			XSSFCellStyle styleNumeric, XSSFCellStyle styleNumericGrey, XSSFCellStyle styleBoringLeft,
 			XSSFCellStyle styleBoringLeftGrey, XSSFCellStyle styleBoringBlueGrey, List<XSSFCellStyle> styleList,
-			XSSFCellStyle styleBlankBoring, XSSFCellStyle styleBoringUnderlinedEntry, Boolean useAmbiguous) {
+			XSSFCellStyle styleBlankBoring, XSSFCellStyle styleBoringUnderlinedEntry, boolean useAmbiguous) {
 
-		XSSFCellStyle styleNumericShortestGrey = styleList.get(BinnerConstants.STYLE_NUMERIC_SHORTEST_GREY); // ,
-																													// this.grabStyleNumericShorter(workBook,
-																													// true,
-																													// 2));
-		XSSFCellStyle styleNumericShortest = styleList.get(BinnerConstants.STYLE_NUMERIC_SHORTEST); // ,
-																											// this.grabStyleNumericShorter(workBook,
-																											// true,
-																											// 2));
+		XSSFCellStyle styleNumericShortestGrey = styleList.get(BinnerConstants.STYLE_NUMERIC_SHORTEST_GREY);
+		XSSFCellStyle styleNumericShortest = styleList.get(BinnerConstants.STYLE_NUMERIC_SHORTEST);
 
+//		Font font = workBook.createFont();
+//		font.setFontName("Courier");
+//		styleNumericShortest.setFont(font);
+//		styleNumericShortestGrey.setFont(font);
+//
+//		XSSFCellStyle styleBoringRed = (XSSFCellStyle) styleBoring.clone();
+//		XSSFCellStyle styleNumericRed = (XSSFCellStyle) styleNumeric.clone();
+//		XSSFCellStyle styleNumericGreyRed = (XSSFCellStyle) styleNumericGrey.clone();
+//		XSSFCellStyle styleBoringLeftRed = (XSSFCellStyle) styleBoringLeft.clone();
+//		XSSFCellStyle styleBoringLeftGreyRed = (XSSFCellStyle) styleBoringLeftGrey.clone();
+//		XSSFCellStyle styleBoringBlueGreyRed = (XSSFCellStyle) styleBoringBlueGrey.clone();
+//		XSSFCellStyle styleIntegerRed = (XSSFCellStyle) styleInteger.clone();
+//		XSSFCellStyle styleIntegerGreyRed = (XSSFCellStyle) styleIntegerGrey.clone();
+//		XSSFCellStyle styleNumericShortestGreyRed = (XSSFCellStyle) styleNumericShortestGrey.clone();
+//		XSSFCellStyle styleNumericShortestRed = (XSSFCellStyle) styleNumericShortest.clone();
+//
+//		Font redFont = workBook.createFont();
+//		redFont.setColor(IndexedColors.RED.getIndex());
+//		redFont.setFontName("Courier");
+//
+//		Font greenFont = workBook.createFont();
+//		greenFont.setColor(IndexedColors.YELLOW.getIndex());
+//		greenFont.setFontName("Courier");
+//
+//		styleBoringRed.setFont(redFont);
+//		styleNumericGreyRed.setFont(redFont);
+//		styleBoringLeftRed.setFont(redFont);
+//		styleBoringLeftGreyRed.setFont(redFont);
+//		styleBoringBlueGreyRed.setFont(redFont);
+//		styleIntegerRed.setFont(redFont);
+//		styleIntegerGreyRed.setFont(redFont);
+//		styleNumericRed.setFont(redFont);
+//		styleNumericShortestGreyRed.setFont(redFont);
+//		styleNumericShortestRed.setFont(redFont);
+		
 		Font font = workBook.createFont();
 		font.setFontName("Courier");
 		styleNumericShortest.setFont(font);
 		styleNumericShortestGrey.setFont(font);
-
-		XSSFCellStyle styleBoringRed = (XSSFCellStyle) styleBoring.clone();
-		XSSFCellStyle styleNumericRed = (XSSFCellStyle) styleNumeric.clone();
-		XSSFCellStyle styleNumericGreyRed = (XSSFCellStyle) styleNumericGrey.clone();
-		XSSFCellStyle styleBoringLeftRed = (XSSFCellStyle) styleBoringLeft.clone();
-		XSSFCellStyle styleBoringLeftGreyRed = (XSSFCellStyle) styleBoringLeftGrey.clone();
-		XSSFCellStyle styleBoringBlueGreyRed = (XSSFCellStyle) styleBoringBlueGrey.clone();
-		XSSFCellStyle styleIntegerRed = (XSSFCellStyle) styleInteger.clone();
-		XSSFCellStyle styleIntegerGreyRed = (XSSFCellStyle) styleIntegerGrey.clone();
-		XSSFCellStyle styleNumericShortestGreyRed = (XSSFCellStyle) styleNumericShortestGrey.clone();
-		XSSFCellStyle styleNumericShortestRed = (XSSFCellStyle) styleNumericShortest.clone();
-
+		
 		Font redFont = workBook.createFont();
 		redFont.setColor(IndexedColors.RED.getIndex());
 		redFont.setFontName("Courier");
-
+		
 		Font greenFont = workBook.createFont();
 		greenFont.setColor(IndexedColors.YELLOW.getIndex());
 		greenFont.setFontName("Courier");
-
+		
+		XSSFCellStyle styleBoringRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleBoringRed.cloneStyleFrom(styleBoring);
 		styleBoringRed.setFont(redFont);
-		styleNumericGreyRed.setFont(redFont);
-		styleBoringLeftRed.setFont(redFont);
-		styleBoringLeftGreyRed.setFont(redFont);
-		styleBoringBlueGreyRed.setFont(redFont);
-		styleIntegerRed.setFont(redFont);
-		styleIntegerGreyRed.setFont(redFont);
+		
+		XSSFCellStyle styleNumericRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleNumericRed.cloneStyleFrom(styleNumeric);
 		styleNumericRed.setFont(redFont);
+				
+		XSSFCellStyle styleNumericGreyRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleNumericGreyRed.cloneStyleFrom(styleNumericGrey);
+		styleNumericGreyRed.setFont(redFont);
+		
+		XSSFCellStyle styleBoringLeftRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleBoringLeftRed.cloneStyleFrom(styleBoringLeft);
+		styleBoringLeftRed.setFont(redFont);		
+		
+		XSSFCellStyle styleBoringLeftGreyRed = (XSSFCellStyle)workBook.createCellStyle(); 
+		styleBoringLeftGreyRed.cloneStyleFrom(styleBoringLeftGrey);
+		styleBoringLeftGreyRed.setFont(redFont);
+		
+		XSSFCellStyle styleBoringBlueGreyRed = (XSSFCellStyle)workBook.createCellStyle(); 
+		styleBoringBlueGreyRed.cloneStyleFrom(styleBoringBlueGrey);
+		styleBoringBlueGreyRed.setFont(redFont);
+		
+		XSSFCellStyle styleIntegerRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleIntegerRed.cloneStyleFrom(styleInteger);
+		styleIntegerRed.setFont(redFont);
+		
+		XSSFCellStyle styleIntegerGreyRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleIntegerGreyRed.cloneStyleFrom(styleIntegerGrey);
+		styleIntegerGreyRed.setFont(redFont);
+		
+		XSSFCellStyle styleNumericShortestGreyRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleNumericShortestGreyRed.cloneStyleFrom(styleNumericShortestGrey);
 		styleNumericShortestGreyRed.setFont(redFont);
+		
+		XSSFCellStyle styleNumericShortestRed = (XSSFCellStyle)workBook.createCellStyle();
+		styleNumericShortestRed.cloneStyleFrom(styleNumericShortest);
 		styleNumericShortestRed.setFont(redFont);
 
 		rowCt = 1;
@@ -216,7 +265,7 @@ public class BatchMatchExpandedFeatureWriter extends BatchMatchFeatureWriter {
 
 		Integer currGrp = feature.getRedundancyGroup();
 		Integer prevGrp = lastRedundancyGrp;
-		Boolean sameGrp = (currGrp == null || prevGrp == null) ? false : (currGrp.intValue() == prevGrp.intValue());
+		boolean sameGrp = (currGrp == null || prevGrp == null) ? false : (currGrp.intValue() == prevGrp.intValue());
 		if (!sameGrp) {
 			usingGrey = (usingGrey == false);
 		}
@@ -375,12 +424,12 @@ public class BatchMatchExpandedFeatureWriter extends BatchMatchFeatureWriter {
 	}
 
 	private void createHeader(List<String> nonStandardHeadersRead, List<String> intensityHeaders, Sheet sheet,
-			XSSFCellStyle styleBoring, XSSFCellStyle styleBlankBoring, Boolean second) {
+			XSSFCellStyle styleBoring, XSSFCellStyle styleBlankBoring, boolean second) {
 
 		styleBoring.setAlignment(HorizontalAlignment.CENTER);
 
-		XSSFCellStyle styleBoringGreen = (XSSFCellStyle) styleBoring.clone();
-
+		XSSFCellStyle styleBoringGreen = (XSSFCellStyle)workBook.createCellStyle();
+		styleBoringGreen.cloneStyleFrom(styleBoring);
 		Font greenFont = workBook.createFont();
 		greenFont.setColor(IndexedColors.YELLOW.getIndex());
 		greenFont.setFontName("Courier");

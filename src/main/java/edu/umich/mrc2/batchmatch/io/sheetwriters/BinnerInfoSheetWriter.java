@@ -5,6 +5,7 @@
 
 package edu.umich.mrc2.batchmatch.io.sheetwriters;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FontUnderline;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -68,8 +69,8 @@ public class BinnerInfoSheetWriter extends BinnerSpreadSheetWriter {
 		styleHeader.setIndention((short) 2);
 		styleHeader.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleHeader.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleHeader.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleHeader.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleHeader.setBorderLeft(BorderStyle.THIN);
+		styleHeader.setBorderRight(BorderStyle.THIN);
 
 		try {
 			styleBoring = grabStyleBlankBoring(workBook, ColorUtils.grabRGBColor(242, 242, 242));
@@ -89,8 +90,8 @@ public class BinnerInfoSheetWriter extends BinnerSpreadSheetWriter {
 		styleBoringEntry.setIndention((short) indent);
 		styleBoringEntry.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleBoringEntry.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleBoringEntry.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleBoringEntry.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleBoringEntry.setBorderLeft(BorderStyle.THIN);
+		styleBoringEntry.setBorderRight(BorderStyle.THIN);
 
 		styleBoringRedEntry = null;
 		try {
@@ -102,8 +103,8 @@ public class BinnerInfoSheetWriter extends BinnerSpreadSheetWriter {
 		styleBoringRedEntry.setIndention((short) indent);
 		styleBoringRedEntry.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleBoringRedEntry.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleBoringRedEntry.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleBoringRedEntry.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleBoringRedEntry.setBorderLeft(BorderStyle.THIN);
+		styleBoringRedEntry.setBorderRight(BorderStyle.THIN);
 		styleBoringRedEntry.getFont().setColor(ColorUtils.grabRGBColor(179, 0, 0));
 
 		try {
@@ -115,8 +116,8 @@ public class BinnerInfoSheetWriter extends BinnerSpreadSheetWriter {
 		styleBoringUnderlinedEntry.setIndention((short) indent);
 		styleBoringUnderlinedEntry.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleBoringUnderlinedEntry.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleBoringUnderlinedEntry.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleBoringUnderlinedEntry.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleBoringUnderlinedEntry.setBorderLeft(BorderStyle.THIN);
+		styleBoringUnderlinedEntry.setBorderRight(BorderStyle.THIN);
 		styleBoringUnderlinedEntry.getFont().setUnderline(FontUnderline.SINGLE);
 
 		try {
@@ -128,8 +129,8 @@ public class BinnerInfoSheetWriter extends BinnerSpreadSheetWriter {
 		styleBoringBoldUnderlinedEntry.setIndention((short) indent);
 		styleBoringBoldUnderlinedEntry.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleBoringBoldUnderlinedEntry.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleBoringBoldUnderlinedEntry.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleBoringBoldUnderlinedEntry.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleBoringBoldUnderlinedEntry.setBorderLeft(BorderStyle.THIN);
+		styleBoringBoldUnderlinedEntry.setBorderRight(BorderStyle.THIN);
 		styleBoringBoldUnderlinedEntry.getFont().setUnderline(FontUnderline.SINGLE);
 		styleBoringBoldUnderlinedEntry.getFont().setBold(true);
 
@@ -142,16 +143,17 @@ public class BinnerInfoSheetWriter extends BinnerSpreadSheetWriter {
 		styleBoringBold.setIndention((short) indent);
 		styleBoringBold.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleBoringBold.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleBoringBold.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleBoringBold.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleBoringBold.setBorderLeft(BorderStyle.THIN);
+		styleBoringBold.setBorderRight(BorderStyle.THIN);
 		styleBoringBold.getFont().setBold(true);
 		styleBoringBold.getFont().setUnderline(FontUnderline.NONE);
 
-		styleBoringBottom = (XSSFCellStyle) styleBoring.clone();
+		styleBoringBottom = (XSSFCellStyle)workBook.createCellStyle();
+		styleBoringBottom.cloneStyleFrom(styleBoring);		
 		styleBoringBottom.setBorderColor(BorderSide.TOP, colorBlack);
-		styleBoringBottom.setBorderTop(XSSFCellStyle.BORDER_THIN);
-		styleBoringBottom.setBorderLeft(XSSFCellStyle.BORDER_NONE);
-		styleBoringBottom.setBorderRight(XSSFCellStyle.BORDER_NONE);
-		styleBoringBottom.setBorderBottom(XSSFCellStyle.BORDER_NONE);
+		styleBoringBottom.setBorderTop(BorderStyle.THIN);
+		styleBoringBottom.setBorderLeft(BorderStyle.NONE);
+		styleBoringBottom.setBorderRight(BorderStyle.NONE);
+		styleBoringBottom.setBorderBottom(BorderStyle.NONE);
 	}
 }

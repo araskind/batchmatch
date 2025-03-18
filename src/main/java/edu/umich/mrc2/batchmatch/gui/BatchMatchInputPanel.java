@@ -22,11 +22,13 @@
 package edu.umich.mrc2.batchmatch.gui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.util.prefs.Preferences;
 
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -48,16 +50,21 @@ public abstract class BatchMatchInputPanel extends JPanel implements BackedByPre
 	
 	protected Preferences panelPreferences;
 
-	public BatchMatchInputPanel(String panelId, String panelTitle) {
+	public BatchMatchInputPanel(String panelId, String panelTitle, boolean isContainer) {
 		super();
 		this.panelId = panelId;
 		this.panelTitle = panelTitle;
+		Color titleColor = Color.BLACK;
+		Font titleFont  = UIManager.getDefaults().getFont("TitledBorder.font");
+		if(isContainer) {
+			titleColor = BinnerConstants.TITLE_COLOR;
+			titleFont = GUIUtils.boldFontForTitlePanel(null, false);
+		}
 		setBorder(new CompoundBorder(
 				new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, 
 				new Color(255, 255, 255), new Color(160, 160, 160)),
 				panelTitle, TitledBorder.LEADING, TitledBorder.TOP, 
-				GUIUtils.boldFontForTitlePanel(null, false), 
-				BinnerConstants.TITLE_COLOR), 
+				titleFont, titleColor), 
 				new EmptyBorder(10, 10, 10, 10)));
 		gridBagLayout = new GridBagLayout();		
 		setLayout(gridBagLayout);

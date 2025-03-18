@@ -160,11 +160,11 @@ public abstract class FileListLoaderDisplayPanel extends StickySettingsPanel {
 		batchIdxPanel = new DraggableListViewPanel(false, true) {
 
 			@Override
-			protected Boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
+			protected boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
 
 				updateMaps();
 
-				return null;
+				return true;
 			}
 
 		};
@@ -179,10 +179,9 @@ public abstract class FileListLoaderDisplayPanel extends StickySettingsPanel {
 		filePathPanel = new DraggableListViewPanel() {
 
 			@Override
-			protected Boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
+			protected boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
 				updateMaps();
-				// updateInterfaceForNewData(newSelection, strings);
-				return null;
+				return true;
 			}
 		};
 		filePathPanel.setOpaque(true);
@@ -197,7 +196,7 @@ public abstract class FileListLoaderDisplayPanel extends StickySettingsPanel {
 		mergeIdxPanel = new DraggableListViewPanel(true, true) {
 
 			@Override
-			protected Boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
+			protected boolean updateForNewOrdering(DefaultListModel<String> strings, Integer newSelection) {
 
 				updateMaps();
 

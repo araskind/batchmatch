@@ -42,9 +42,6 @@ public class BatchMatchMainWindow extends JFrame implements ActionListener, Wind
 
 	public BatchMatchMainWindow() {
 		
-		PostProcessUtils.ensureConfigDirectoryExists();
-		PostProcessUtils.ensureTempDirectoryExists();
-		
 		try {
 			// Set System L&F
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

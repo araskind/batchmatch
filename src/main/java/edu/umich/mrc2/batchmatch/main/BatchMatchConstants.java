@@ -10,8 +10,8 @@ public class BatchMatchConstants {
 	public static final String HOME_DIRECTORY = System.getProperty("user.home", "~") + FILE_SEPARATOR;
 	public static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	public static String CONFIGURATION_DIRECTORY = "BatchMatchConfiguration";
-	public static String SCRATCH_DIRECTORY = "BatchMatchScratchDirectory";
+	public static String CONFIGURATION_DIRECTORY = "config";
+	public static String TMP_DIRECTORY = "tmp";
 
 	public static String VERSION = "0.0.5";
 	public static String PROPS_FILE = "batchmatch.props" + "." + VERSION;

@@ -14,8 +14,10 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 
 import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
@@ -26,8 +28,7 @@ import edu.umich.mrc2.batchmatch.utils.MyDataFormatter;
 public class MetabolomicsDataReader {
 
 	protected Boolean foundIndex, foundGroupIsotope, foundAnnotation, foundGroupAnnotation, foundFurtherAnnotation;
-	protected Boolean foundFeature, foundRT, foundOldRT, foundMass, foundIntensity, foundKmd, foundIsotope,
-			foundDerivation;
+	protected Boolean foundFeature, foundRT, foundOldRT, foundMass, foundIntensity, foundKmd, foundIsotope, foundDerivation;
 	protected Boolean foundPutative, foundBin, foundCluster, foundRebinCluster, foundRTCluster, foundMassError;
 	protected Boolean foundCc, foundAdduct, foundMolecularIon;
 	protected Boolean foundRedundancyGroup, foundPctMissing, foundRSD, foundBatch;
@@ -42,10 +43,12 @@ public class MetabolomicsDataReader {
 	protected List<FeatureFromFile> featuresToSearch = null;
 
 	protected Boolean forMergeOutput = false;
-	private SimpleDateFormat dateFmt = new SimpleDateFormat("M/d/yyyy");
-	private MyDataFormatter formatter;
-	private String pasteValue, returnValue;
-	Boolean haveAlready = false, haveNow = false;
+	protected SimpleDateFormat dateFmt = new SimpleDateFormat("M/d/yyyy");
+	protected MyDataFormatter formatter;
+	protected String pasteValue;
+	protected String returnValue;
+	protected boolean haveAlready = false;
+	protected boolean haveNow = false;
 
 	public MetabolomicsDataReader(String filename) {
 		formatter = new MyDataFormatter();
@@ -55,8 +58,6 @@ public class MetabolomicsDataReader {
 	protected void initializeHeaderTagMap() {
 
 		headerTagMap = new HashMap<String, String>();
-
-		// System.out.println( "Initializing tag map");
 
 		for (String hdr : PostProccessConstants.BATCH_IDX_CHOICES_ARRAY)
 			headerTagMap.put(hdr, "batch");
@@ -356,11 +357,11 @@ public class MetabolomicsDataReader {
 		// cellExtension.setCell(cell);
 
 		switch (cell.getCellType()) {
-		case Cell.CELL_TYPE_BOOLEAN:
+		case BOOLEAN:
 			returnValue = "" + cell.getBooleanCellValue();
 			break;
 
-		case Cell.CELL_TYPE_STRING:
+		case STRING:
 			// bug?
 		default:
 			pasteValue = cell.getStringCellValue();
@@ -368,18 +369,17 @@ public class MetabolomicsDataReader {
 			pasteValue = pasteValue.replace("=", "");
 			returnValue = pasteValue;
 			break;
-		case Cell.CELL_TYPE_BLANK:
+		case BLANK:
 			returnValue = "";
 			break;
 
-		case Cell.CELL_TYPE_NUMERIC:
-			// if (DateUtil.isCellDateFormatted(cell)) {
+		case NUMERIC:
+
 			if (DateUtil.isCellDateFormatted(cell)) {
-				// SimpleDateFormat fmt = new SimpleDateFormat("M/d/yyyy");
+
 				returnValue = dateFmt.format(cell.getDateCellValue());
 			} else {
 				formatter = new MyDataFormatter();
-				// String formattedValue =
 				returnValue = formatter.formatCellValue(cell);
 			}
 			break;
@@ -471,9 +471,9 @@ public class MetabolomicsDataReader {
 	}
 
 	protected String pullValue(Row r, int col) {
-		// Cell c = r.getCell(col, Row.CREATE_NULL_AS_BLANK);
+
 		try {
-			return handleCell(r.getCell(col, Row.CREATE_NULL_AS_BLANK));
+			return handleCell(r.getCell(col, MissingCellPolicy.CREATE_NULL_AS_BLANK));
 		} catch (Exception e) {
 			System.out.println("Null cell");
 		}

@@ -45,8 +45,10 @@ public class BatchMatchDataSetSummaryWriter extends BatchMatchFeatureWriter {
 		XSSFCellStyle styleNumericGrey = grabStyleNumeric(workBook, true);
 		XSSFCellStyle styleBoringLeft = grabStyleBoringLeft(workBook);
 		XSSFCellStyle styleBoringLeftGrey = grabStyleBoringLeftGrey(workBook);
-		XSSFCellStyle styleToClone = styleList.get(BinnerConstants.STYLE_BORING_GREY);
-		XSSFCellStyle styleBoringBlueGrey = (XSSFCellStyle) styleToClone.clone();
+
+		XSSFCellStyle styleBoringBlueGrey = (XSSFCellStyle)workBook.createCellStyle();
+		styleBoringBlueGrey.cloneStyleFrom(styleList.get(BinnerConstants.STYLE_BORING_GREY));
+		
 		XSSFCellStyle styleBlankBoring = this.grabStyleBlankBoring(workBook);
 		XSSFCellStyle styleHeader = this.grabStyleBatchMatchHeader(workBook);
 		XSSFCellStyle styleBoringUnderlinedEntry = this.grabStyleBoringUnderlined(workBook);

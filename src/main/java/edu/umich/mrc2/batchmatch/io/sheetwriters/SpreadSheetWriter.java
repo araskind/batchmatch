@@ -334,7 +334,7 @@ public class SpreadSheetWriter implements Serializable {
 
 	public XSSFCellStyle grabStyleSubTitle(Workbook workBook, boolean larger) {
 		Font fontHeader = workBook.createFont();
-		fontHeader.setBoldweight(XSSFFont.BOLDWEIGHT_NORMAL);
+		fontHeader.setBold(true);
 		fontHeader.setFontHeightInPoints((short) (larger ? 18 : 16));
 		fontHeader.setItalic(true);
 		fontHeader.setColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
@@ -385,10 +385,10 @@ public class SpreadSheetWriter implements Serializable {
 		styleYellow.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleYellow.setBorderColor(BorderSide.RIGHT, colorBlack);
 
-		styleYellow.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-		styleYellow.setBorderTop(XSSFCellStyle.BORDER_THIN);
-		styleYellow.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleYellow.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleYellow.setBorderBottom(BorderStyle.THIN);
+		styleYellow.setBorderTop(BorderStyle.THIN);
+		styleYellow.setBorderLeft(BorderStyle.THIN);
+		styleYellow.setBorderRight(BorderStyle.THIN);
 
 		styleYellow.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
@@ -402,7 +402,7 @@ public class SpreadSheetWriter implements Serializable {
 			styleYellow.setFillForegroundColor(IndexedColors.DARK_YELLOW.getIndex());
 
 		styleYellow.setWrapText(wrapText);
-		styleYellow.setVerticalAlignment(XSSFCellStyle.VERTICAL_TOP);
+		styleYellow.setVerticalAlignment(VerticalAlignment.TOP);
 
 		return styleYellow;
 	}
@@ -418,17 +418,17 @@ public class SpreadSheetWriter implements Serializable {
 		styleLightBlue.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleLightBlue.setBorderColor(BorderSide.RIGHT, colorBlack);
 
-		styleLightBlue.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-		styleLightBlue.setBorderTop(XSSFCellStyle.BORDER_THIN);
-		styleLightBlue.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleLightBlue.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleLightBlue.setBorderBottom(BorderStyle.THIN);
+		styleLightBlue.setBorderTop(BorderStyle.THIN);
+		styleLightBlue.setBorderLeft(BorderStyle.THIN);
+		styleLightBlue.setBorderRight(BorderStyle.THIN);
 
 		styleLightBlue.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
 		styleLightBlue.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
 
 		styleLightBlue.setWrapText(true);
-		styleLightBlue.setVerticalAlignment(XSSFCellStyle.VERTICAL_TOP);
+		styleLightBlue.setVerticalAlignment(VerticalAlignment.TOP);
 
 		return styleLightBlue;
 	}
@@ -446,17 +446,17 @@ public class SpreadSheetWriter implements Serializable {
 		styleLightGreen.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleLightGreen.setBorderColor(BorderSide.RIGHT, colorBlack);
 
-		styleLightGreen.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-		styleLightGreen.setBorderTop(XSSFCellStyle.BORDER_THIN);
-		styleLightGreen.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleLightGreen.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleLightGreen.setBorderBottom(BorderStyle.THIN);
+		styleLightGreen.setBorderTop(BorderStyle.THIN);
+		styleLightGreen.setBorderLeft(BorderStyle.THIN);
+		styleLightGreen.setBorderRight(BorderStyle.THIN);
 
 		styleLightGreen.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
 		styleLightGreen.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
 
 		styleLightGreen.setWrapText(false);
-		styleLightGreen.setVerticalAlignment(XSSFCellStyle.VERTICAL_TOP);
+		styleLightGreen.setVerticalAlignment(VerticalAlignment.TOP);
 
 		return styleLightGreen;
 	}
@@ -469,7 +469,7 @@ public class SpreadSheetWriter implements Serializable {
 		styleYellow.setAlignment(HorizontalAlignment.CENTER);
 		styleYellow.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		styleYellow.setWrapText(false);
-		styleYellow.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		styleYellow.setVerticalAlignment(VerticalAlignment.CENTER);
 
 		XSSFColor color = ColorUtils.HSVtoRGBSimple(hue, saturation, vibrance);
 		styleYellow.setFillForegroundColor(color);
@@ -496,7 +496,7 @@ public class SpreadSheetWriter implements Serializable {
 		style.setFillForegroundColor(color);
 
 		style.setWrapText(false);
-		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
 
 		return style;
 	}
@@ -510,7 +510,7 @@ public class SpreadSheetWriter implements Serializable {
 		style.setLocked(true);
 		style.setAlignment(HorizontalAlignment.CENTER);
 		style.setWrapText(false);
-		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
+		style.setVerticalAlignment(VerticalAlignment.CENTER);
 
 		Font font = workBook.createFont();
 		font.setFontName("Courier");
@@ -523,7 +523,7 @@ public class SpreadSheetWriter implements Serializable {
 		style.setLocked(true);
 		style.setAlignment(HorizontalAlignment.CENTER);
 		style.setWrapText(wrapText);
-		style.setVerticalAlignment(XSSFCellStyle.VERTICAL_BOTTOM);
+		style.setVerticalAlignment(VerticalAlignment.BOTTOM);
 
 		Font font = workBook.createFont();
 		font.setFontName("Courier");
@@ -535,7 +535,7 @@ public class SpreadSheetWriter implements Serializable {
 		XSSFColor colorBlack = ColorUtils.grabRGBColor(255, 255, 255);
 		Font headerFont = workBook.createFont();
 		headerFont.setFontName("Courier");
-		headerFont.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		headerFont.setBold(true);
 		headerFont.setColor(IndexedColors.WHITE.getIndex());
 
 		XSSFCellStyle styleHeader = this.grabStyleBlue(workBook, false);
@@ -546,8 +546,8 @@ public class SpreadSheetWriter implements Serializable {
 		styleHeader.setIndention((short) 2);
 		styleHeader.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleHeader.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleHeader.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleHeader.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleHeader.setBorderLeft(BorderStyle.THIN);
+		styleHeader.setBorderRight(BorderStyle.THIN);
 		styleHeader.setFillForegroundColor(ColorUtils.grabFromHtml("#203764"));
 		styleHeader.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		styleHeader.setFont(headerFont);
@@ -567,8 +567,8 @@ public class SpreadSheetWriter implements Serializable {
 		styleBoringUnderlinedEntry.setAlignment(HorizontalAlignment.LEFT);
 		styleBoringUnderlinedEntry.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleBoringUnderlinedEntry.setBorderColor(BorderSide.RIGHT, colorBlack);
-		styleBoringUnderlinedEntry.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleBoringUnderlinedEntry.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleBoringUnderlinedEntry.setBorderLeft(BorderStyle.THIN);
+		styleBoringUnderlinedEntry.setBorderRight(BorderStyle.THIN);
 		styleBoringUnderlinedEntry.getFont().setUnderline(FontUnderline.SINGLE);
 		return styleBoringUnderlinedEntry;
 	}
@@ -606,10 +606,10 @@ public class SpreadSheetWriter implements Serializable {
 		XSSFCellStyle styleBlankBoring = grabStyleBoring(workBook);
 
 		styleBlankBoring.setAlignment(HorizontalAlignment.CENTER);
-		styleBlankBoring.setBorderBottom(XSSFCellStyle.BORDER_NONE);
-		styleBlankBoring.setBorderTop(XSSFCellStyle.BORDER_NONE);
-		styleBlankBoring.setBorderLeft(XSSFCellStyle.BORDER_NONE);
-		styleBlankBoring.setBorderRight(XSSFCellStyle.BORDER_NONE);
+		styleBlankBoring.setBorderBottom(BorderStyle.NONE);
+		styleBlankBoring.setBorderTop(BorderStyle.NONE);
+		styleBlankBoring.setBorderLeft(BorderStyle.NONE);
+		styleBlankBoring.setBorderRight(BorderStyle.NONE);
 		styleBlankBoring.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		styleBlankBoring.setFillForegroundColor(color);
 
@@ -626,7 +626,7 @@ public class SpreadSheetWriter implements Serializable {
 		styleYellow.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		styleYellow.setFillForegroundColor(IndexedColors.LEMON_CHIFFON.getIndex());
 		styleYellow.setWrapText(true);
-		styleYellow.setVerticalAlignment(XSSFCellStyle.VERTICAL_TOP);
+		styleYellow.setVerticalAlignment(VerticalAlignment.TOP);
 
 		return styleYellow;
 	}
@@ -652,7 +652,7 @@ public class SpreadSheetWriter implements Serializable {
 			styleWhite.setIndention((short) 5);
 		Font fontLabel = workBook.createFont();
 		fontLabel.setFontHeightInPoints((short) 16);
-		fontLabel.setBoldweight((short) 5);
+		fontLabel.setBold(true);
 		styleWhite.setFont(fontLabel);
 
 		if (bordered) {
@@ -663,10 +663,10 @@ public class SpreadSheetWriter implements Serializable {
 			styleWhite.setBorderColor(BorderSide.LEFT, colorGrey);
 			styleWhite.setBorderColor(BorderSide.RIGHT, colorGrey);
 
-			styleWhite.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-			styleWhite.setBorderTop(XSSFCellStyle.BORDER_THIN);
-			styleWhite.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-			styleWhite.setBorderRight(XSSFCellStyle.BORDER_THIN);
+			styleWhite.setBorderBottom(BorderStyle.THIN);
+			styleWhite.setBorderTop(BorderStyle.THIN);
+			styleWhite.setBorderLeft(BorderStyle.THIN);
+			styleWhite.setBorderRight(BorderStyle.THIN);
 
 			styleWhite.setAlignment(HorizontalAlignment.CENTER);
 		}
@@ -686,7 +686,7 @@ public class SpreadSheetWriter implements Serializable {
 			styleWhite.setIndention((short) 5);
 
 		Font fontLabel = workBook.createFont();
-		fontLabel.setBoldweight((short) 4);
+		fontLabel.setBold(true);
 		styleWhite.setFont(fontLabel);
 
 		if (bordered) {
@@ -697,10 +697,10 @@ public class SpreadSheetWriter implements Serializable {
 			styleWhite.setBorderColor(BorderSide.LEFT, color);
 			styleWhite.setBorderColor(BorderSide.RIGHT, color);
 
-			styleWhite.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-			styleWhite.setBorderTop(XSSFCellStyle.BORDER_THIN);
-			styleWhite.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-			styleWhite.setBorderRight(XSSFCellStyle.BORDER_THIN);
+			styleWhite.setBorderBottom(BorderStyle.THIN);
+			styleWhite.setBorderTop(BorderStyle.THIN);
+			styleWhite.setBorderLeft(BorderStyle.THIN);
+			styleWhite.setBorderRight(BorderStyle.THIN);
 
 			styleWhite.setAlignment(HorizontalAlignment.CENTER);
 		}
@@ -715,7 +715,7 @@ public class SpreadSheetWriter implements Serializable {
 
 	public XSSFCellStyle grabStyleBlue(Workbook workBook, boolean larger) {
 		Font fontHeaderWhite = workBook.createFont();
-		fontHeaderWhite.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		fontHeaderWhite.setBold(true);
 		fontHeaderWhite.setFontHeightInPoints(larger ? (short) 16 : (short) 12);
 		fontHeaderWhite.setColor(IndexedColors.WHITE.getIndex());
 
@@ -730,10 +730,10 @@ public class SpreadSheetWriter implements Serializable {
 		styleBlueHeader.setBorderColor(BorderSide.RIGHT, color);
 		styleBlueHeader.setAlignment(HorizontalAlignment.CENTER);
 
-		styleBlueHeader.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-		styleBlueHeader.setBorderTop(XSSFCellStyle.BORDER_THIN);
-		styleBlueHeader.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleBlueHeader.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleBlueHeader.setBorderBottom(BorderStyle.THIN);
+		styleBlueHeader.setBorderTop(BorderStyle.THIN);
+		styleBlueHeader.setBorderLeft(BorderStyle.THIN);
+		styleBlueHeader.setBorderRight(BorderStyle.THIN);
 
 		styleBlueHeader.setFont(fontHeaderWhite);
 		styleBlueHeader.setLocked(true);
@@ -747,7 +747,7 @@ public class SpreadSheetWriter implements Serializable {
 
 	public XSSFCellStyle grabStyleInstructions(Workbook workBook, boolean bottomAlign, boolean emphasize) {
 		Font fontHeader = workBook.createFont();
-		fontHeader.setBoldweight(XSSFFont.BOLDWEIGHT_NORMAL);
+		fontHeader.setBold(true);
 		fontHeader.setFontHeightInPoints(emphasize ? (short) 16 : (short) 12);
 		fontHeader.setItalic(true);
 		if (emphasize)
@@ -764,7 +764,7 @@ public class SpreadSheetWriter implements Serializable {
 
 	public XSSFCellStyle grabStylePageTitle(Workbook workBook, boolean bottomAlign, boolean larger) {
 		Font fontHeader = workBook.createFont();
-		fontHeader.setBoldweight(XSSFFont.BOLDWEIGHT_NORMAL);
+		fontHeader.setBold(true);
 		fontHeader.setFontHeightInPoints((short) (larger ? 16 : 12));
 		fontHeader.setItalic(true);
 		fontHeader.setColor(IndexedColors.DARK_BLUE.getIndex());
@@ -946,21 +946,21 @@ public class SpreadSheetWriter implements Serializable {
 		styleLavender.setBorderColor(BorderSide.LEFT, colorBlack);
 		styleLavender.setBorderColor(BorderSide.RIGHT, colorBlack);
 
-		styleLavender.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-		styleLavender.setBorderTop(XSSFCellStyle.BORDER_THIN);
-		styleLavender.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-		styleLavender.setBorderRight(XSSFCellStyle.BORDER_THIN);
+		styleLavender.setBorderBottom(BorderStyle.THIN);
+		styleLavender.setBorderTop(BorderStyle.THIN);
+		styleLavender.setBorderLeft(BorderStyle.THIN);
+		styleLavender.setBorderRight(BorderStyle.THIN);
 		styleLavender.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		styleLavender.setFillForegroundColor(ColorUtils.grabFromHtml("#ccccff"));
 		styleLavender.setWrapText(true);
-		styleLavender.setVerticalAlignment(XSSFCellStyle.VERTICAL_TOP);
+		styleLavender.setVerticalAlignment(VerticalAlignment.TOP);
 
 		return styleLavender;
 	}
 
 	protected XSSFCellStyle grabStyleChart(Workbook workBook, Boolean isNumeric) throws Exception {
 		Font fontChart = workBook.createFont();
-		fontChart.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		fontChart.setBold(true);
 		fontChart.setFontHeightInPoints((short) 14);
 		fontChart.setColor(IndexedColors.BLACK.getIndex());
 
@@ -985,7 +985,7 @@ public class SpreadSheetWriter implements Serializable {
 	protected XSSFCellStyle grabStyleChartBothBar(Workbook workBook, Boolean isNumeric, Boolean isRight)
 			throws Exception {
 		Font fontChart = workBook.createFont();
-		fontChart.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		fontChart.setBold(true);
 		fontChart.setFontHeightInPoints((short) 14);
 		fontChart.setColor(IndexedColors.BLACK.getIndex());
 

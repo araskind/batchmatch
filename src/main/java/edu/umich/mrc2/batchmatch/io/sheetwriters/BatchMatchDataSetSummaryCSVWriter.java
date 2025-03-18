@@ -8,6 +8,9 @@ package edu.umich.mrc2.batchmatch.io.sheetwriters;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -179,12 +182,14 @@ public class BatchMatchDataSetSummaryCSVWriter {
 
 			sb.append(BinnerConstants.LINE_SEPARATOR);
 		}
-
 		try {
-			FileUtils.writeStringToFile(outputFile, sb.toString(), null, false);
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			return null;
+			Files.writeString(outputFile.toPath(), 
+					sb.toString(), 
+					StandardCharsets.UTF_8,
+					StandardOpenOption.CREATE, 
+					StandardOpenOption.TRUNCATE_EXISTING);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		System.out.println("Final match counts (current iteration)");

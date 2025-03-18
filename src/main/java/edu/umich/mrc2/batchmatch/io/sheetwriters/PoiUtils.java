@@ -6,6 +6,7 @@ package edu.umich.mrc2.batchmatch.io.sheetwriters;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -59,8 +60,7 @@ public class PoiUtils {
 		if (rowHeight != null)
 			rowBlank.setHeightInPoints(rowHeight);
 
-		Cell cellBlank = rowBlank.createCell(col);
-		cellBlank.setCellType(Cell.CELL_TYPE_STRING);
+		Cell cellBlank = rowBlank.createCell(col, CellType.STRING);
 		cellBlank.setCellValue("" + cellValue);
 		if (cellStyle != null)
 			cellBlank.setCellStyle(cellStyle);
@@ -73,8 +73,7 @@ public class PoiUtils {
 		if (rowBlank == null)
 			rowBlank = sheet.createRow(row);
 
-		Cell cellBlank = rowBlank.createCell(col);
-		cellBlank.setCellType(Cell.CELL_TYPE_NUMERIC);
+		Cell cellBlank = rowBlank.createCell(col, CellType.NUMERIC);
 		cellBlank.setCellStyle(cellStyle);
 		cellBlank.setCellValue(Double.valueOf(cellValue));
 
@@ -82,8 +81,9 @@ public class PoiUtils {
 	}
 
 	public static Cell createRowEntryWithFormula(int row, int col, Sheet sheet, String formula, CellStyle cellStyle) {
+		
 		Cell cell = createRowEntry(row, col, sheet, "", cellStyle);
-		cell.setCellType(XSSFCell.CELL_TYPE_FORMULA);
+		//cell.setCellType(CellType.FORMULA);
 		cell.setCellFormula(formula);
 		return cell;
 	}
@@ -94,33 +94,34 @@ public class PoiUtils {
 
 	public static String getString(Cell cell, Boolean forceInteger) {
 		String value = "";
-		int type = cell.getCellType();
+		CellType type = cell.getCellType();
 
-		if (type == Cell.CELL_TYPE_FORMULA)
+		if (type.equals(CellType.FORMULA))
 			type = cell.getCachedFormulaResultType();
 
 		switch (type) {
-		case Cell.CELL_TYPE_BLANK:
-			value = "";
-			break;
-
-		case Cell.CELL_TYPE_BOOLEAN:
-			value = cell.getBooleanCellValue() ? "true" : "false";
-			break;
-		case Cell.CELL_TYPE_STRING:
-
-			value = cell.getStringCellValue();
-			break;
-		case Cell.CELL_TYPE_NUMERIC:
-			value = "" + cell.getNumericCellValue();
-			cell.setCellValue("" + value);
-			value = cell.getStringCellValue();
-			break;
-		case Cell.CELL_TYPE_ERROR:
-		default:
-			break;
+			case BLANK:
+				value = "";
+				break;
+	
+			case BOOLEAN:
+				value = cell.getBooleanCellValue() ? "true" : "false";
+				break;
+				
+			case STRING:
+				value = cell.getStringCellValue();
+				break;
+				
+			case NUMERIC:
+				value = "" + cell.getNumericCellValue();
+				cell.setCellValue("" + value);
+				value = cell.getStringCellValue();
+				break;
+				
+			case ERROR:
+			default:
+				break;
 		}
-
 		return value;
 	}
 }

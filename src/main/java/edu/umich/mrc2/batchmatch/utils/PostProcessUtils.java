@@ -20,42 +20,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.umich.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 
 public class PostProcessUtils {
-	
-	public static void ensureConfigDirectoryExists() {
-		
-		File directory = Paths.get(BatchMatchConstants.HOME_DIRECTORY, 
-				BatchMatchConstants.CONFIGURATION_DIRECTORY).toFile();				
-		if (!directory.exists()) {
-			try {
-				directory.mkdirs();
-			} catch (SecurityException se) {
-				se.printStackTrace();
-			}
-		}
-	}	
-
-	public static void ensureTempDirectoryExists() {
-
-		String tempDirName = getTempDirectoryName();
-		File directory = new File(tempDirName);
-		if (!directory.exists()) {
-			try {
-				directory.mkdirs();
-			} catch (SecurityException se) {
-				se.printStackTrace();
-			}
-		}
-	}
 
 	public static String getTempDirectoryName() {
-		
-		String tempDirName =  Paths.get(BatchMatchConstants.HOME_DIRECTORY, 
-				BatchMatchConstants.SCRATCH_DIRECTORY).toString();
-
-		return tempDirName;
+		return BatchMatch.tmpDir.getAbsolutePath();
 	}
 
 	public static String getBinnerProperty(String filename, String key) {
