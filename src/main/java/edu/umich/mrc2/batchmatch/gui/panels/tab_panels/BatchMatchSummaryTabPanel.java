@@ -45,7 +45,6 @@ import edu.umich.mrc2.batchmatch.io.sheetwriters.BatchMatchExpandedFeatureCSVWri
 import edu.umich.mrc2.batchmatch.io.sheetwriters.RecursiveLatticeFileWriter;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
 import edu.umich.mrc2.batchmatch.process.BatchMatchMatchGroupFilteringEngine;
 import edu.umich.mrc2.batchmatch.process.BatchMatchSummaryInfo;
 import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;

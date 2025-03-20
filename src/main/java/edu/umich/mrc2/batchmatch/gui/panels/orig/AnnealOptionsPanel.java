@@ -26,7 +26,6 @@ import edu.umich.mrc2.batchmatch.gui.LayoutItem;
 import edu.umich.mrc2.batchmatch.gui.LayoutUtils;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
 
 public abstract class AnnealOptionsPanel extends StickySettingsPanel {
 

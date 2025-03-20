@@ -19,35 +19,20 @@
  *
  ******************************************************************************/
 
-package edu.umich.mrc2.batchmatch.testpkg;
+package edu.umich.mrc2.batchmatch.gui.table;
 
-import java.io.File;
-import java.nio.file.Paths;
+public class BinnerInputTable extends BasicTable {
 
-import edu.umich.mrc2.batchmatch.main.config.FilePreferencesFactory;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-public class GUITestClass {
-
-	public static final String homeDirLocation = ".";
-	public static final File configFile = Paths.get(homeDirLocation, "BatchMatchConfig.txt").toFile();
-	
-	private static TestFrame mainWindow;
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		System.setProperty("java.util.prefs.PreferencesFactory", 
-				FilePreferencesFactory.class.getName());		
-		System.setProperty(FilePreferencesFactory.SYSTEM_PROPERTY_FILE, configFile.getAbsolutePath());
-		
-		mainWindow = new TestFrame();
-		mainWindow.setVisible(true);
+	public BinnerInputTable() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 	
-	public static void shutDown() {
-		
-		mainWindow.dispose();
-		System.gc();
-		System.exit(0);
-	}
+	
 
 }

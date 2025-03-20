@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-
 import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
 import edu.umich.mrc2.batchmatch.data.RtPair;
 import edu.umich.mrc2.batchmatch.data.comparators.FeatureByAbsDeltaRtComparator;

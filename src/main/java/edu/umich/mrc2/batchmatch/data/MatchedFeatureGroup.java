@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.umich.mrc2.batchmatch.data.comparators.FeatureByBatchComparator;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByRtAndMassComparator;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.utils.ListUtils;
 import edu.umich.mrc2.batchmatch.utils.StringUtils;

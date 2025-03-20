@@ -3,14 +3,12 @@ package edu.umich.mrc2.batchmatch.data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVParser;
-import au.com.bytecode.opencsv.CSVWriter;
 
 public class TextFile {
 
@@ -129,8 +127,7 @@ public class TextFile {
 		if (data.size() <= row || data.get(row) == null) {
 			return -1;
 		}
-
-		return data.get(row).size() - 1;
+		return data.get(row).size();
 	}
 
 	public List<String> getRawStringRow(int row) {

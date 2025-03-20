@@ -42,18 +42,8 @@ public class BatchMatchLatticeBuilder {
 			} catch (IOException ioe) {
 				ioe.printStackTrace();
 			}
-
-			// int binnerNameColIndex = -1;
-			// for (int colIndex = 0; colIndex <= textFile.getEndColIndex(0); colIndex++) {
-			// String colHeader = textFile.getString(0, colIndex);
-			// if (colHeader.contains("Binner name")) {
-			// binnerNameColIndex = colIndex;
-			// break;
-			// }
-			// }
-
 			int neutralMassColIndex = -1;
-			for (int colIndex = 0; colIndex <= textFile.getEndColIndex(0); colIndex++) {
+			for (int colIndex = 0; colIndex < textFile.getEndColIndex(0); colIndex++) {
 				String colHeader = textFile.getString(0, colIndex);
 				if (colHeader.contains("Monoisotopic M/Z")) {
 
@@ -61,16 +51,14 @@ public class BatchMatchLatticeBuilder {
 					break;
 				}
 			}
-
 			int rtExpectedColIndex = -1, rtObservedColIndex = -1;
-			for (int colIndex = 0; colIndex <= textFile.getEndColIndex(0); colIndex++) {
+			for (int colIndex = 0; colIndex < textFile.getEndColIndex(0); colIndex++) {
 				String colHeader = textFile.getString(0, colIndex);
 				if (colHeader.equals("RT expected") || colHeader.equals("RT observed")) {
 					rtExpectedColIndex = colIndex;
 					break;
 				}
 			}
-
 			for (int colIndex = 0; colIndex <= textFile.getEndColIndex(0); colIndex++) {
 				String colHeader = textFile.getString(0, colIndex);
 				if (colHeader.equals("RT observed")) {
@@ -81,7 +69,7 @@ public class BatchMatchLatticeBuilder {
 
 			ArrayList<Integer> mpColArray = new ArrayList<Integer>();
 
-			for (int colIndex = 0, mpIndex = 0; colIndex <= textFile.getEndColIndex(0); colIndex++) {
+			for (int colIndex = 0, mpIndex = 0; colIndex < textFile.getEndColIndex(0); colIndex++) {
 				String colHeader = textFile.getString(0, colIndex);
 				if (colHeader.contains("CS00000MP")) {
 					mpColArray.add(mpIndex++);

@@ -31,7 +31,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractButton;
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;

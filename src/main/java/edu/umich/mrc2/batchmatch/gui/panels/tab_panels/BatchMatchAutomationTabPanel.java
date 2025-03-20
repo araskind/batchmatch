@@ -51,7 +51,6 @@ import edu.umich.mrc2.batchmatch.io.sheetwriters.BatchMatchNamedResultsWriter;
 import edu.umich.mrc2.batchmatch.io.sheetwriters.RecursiveLatticeFileWriter;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
 import edu.umich.mrc2.batchmatch.process.BatchDataMerger;
 import edu.umich.mrc2.batchmatch.process.BatchDataShifter;
 import edu.umich.mrc2.batchmatch.process.BatchMatchMappingFileInfo;

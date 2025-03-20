@@ -24,7 +24,6 @@ import javax.swing.event.ChangeListener;
 
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
 
 //> 2
 

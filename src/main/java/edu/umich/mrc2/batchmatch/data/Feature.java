@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.utils.ObjectHandler;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
-
 public class Feature {
 	private String name = null;
 	private Double mass = null;

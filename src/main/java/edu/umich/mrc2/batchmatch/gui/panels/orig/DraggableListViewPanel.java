@@ -1,7 +1,6 @@
 package edu.umich.mrc2.batchmatch.gui.panels.orig;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;

@@ -2,7 +2,6 @@ package edu.umich.mrc2.batchmatch.main;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.prefs.Preferences;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -10,7 +9,6 @@ import org.apache.log4j.Logger;
 import edu.umich.mrc2.batchmatch.gui.BatchMatchMainWindow;
 import edu.umich.mrc2.batchmatch.main.config.FilePreferencesFactory;
 import edu.umich.mrc2.batchmatch.preferences.AppData;
-import edu.umich.mrc2.batchmatch.utils.PostProcessUtils;
 
 public class BatchMatch {
 

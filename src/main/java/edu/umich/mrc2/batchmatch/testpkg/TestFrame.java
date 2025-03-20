@@ -22,44 +22,21 @@
 package edu.umich.mrc2.batchmatch.testpkg;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.HeadlessException;
 import java.awt.LayoutManager;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.gui.GUIUtils;
 import edu.umich.mrc2.batchmatch.gui.jnafilechooser.CommonFileTypes;
 import edu.umich.mrc2.batchmatch.gui.jnafilechooser.FileChooserAction;
 import edu.umich.mrc2.batchmatch.gui.jnafilechooser.api.JnaFileChooser.Mode;
 import edu.umich.mrc2.batchmatch.gui.panels.BatchMatchTestFileSelectorPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.DraggableListViewPanel;
-import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
-import edu.umich.mrc2.batchmatch.main.BinnerConstants;
 
 public class TestFrame extends JFrame implements WindowListener {
 
