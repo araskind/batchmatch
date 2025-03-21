@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.umich.mrc2.batchmatch.data.BinnerGroup;
+import edu.umich.mrc2.batchmatch.data.orig.BinnerGroup;
 
 public class BinnerOutput implements Serializable {
 	private static final long serialVersionUID = -9094076418500095505L;

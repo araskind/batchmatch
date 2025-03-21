@@ -21,8 +21,8 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.utils.PostProcessMergeNameExtractor;
-import edu.umich.mrc2.batchmatch.utils.RecentSelectionUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.PostProcessMergeNameExtractor;
+import edu.umich.mrc2.batchmatch.utils.orig.RecentSelectionUtils;
 
 public class PopupChecklist extends JDialog {
 

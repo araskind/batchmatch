@@ -14,9 +14,9 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import edu.umich.mrc2.batchmatch.data.TextFile;
+import edu.umich.mrc2.batchmatch.data.orig.TextFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class FeatureListReader {
 

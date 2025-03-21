@@ -20,11 +20,11 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.data.FeatureInfoForMatchGroupMapping;
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureInfoForMatchGroupMapping;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.io.sheetreaders.DataSetMappingReader;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.utils.BinnerFileUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerFileUtils;
 
 
 public class DataSetMappingLoaderPanel extends StickySettingsPanel {

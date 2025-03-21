@@ -10,11 +10,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
-import edu.umich.mrc2.batchmatch.data.AnalysisData;
-import edu.umich.mrc2.batchmatch.data.BinnerGroup;
-import edu.umich.mrc2.batchmatch.data.Feature;
+import edu.umich.mrc2.batchmatch.data.orig.AnalysisData;
+import edu.umich.mrc2.batchmatch.data.orig.BinnerGroup;
+import edu.umich.mrc2.batchmatch.data.orig.Feature;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BinnerNonAnnotatedFeatureWriter extends BinnerSpreadSheetWriterBatchMatch implements Serializable {
 	protected static final long serialVersionUID = -118116585712037767L;

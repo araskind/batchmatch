@@ -12,11 +12,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByRedGrpMassAndRtComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.FeatureByRedGrpMassAndRtComparator;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BatchMatchExpandedFeatureCSVWriter extends CSVWriter {
 

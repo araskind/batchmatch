@@ -27,9 +27,9 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.data.RtPair;
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
-import edu.umich.mrc2.batchmatch.data.comparators.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.orig.RtPair;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.gui.LayoutUtils;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.AbstractStickyFileLocationPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.BatchMatchLatticeTypePanel;
@@ -41,8 +41,8 @@ import edu.umich.mrc2.batchmatch.io.sheetreaders.MetabolomicsTargetedDataLoader;
 import edu.umich.mrc2.batchmatch.io.sheetwriters.AnchorFileWriter;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.utils.BatchMatchLatticeBuilder;
-import edu.umich.mrc2.batchmatch.utils.ListUtils;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchLatticeBuilder;
+import edu.umich.mrc2.batchmatch.utils.orig.ListUtils;
 
 public class BatchMatchNewWorkflowTabPanel extends StickySettingsPanel {
 

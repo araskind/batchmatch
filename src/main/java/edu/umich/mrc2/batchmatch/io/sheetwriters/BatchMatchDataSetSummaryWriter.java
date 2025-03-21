@@ -19,7 +19,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
 
 public class BatchMatchDataSetSummaryWriter extends BatchMatchFeatureWriter {
 

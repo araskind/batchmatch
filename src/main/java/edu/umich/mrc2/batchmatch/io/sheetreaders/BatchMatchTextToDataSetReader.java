@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.TextFile;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.TextFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 //FeatureInfo
 //Salts

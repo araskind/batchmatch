@@ -32,14 +32,14 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.gui.LayoutGrid;
 import edu.umich.mrc2.batchmatch.gui.LayoutItem;
 import edu.umich.mrc2.batchmatch.gui.LayoutUtils;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.utils.BinnerFileUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerFileUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public abstract class FileListLoaderDisplayPanel extends StickySettingsPanel {
 

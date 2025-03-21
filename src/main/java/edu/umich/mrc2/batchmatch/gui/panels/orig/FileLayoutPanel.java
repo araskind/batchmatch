@@ -23,7 +23,7 @@ import edu.umich.mrc2.batchmatch.gui.ChecklistParameters;
 import edu.umich.mrc2.batchmatch.gui.PopupChecklist;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.utils.ListUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.ListUtils;
 
 public abstract class FileLayoutPanel extends StickySettingsPanel {
 

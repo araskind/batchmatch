@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.data.FeatureInfoForMatchGroupMapping;
-import edu.umich.mrc2.batchmatch.data.TextFile;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureInfoForMatchGroupMapping;
+import edu.umich.mrc2.batchmatch.data.orig.TextFile;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class DataSetMappingReader {
 

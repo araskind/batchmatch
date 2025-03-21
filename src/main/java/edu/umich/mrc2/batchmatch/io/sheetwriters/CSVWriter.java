@@ -7,8 +7,8 @@ package edu.umich.mrc2.batchmatch.io.sheetwriters;
 
 import java.io.File;
 
-import edu.umich.mrc2.batchmatch.utils.BinnerNumUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerNumUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class CSVWriter {
 

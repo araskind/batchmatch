@@ -20,8 +20,8 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.data.FeatureInfoForMatchGroupMapping;
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureInfoForMatchGroupMapping;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.gui.LayoutUtils;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.AbstractStickyFileLocationPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.BatchMatchCSVReportLoaderPanel;
@@ -32,8 +32,8 @@ import edu.umich.mrc2.batchmatch.gui.panels.orig.StickySettingsPanel;
 import edu.umich.mrc2.batchmatch.io.sheetwriters.BatchMatchExpandedFeatureCSVWriter;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.process.TwoStageAnalysisEngine;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.process.orig.TwoStageAnalysisEngine;
 
 public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 

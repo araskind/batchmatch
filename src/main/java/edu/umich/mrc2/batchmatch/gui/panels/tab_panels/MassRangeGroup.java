@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.MatchedFeatureGroup;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.MatchedFeatureGroup;
 
 public class MassRangeGroup {
 

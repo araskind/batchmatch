@@ -25,7 +25,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchAutomationTabPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchNamedUnnamedComparisonTabPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchNewWorkflowTabPanel;

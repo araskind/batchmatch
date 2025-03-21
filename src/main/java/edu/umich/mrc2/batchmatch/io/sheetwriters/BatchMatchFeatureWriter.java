@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
-import edu.umich.mrc2.batchmatch.data.Feature;
+import edu.umich.mrc2.batchmatch.data.orig.Feature;
 
 public class BatchMatchFeatureWriter extends BinnerSpreadSheetWriter implements Serializable {
 	protected static final long serialVersionUID = -118116585712037767L;

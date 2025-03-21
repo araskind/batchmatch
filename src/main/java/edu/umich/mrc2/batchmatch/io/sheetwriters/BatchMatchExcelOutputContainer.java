@@ -17,10 +17,10 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.BatchMatchSummaryInfo;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchSummaryInfo;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
 
 public class BatchMatchExcelOutputContainer extends BinnerSpreadSheetWriter implements Serializable {
 

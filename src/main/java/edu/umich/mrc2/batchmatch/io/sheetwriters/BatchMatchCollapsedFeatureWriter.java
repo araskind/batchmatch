@@ -22,13 +22,13 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder.BorderSide;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByRedGrpMassAndRtComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.FeatureByRedGrpMassAndRtComparator;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.ListUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.ListUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BatchMatchCollapsedFeatureWriter extends BatchMatchFeatureWriter {
 

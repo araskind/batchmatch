@@ -25,13 +25,13 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.data.TextFile;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByMassAndRtComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.FeatureByMassAndRtComparator;
+import edu.umich.mrc2.batchmatch.data.orig.TextFile;
 import edu.umich.mrc2.batchmatch.io.sheetreaders.BinnerTextToDataSetReader;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.BinnerFileUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerFileUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 

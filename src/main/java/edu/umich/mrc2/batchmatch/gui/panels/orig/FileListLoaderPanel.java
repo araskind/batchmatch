@@ -24,11 +24,11 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
-import edu.umich.mrc2.batchmatch.data.TextFile;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
+import edu.umich.mrc2.batchmatch.data.orig.TextFile;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.utils.BinnerFileUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerFileUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public abstract class FileListLoaderPanel extends StickySettingsPanel {
 

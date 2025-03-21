@@ -23,7 +23,7 @@ import edu.umich.mrc2.batchmatch.gui.NumberVerifier;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class MultipleParametersPanel extends StickySettingsPanel {
 

@@ -17,13 +17,13 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 
-import edu.umich.mrc2.batchmatch.data.AnalysisData;
-import edu.umich.mrc2.batchmatch.data.BinnerGroup;
-import edu.umich.mrc2.batchmatch.data.Feature;
-import edu.umich.mrc2.batchmatch.data.IndexListItem;
-import edu.umich.mrc2.batchmatch.utils.BinnerNumUtils;
-import edu.umich.mrc2.batchmatch.utils.ListUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.data.orig.AnalysisData;
+import edu.umich.mrc2.batchmatch.data.orig.BinnerGroup;
+import edu.umich.mrc2.batchmatch.data.orig.Feature;
+import edu.umich.mrc2.batchmatch.data.orig.IndexListItem;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerNumUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.ListUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BinnerSpreadSheetWriterBatchMatch extends SpreadSheetWriter implements Serializable {
 	private static final long serialVersionUID = -6273318608527606812L;

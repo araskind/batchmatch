@@ -30,17 +30,17 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.FeatureMatch;
-import edu.umich.mrc2.batchmatch.data.MassRangeGroup;
-import edu.umich.mrc2.batchmatch.data.MatchedFeatureGroup;
-import edu.umich.mrc2.batchmatch.data.comparators.MatchedFeatureGroupByNameTagComparator;
-import edu.umich.mrc2.batchmatch.process.BatchMatchMappingFileInfo;
-import edu.umich.mrc2.batchmatch.process.BatchMatchNamedMassResults;
-import edu.umich.mrc2.batchmatch.process.BatchMatchSummaryInfo;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.ListUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.MatchedFeatureGroupByNameTagComparator;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureMatch;
+import edu.umich.mrc2.batchmatch.data.orig.MassRangeGroup;
+import edu.umich.mrc2.batchmatch.data.orig.MatchedFeatureGroup;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchMappingFileInfo;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchNamedMassResults;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchSummaryInfo;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.ListUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BatchMatchNamedResultsWriter extends BinnerSpreadSheetWriter {
 

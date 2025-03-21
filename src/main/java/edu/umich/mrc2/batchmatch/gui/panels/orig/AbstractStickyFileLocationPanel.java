@@ -26,8 +26,8 @@ import javax.swing.border.TitledBorder;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
-import edu.umich.mrc2.batchmatch.utils.PostProcessUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.PostProcessUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public abstract class AbstractStickyFileLocationPanel extends StickySettingsPanel {
 

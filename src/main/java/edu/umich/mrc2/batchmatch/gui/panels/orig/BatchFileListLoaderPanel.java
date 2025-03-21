@@ -7,7 +7,7 @@ package edu.umich.mrc2.batchmatch.gui.panels.orig;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.io.sheetreaders.MetabolomicsIntensityDataLoader;
 
 //Select All

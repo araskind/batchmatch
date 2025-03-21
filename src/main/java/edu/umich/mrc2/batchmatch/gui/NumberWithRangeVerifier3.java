@@ -7,7 +7,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import edu.umich.mrc2.batchmatch.utils.BinnerNumUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerNumUtils;
 
 public class NumberWithRangeVerifier3 extends InputVerifier {
 	private String lastGood;

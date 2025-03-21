@@ -17,18 +17,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.RtPair;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByAbsDeltaRtComparator;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByBatchAndMassComparator;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByMassComparator;
-import edu.umich.mrc2.batchmatch.data.comparators.FeatureByRtOnlyComparator;
-import edu.umich.mrc2.batchmatch.data.comparators.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.FeatureByAbsDeltaRtComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.FeatureByBatchAndMassComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.FeatureByMassComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.FeatureByRtOnlyComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.RtPair;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.BacktrackingEngine;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.ListUtils;
+import edu.umich.mrc2.batchmatch.process.orig.BacktrackingEngine;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.ListUtils;
 
 public class BatchMatchDataSetSummaryCSVWriter {
 

@@ -17,8 +17,8 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 
-import edu.umich.mrc2.batchmatch.utils.BinnerNumUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.BinnerNumUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BinnerSpreadSheetWriter extends SpreadSheetWriter implements Serializable {
 	private static final long serialVersionUID = -6273318608527606812L;

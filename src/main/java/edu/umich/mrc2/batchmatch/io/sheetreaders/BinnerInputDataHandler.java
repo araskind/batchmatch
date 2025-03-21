@@ -15,13 +15,13 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.TextFile;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.TextFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BinnerInputDataHandler {
 

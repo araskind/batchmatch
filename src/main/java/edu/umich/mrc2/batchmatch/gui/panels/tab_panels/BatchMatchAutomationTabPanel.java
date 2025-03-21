@@ -27,12 +27,12 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.data.AnchorMap;
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.FeatureMatch;
-import edu.umich.mrc2.batchmatch.data.RtPair;
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
-import edu.umich.mrc2.batchmatch.data.comparators.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.orig.AnchorMap;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureMatch;
+import edu.umich.mrc2.batchmatch.data.orig.RtPair;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.AbstractStickyFileLocationPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.AnchorLoaderPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.BatchFileListLoaderPanel;
@@ -51,16 +51,16 @@ import edu.umich.mrc2.batchmatch.io.sheetwriters.BatchMatchNamedResultsWriter;
 import edu.umich.mrc2.batchmatch.io.sheetwriters.RecursiveLatticeFileWriter;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.BatchDataMerger;
-import edu.umich.mrc2.batchmatch.process.BatchDataShifter;
-import edu.umich.mrc2.batchmatch.process.BatchMatchMappingFileInfo;
-import edu.umich.mrc2.batchmatch.process.BatchNamedDataIntegrator;
-import edu.umich.mrc2.batchmatch.process.CompoundMatchDisambiguationEngine;
-import edu.umich.mrc2.batchmatch.process.LatticeMixer;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.ListUtils;
-import edu.umich.mrc2.batchmatch.utils.PostProcessUtils;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.process.orig.BatchDataMerger;
+import edu.umich.mrc2.batchmatch.process.orig.BatchDataShifter;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchMappingFileInfo;
+import edu.umich.mrc2.batchmatch.process.orig.BatchNamedDataIntegrator;
+import edu.umich.mrc2.batchmatch.process.orig.CompoundMatchDisambiguationEngine;
+import edu.umich.mrc2.batchmatch.process.orig.LatticeMixer;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.ListUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.PostProcessUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 

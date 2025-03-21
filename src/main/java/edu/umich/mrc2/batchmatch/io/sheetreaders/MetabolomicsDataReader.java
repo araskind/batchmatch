@@ -18,11 +18,11 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.mrc2.batchmatch.main.PostProccessConstants;
-import edu.umich.mrc2.batchmatch.utils.MyDataFormatter;
+import edu.umich.mrc2.batchmatch.utils.orig.MyDataFormatter;
 
 public class MetabolomicsDataReader {
 

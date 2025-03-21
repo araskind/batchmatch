@@ -16,12 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.umich.mrc2.batchmatch.data.AnchorMap;
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.RtPair;
-import edu.umich.mrc2.batchmatch.data.comparators.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.comparators.orig.RtPairComparator;
+import edu.umich.mrc2.batchmatch.data.orig.AnchorMap;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.RtPair;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
 
 public class RecursiveLatticeFileWriter {
 

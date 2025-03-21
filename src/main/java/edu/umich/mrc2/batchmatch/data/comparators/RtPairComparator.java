@@ -1,22 +1,61 @@
-////////////////////////////////////////////////////
-// RtPairComparator.java
-// Written by Jan Wigginton, October 2019
-////////////////////////////////////////////////////
+/*******************************************************************************
+ *
+ * (C) Copyright 2018-2020 MRC2 (http://mrc2.umich.edu).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Contributors:
+ * Alexander Raskind (araskind@med.umich.edu)
+ *
+ ******************************************************************************/
 
 package edu.umich.mrc2.batchmatch.data.comparators;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
 import edu.umich.mrc2.batchmatch.data.RtPair;
 
-public class RtPairComparator implements Comparator<RtPair>, Serializable {
+public class RtPairComparator extends ObjectCompatrator<RtPair> {
 
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
+
+	public RtPairComparator(SortProperty property, SortDirection direction) {
+		super(property, direction);
+	}
+
+	public RtPairComparator(SortProperty property) {
+		super(property);
+	}
+	
 	@Override
 	public int compare(RtPair pair1, RtPair pair2) {
-		return (((Double) (1000000.0 * pair1.getRt1() + pair1.getRt2()))
-				.compareTo(((Double) (1000000.0 * pair2.getRt1() + pair2.getRt2()))));
+		
+		int result = 0;
+		switch (property) {
+				
+			case RT:
+				result = Double.compare(pair1.getAverageRT(), pair2.getAverageRT());
+	
+				if (direction == SortDirection.ASC)
+					return result;
+				else
+					return -result;
+				
+			default:
+				break;
+		}
+		throw (new IllegalStateException());		
 	}
 }

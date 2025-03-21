@@ -1,104 +1,84 @@
+/*******************************************************************************
+ *
+ * (C) Copyright 2018-2020 MRC2 (http://mrc2.umich.edu).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Contributors:
+ * Alexander Raskind (araskind@med.umich.edu)
+ *
+ ******************************************************************************/
+
 package edu.umich.mrc2.batchmatch.data;
 
-import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
+import java.util.Map;
+import java.util.TreeMap;
+
+import edu.umich.mrc2.batchmatch.data.enums.RTValueSource;
 
 public class BatchMatchFeatureInfo {
-	private Double mass = null;
-	private Double rtFromBinnerName = null;
-	private Double rtFromBatchExpected = null;
-	private Double rtFromBatchObserved = null;
-	private Double rtFromConversion = null;
-	private Double intensity = null;
-	private Integer batch = null;
 
+	private double mass = -1.0d;
+	private double intensity = -1.0d;
+	private int batch = -1;
+	private Map<RTValueSource,Double>rtMap;
+	
 	public BatchMatchFeatureInfo() {
+		super();
+		rtMap = new TreeMap<RTValueSource,Double>();
 	}
 
-	public Double getSpecifiedRt(Integer rtToUse) {
-		if (BatchMatchConstants.RT_FROM_BINNER_NAME.equals(rtToUse)) {
-			return getRtFromBinnerName();
-		}
-		if (BatchMatchConstants.RT_FROM_BATCH_EXPECTED.equals(rtToUse)) {
-			return getRtFromBatchExpected();
-		}
-		if (BatchMatchConstants.RT_FROM_BATCH_OBSERVED.equals(rtToUse)) {
-			return getRtFromBatchObserved();
-		}
-		if (BatchMatchConstants.RT_FROM_CONVERSION.equals(rtToUse)) {
-			return getRtFromConversion();
-		}
-		return null;
-	}
-
-	public String getAppropriateRtTag(Integer rtToUse) {
-		if (BatchMatchConstants.RT_FROM_BINNER_NAME.equals(rtToUse)) {
-			return "PAR";
-		}
-		if (BatchMatchConstants.RT_FROM_BATCH_EXPECTED.equals(rtToUse)) {
-			return "EXP";
-		}
-		if (BatchMatchConstants.RT_FROM_BATCH_OBSERVED.equals(rtToUse)) {
-			return "OBS";
-		}
-		if (BatchMatchConstants.RT_FROM_CONVERSION.equals(rtToUse)) {
-			return "CON";
-		}
-		return "UNK";
-	}
-
-	public Double getMass() {
+	public double getMass() {
 		return mass;
 	}
 
-	public void setMass(Double mass) {
+	public void setMass(double mass) {
 		this.mass = mass;
 	}
 
-	public Double getRtFromBinnerName() {
-		return rtFromBinnerName;
-	}
-
-	public void setRtFromBinnerName(Double rtFromBinnerName) {
-		this.rtFromBinnerName = rtFromBinnerName;
-	}
-
-	public Double getRtFromBatchExpected() {
-		return rtFromBatchExpected;
-	}
-
-	public void setRtFromBatchExpected(Double rtFromBatchExpected) {
-		this.rtFromBatchExpected = rtFromBatchExpected;
-	}
-
-	public Double getRtFromBatchObserved() {
-		return rtFromBatchObserved;
-	}
-
-	public void setRtFromBatchObserved(Double rtFromBatchObserved) {
-		this.rtFromBatchObserved = rtFromBatchObserved;
-	}
-
-	public Double getRtFromConversion() {
-		return rtFromConversion;
-	}
-
-	public void setRtFromConversion(Double rtFromConversion) {
-		this.rtFromConversion = rtFromConversion;
-	}
-
-	public Double getIntensity() {
+	public double getIntensity() {
 		return intensity;
 	}
 
-	public void setIntensity(Double intensity) {
+	public void setIntensity(double intensity) {
 		this.intensity = intensity;
 	}
 
-	public Integer getBatch() {
+	public int getBatch() {
 		return batch;
 	}
 
-	public void setBatch(Integer batch) {
+	public void setBatch(int batch) {
 		this.batch = batch;
+	}
+	
+	public void setRTofType(double rt, RTValueSource type) {
+		rtMap.put(type, rt);
+	}
+	
+	public double getRTofType(RTValueSource type) {
+		
+		if(rtMap.containsKey(type))
+			return rtMap.get(type);
+		else
+			return -1.0d;
+	}
+	
+	public double getObservedRt() {
+		
+		if(rtMap.containsKey(RTValueSource.FROM_BATCH_OBSERVED))
+			return rtMap.get(RTValueSource.FROM_BATCH_OBSERVED);
+		else
+			return -1.0d;
 	}
 }

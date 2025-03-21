@@ -24,8 +24,8 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
-import edu.umich.mrc2.batchmatch.data.SharedAnalysisSettings;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
 import edu.umich.mrc2.batchmatch.gui.LayoutUtils;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.AbstractStickyFileLocationPanel;
 import edu.umich.mrc2.batchmatch.gui.panels.orig.BatchFileListLoaderPanel;
@@ -45,11 +45,11 @@ import edu.umich.mrc2.batchmatch.io.sheetwriters.BatchMatchExpandedFeatureCSVWri
 import edu.umich.mrc2.batchmatch.io.sheetwriters.RecursiveLatticeFileWriter;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.process.BatchMatchMatchGroupFilteringEngine;
-import edu.umich.mrc2.batchmatch.process.BatchMatchSummaryInfo;
-import edu.umich.mrc2.batchmatch.process.PostProcessDataSet;
-import edu.umich.mrc2.batchmatch.utils.PostProcessMergeNameExtractor;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchMatchGroupFilteringEngine;
+import edu.umich.mrc2.batchmatch.process.orig.BatchMatchSummaryInfo;
+import edu.umich.mrc2.batchmatch.process.orig.PostProcessDataSet;
+import edu.umich.mrc2.batchmatch.utils.orig.PostProcessMergeNameExtractor;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 

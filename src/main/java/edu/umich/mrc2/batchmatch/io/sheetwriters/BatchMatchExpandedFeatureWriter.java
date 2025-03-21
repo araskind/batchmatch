@@ -16,10 +16,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 
-import edu.umich.mrc2.batchmatch.data.FeatureFromFile;
+import edu.umich.mrc2.batchmatch.data.orig.FeatureFromFile;
 import edu.umich.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.mrc2.batchmatch.main.BinnerConstants;
-import edu.umich.mrc2.batchmatch.utils.StringUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class BatchMatchExpandedFeatureWriter extends BatchMatchFeatureWriter {
 

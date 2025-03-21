@@ -26,7 +26,7 @@ import javax.swing.event.DocumentListener;
 import edu.umich.mrc2.batchmatch.io.sheetwriters.BinnerDecimalTextFieldPair3;
 import edu.umich.mrc2.batchmatch.preferences.BinnerStickySettings;
 import edu.umich.mrc2.batchmatch.preferences.BinnerStickyStringSettings;
-import edu.umich.mrc2.batchmatch.utils.PostProcessUtils;
+import edu.umich.mrc2.batchmatch.utils.orig.PostProcessUtils;
 
 public class StickySettingsPanel extends JPanel implements ItemListener {
 	
