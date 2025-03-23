@@ -21,31 +21,36 @@
 
 package edu.umich.med.mrc2.batchmatch.gui.table;
 
+import java.awt.Component;
 import java.io.File;
 
-public class BinnerInputTableModel extends BasicTableModel {
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 
+public class FileNameRenderer extends DefaultTableCellRenderer {
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 5606480088624625214L;
 
-	public static final String BATCH_NUMBER_COLUMN = "Batch ##";
-	public static final String PEAK_AREAS_FILE_COLUMN = "Peak areas file";
-	public static final String BINNER_OUTPUT_FILE_COLUMN = "Binner output file";
-	public static final String PRIMARY_BATCH_COLUMN = "Primary";
-	
-	public BinnerInputTableModel() {
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+			int row, int column) {
 
-		super();
+		Component rendererComponent = 
+				table.prepareRenderer(new DefaultTableCellRenderer(), row, column);
+		setForeground(rendererComponent.getForeground());
+		setBackground(rendererComponent.getBackground());
+		setFont(rendererComponent.getFont());
 
-		columnArray = new ColumnContext[] {
-			new ColumnContext(BATCH_NUMBER_COLUMN, BATCH_NUMBER_COLUMN, Integer.class, false),	
-			new ColumnContext(PEAK_AREAS_FILE_COLUMN, PEAK_AREAS_FILE_COLUMN, File.class, true),
-			new ColumnContext(BINNER_OUTPUT_FILE_COLUMN, BINNER_OUTPUT_FILE_COLUMN, File.class, true),
-			new ColumnContext(PRIMARY_BATCH_COLUMN, PRIMARY_BATCH_COLUMN, Boolean.class, true),
-		};
+		if(value == null){
+			setText("");
+			return this;
+		}
+		if (value instanceof File)
+			setText(((File) value).getName());
+		
+		return this;
 	}
-	
-	
 }

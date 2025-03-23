@@ -22,6 +22,7 @@
 package edu.umich.med.mrc2.batchmatch.gui.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -114,4 +115,13 @@ public class BasicTableModel extends DefaultTableModel implements Reorderable {
 	public void reorder(int fromIndex, int toIndex) {
 		moveRow(fromIndex, fromIndex, toIndex);
 	}
+	
+	public void removeRows(int[] indices) {
+	    Arrays.sort(indices);
+	    for (int i = indices.length - 1; i >= 0; i--)
+	        this.dataVector.remove(indices[i]);
+	        
+	    
+	    fireTableRowsDeleted(indices[0], indices[indices.length - 1]);
+	}	
 }

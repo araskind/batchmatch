@@ -38,6 +38,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 public class BasicTable extends JTable {
 
@@ -50,6 +52,9 @@ public class BasicTable extends JTable {
 	public static final Color WHITE_COLOR = Color.WHITE;
 	
 	protected BasicTableModel model;
+	protected TableRowSorter<? extends TableModel> rowSorter;
+	protected RadioButtonRenderer radioRenderer;
+	protected RadioButtonEditor radioEditor;
 
 	public BasicTable() {
 		super();
@@ -104,6 +109,14 @@ public class BasicTable extends JTable {
 			}
 		}
 		return returnComp;
+	}
+	
+	public void clearTable() {
+		
+		if(getModel().getRowCount() == 0)
+			return;
+
+		((BasicTableModel) this.getModel()).setRowCount(0);
 	}
 	
 	public String getTableDataAsString() {

@@ -21,39 +21,31 @@
 
 package edu.umich.med.mrc2.batchmatch.gui;
 
-import java.awt.event.ActionListener;
+import java.awt.Component;
+import java.io.File;
 
-import javax.swing.JMenu;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
-import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
-
-public class BatchMatchMenuBar extends CommonMenuBar {
+public class FileNameComboboxRenderer extends JLabel implements ListCellRenderer<File> {
 
 	/**
-	 * 
+	 *
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -1755035408278132072L;
 
-	public BatchMatchMenuBar(ActionListener listener) {
-		
-		super(listener);
-		
-		JMenu projectMenu = new JMenu("Project");
-		addItem(projectMenu, BMActionCommands.CREATE_NEW_PROJECT_COMMAND);
+	@Override
+	public Component getListCellRendererComponent(JList<? extends File> list, File value, int index, boolean isSelected,
+			boolean cellHasFocus) {
 
-		projectMenu.addSeparator();
-		
-		addItem(projectMenu, BMActionCommands.OPEN_PROJECT_COMMAND);
-		addItem(projectMenu, BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND);
-		
-		projectMenu.addSeparator();
-		
-		addItem(projectMenu, BMActionCommands.SET_DEFAULT_PROJECT_DIRECTORY_COMMAND);
-		
-		add(projectMenu);
+		if (value == null) {
+			setText("SELECT ...");
+			return this;
+		}
+		if (value instanceof File)
+			setText(((File) value).getName());
 
-		JMenu helpMenu = new JMenu("Help");
-		addItem(helpMenu, BMActionCommands.SHOW_ABOUT_DIALOG_COMMAND);		
-		add(helpMenu);
+		return this;
 	}
 }

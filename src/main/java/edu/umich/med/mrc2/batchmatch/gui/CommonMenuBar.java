@@ -29,7 +29,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import edu.umich.med.mrc2.batchmatch.main.ActionCommands;
+import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 
 public class CommonMenuBar extends JMenuBar {
 
@@ -45,7 +45,7 @@ public class CommonMenuBar extends JMenuBar {
 		this.alistener = alistener;
 	}
 	
-	protected JMenuItem addItem(JMenu menu, ActionCommands command) {
+	protected JMenuItem addItem(JMenu menu, BMActionCommands command) {
 
 		JMenuItem item = new JMenuItem(command.getName());
 		item.setActionCommand(command.getName());
@@ -55,7 +55,7 @@ public class CommonMenuBar extends JMenuBar {
 		return item;
 	}
 	
-	protected JMenuItem addItem(JMenu menu, ActionCommands command, Icon defaultIcon) {
+	protected JMenuItem addItem(JMenu menu, BMActionCommands command, Icon defaultIcon) {
 
 		JMenuItem item = new JMenuItem(command.getName());
 		item.setActionCommand(command.getName());
@@ -65,7 +65,7 @@ public class CommonMenuBar extends JMenuBar {
 		return item;
 	}
 	
-	protected JMenuItem addItem(JMenu menu, String title, ActionCommands command, Icon defaultIcon) {
+	protected JMenuItem addItem(JMenu menu, String title, BMActionCommands command, Icon defaultIcon) {
 
 		JMenuItem item = new JMenuItem(title);
 		item.setActionCommand(command.getName());

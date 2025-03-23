@@ -28,15 +28,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
-import edu.umich.med.mrc2.batchmatch.main.ActionCommands;
+import edu.umich.med.mrc2.batchmatch.gui.panels.BatchMatchProjectSetupPanel;
+import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskEvent;
@@ -55,6 +59,9 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 	private static JDialog progressDialogue;
 	private static TaskProgressPanel progressPanel;
 
+	private JTabbedPane workflowTabbbedPanel;
+	private BatchMatchProjectSetupPanel projectSetupPanel;
+	
 	public BatchMatchMainWindow() {
 		
 		try {
@@ -77,6 +84,12 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 		
 		setLayout(new BorderLayout(0, 0));
 		
+		workflowTabbbedPanel = new JTabbedPane();
+		
+		projectSetupPanel = new BatchMatchProjectSetupPanel();
+		workflowTabbbedPanel.addTab("Project setup", projectSetupPanel);
+			
+		add(workflowTabbbedPanel, BorderLayout.CENTER);
 		initProgressDialog();
 	}
 	
@@ -85,19 +98,19 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 
 		String command = e.getActionCommand();
 		
-		if(command.equals(ActionCommands.CREATE_NEW_PROJECT_COMMAND.getName()))
+		if(command.equals(BMActionCommands.CREATE_NEW_PROJECT_COMMAND.getName()))
 			createNewProject();
 		
-		if(command.equals(ActionCommands.OPEN_PROJECT_COMMAND.getName()))
+		if(command.equals(BMActionCommands.OPEN_PROJECT_COMMAND.getName()))
 			openProject();
 		
-		if(command.equals(ActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND.getName()))
+		if(command.equals(BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND.getName()))
 			saveAndCloseProject();
 		
-		if(command.equals(ActionCommands.SET_DEFAULT_PROJECT_DIRECTORY_COMMAND.getName()))
+		if(command.equals(BMActionCommands.SET_DEFAULT_PROJECT_DIRECTORY_COMMAND.getName()))
 			setDefaultProjectDirectory();
 		
-		if(command.equals(ActionCommands.SHOW_ABOUT_DIALOG_COMMAND.getName()))
+		if(command.equals(BMActionCommands.SHOW_ABOUT_DIALOG_COMMAND.getName()))
 			showAboutDialog();
 	}
 	
@@ -162,6 +175,30 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 		AboutDialog ad = new AboutDialog();
 		ad.setLocationRelativeTo(this);
 		ad.setVisible(true);
+	}
+	
+	public Collection<String>validateProjectSetup(){
+	    
+	    Collection<String>errors = new ArrayList<String>();
+	    errors.addAll(projectSetupPanel.validateProjectSetup());
+	    
+	    
+//	    if(getProjectName().isEmpty())
+//	        errors.add("Project name cannot be empty.");
+//	    
+//	    if(baseDirectory == null || !baseDirectory.exists())
+//	        errors.add("Invalid project directory.");
+//	    
+//	    if(!getProjectName().isEmpty() && baseDirectory != null) {
+//	        
+//	        File newProjectDir = 
+//	                Paths.get(baseDirectory.getAbsolutePath(), getProjectName()).toFile();
+//	        if(newProjectDir.exists()) {
+//	            errors.add("Project \"" + getProjectName() + "\" already exists\n"
+//	                    + "in the directory \"" + baseDirectory.getAbsolutePath() + "\"");
+//	        }
+//	    }		
+	    return errors;
 	}
 
 	@Override

@@ -38,7 +38,7 @@ import javax.swing.ListSelectionModel;
 import edu.umich.med.mrc2.batchmatch.gui.BatchMatchMainWindow;
 import edu.umich.med.mrc2.batchmatch.gui.GuiUtils;
 import edu.umich.med.mrc2.batchmatch.gui.table.BasicTable;
-import edu.umich.med.mrc2.batchmatch.main.ActionCommands;
+import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.Task;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskController;
@@ -101,16 +101,16 @@ public class TaskProgressPanel extends JPanel implements ActionListener {
 		popupMenu = new JPopupMenu();
 
 		cancelTaskMenuItem = GuiUtils.addMenuItem(popupMenu,
-				ActionCommands.CANCEL_SELECTED_TASK_COMMAND.getName(), this,
-				ActionCommands.CANCEL_SELECTED_TASK_COMMAND.getName());
+				BMActionCommands.CANCEL_SELECTED_TASK_COMMAND.getName(), this,
+				BMActionCommands.CANCEL_SELECTED_TASK_COMMAND.getName());
 
 		cancelAllMenuItem = GuiUtils.addMenuItem(popupMenu,
-				ActionCommands.CANCEL_ALL_TASKS_COMMAND.getName(), this,
-				ActionCommands.CANCEL_ALL_TASKS_COMMAND.getName());
+				BMActionCommands.CANCEL_ALL_TASKS_COMMAND.getName(), this,
+				BMActionCommands.CANCEL_ALL_TASKS_COMMAND.getName());
 
 		restartMenuItem = GuiUtils.addMenuItem(popupMenu,
-				ActionCommands.RESTART_SELECTED_TASK_COMMAND.getName(), this,
-				ActionCommands.RESTART_SELECTED_TASK_COMMAND.getName());
+				BMActionCommands.RESTART_SELECTED_TASK_COMMAND.getName(), this,
+				BMActionCommands.RESTART_SELECTED_TASK_COMMAND.getName());
 
 		// Add popup menu to the task table
 		taskTable.setComponentPopupMenu(popupMenu);
@@ -145,7 +145,7 @@ public class TaskProgressPanel extends JPanel implements ActionListener {
 
 		String command = event.getActionCommand();
 
-		if (command.equals(ActionCommands.CANCEL_ALL_TASKS_COMMAND.getName())) {
+		if (command.equals(BMActionCommands.CANCEL_ALL_TASKS_COMMAND.getName())) {
 
 			BatchMatch.getTaskController().cancelAllTasks();
 			BatchMatchMainWindow.hideProgressDialog();
@@ -158,12 +158,12 @@ public class TaskProgressPanel extends JPanel implements ActionListener {
 
 				if (t != null) {
 
-					if (command.equals(ActionCommands.CANCEL_SELECTED_TASK_COMMAND.getName())){
+					if (command.equals(BMActionCommands.CANCEL_SELECTED_TASK_COMMAND.getName())){
 
 						if ((t.getStatus() == TaskStatus.WAITING) || (t.getStatus() == TaskStatus.PROCESSING))
 							t.cancel();
 					}
-					if (command.equals(ActionCommands.RESTART_SELECTED_TASK_COMMAND.getName())) {
+					if (command.equals(BMActionCommands.RESTART_SELECTED_TASK_COMMAND.getName())) {
 
 						Task clonedTask = t.cloneTask();
 						t.setStatus(TaskStatus.REPROCESSING);

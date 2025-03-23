@@ -31,7 +31,7 @@ import edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchNamedUnname
 import edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchNewWorkflowTabPanel;
 import edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchSummaryTabPanel;
 import edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchTwoStageTabPanel;
-import edu.umich.med.mrc2.batchmatch.main.ActionCommands;
+import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
 
@@ -131,7 +131,7 @@ public class BatchMatchMainWindowOrig extends JFrame implements ActionListener, 
 	public void actionPerformed(ActionEvent e) {
 
 		String command = e.getActionCommand();
-		if(command.equals(ActionCommands.SHOW_ABOUT_DIALOG_COMMAND.getName()))
+		if(command.equals(BMActionCommands.SHOW_ABOUT_DIALOG_COMMAND.getName()))
 			showAboutDialog();
 	}
 	

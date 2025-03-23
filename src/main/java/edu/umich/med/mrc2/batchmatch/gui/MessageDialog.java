@@ -55,4 +55,10 @@ public class MessageDialog {
 	public static void showWarningMsg(String message, Component parent) {
 		JOptionPane.showMessageDialog(parent, message, "Warning", JOptionPane.WARNING_MESSAGE);
 	}
+	
+	public static int showChoiceWithWarningMsg(String yesNoQuestion, Component parent) {
+
+		return JOptionPane.showConfirmDialog(parent, yesNoQuestion, "Attention!",
+				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+	}
 }

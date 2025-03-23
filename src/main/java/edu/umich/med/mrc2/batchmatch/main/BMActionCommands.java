@@ -21,7 +21,7 @@
 
 package edu.umich.med.mrc2.batchmatch.main;
 
-public enum ActionCommands {
+public enum BMActionCommands {
 
 	//	Task control commands
 	SET_HIGH_PRIORITY_COMMAND("Set high priority"),
@@ -40,12 +40,16 @@ public enum ActionCommands {
 	SAVE_AND_CLOSE_PROJECT_COMMAND("Save and close BatchMatch project"),	
 	SET_DEFAULT_PROJECT_DIRECTORY_COMMAND("Set default project directory"),
 	
+	//	Setup
+	SELECT_PEAK_AREA_FILES_COMMAND("Select peak area files"),
+	SELECT_BINNER_FILES_COMMAND("Select Binner output files"),
+	CLEAR_FILE_SELECTION_COMMAND("Clear file selection table"),
 
 	;
 	
 	private final String name;
 
-	ActionCommands(String command) {
+	BMActionCommands(String command) {
 		this.name = command;
 	}
 
@@ -58,9 +62,9 @@ public enum ActionCommands {
 		return name;
 	}
 	
-	public static ActionCommands getCommandByName(String commandName) {
+	public static BMActionCommands getCommandByName(String commandName) {
 		
-		for(ActionCommands command : ActionCommands.values()) {
+		for(BMActionCommands command : BMActionCommands.values()) {
 			
 			if(command.name().equals(commandName))
 				return command;
