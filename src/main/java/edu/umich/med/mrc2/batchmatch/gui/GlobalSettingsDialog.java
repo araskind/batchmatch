@@ -30,6 +30,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -45,6 +46,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.api.JnaFileChooser;
+import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
+import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
+
 public class GlobalSettingsDialog extends JDialog implements ActionListener {
 
 	
@@ -52,8 +57,12 @@ public class GlobalSettingsDialog extends JDialog implements ActionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private JTextField textField;
-
+	
+	private static final String BROWSE_COMMAND = "BROWSE_COMMAND";
+	private JTextField defaultProjetDirTextField;
+	private File defaultProjectDirectory;
+	private JSpinner maxThreadsSpinner;
+	
 	public GlobalSettingsDialog() {
 		super();
 		setTitle("BatchMatch global settings");
@@ -82,18 +91,23 @@ public class GlobalSettingsDialog extends JDialog implements ActionListener {
 		gbc_lblNewLabel.gridy = 0;
 		panel.add(lblNewLabel, gbc_lblNewLabel);
 		
-		textField = new JTextField();
-		textField.setEditable(false);
+		defaultProjectDirectory = BatchMatchConfiguration.getProjectDirectory();
+		defaultProjetDirTextField = new JTextField(
+				defaultProjectDirectory.getAbsolutePath());
+		defaultProjetDirTextField.setEditable(false);
 		GridBagConstraints gbc_textField = new GridBagConstraints();
 		gbc_textField.gridwidth = 3;
 		gbc_textField.insets = new Insets(0, 0, 5, 5);
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField.gridx = 0;
 		gbc_textField.gridy = 1;
-		panel.add(textField, gbc_textField);
-		textField.setColumns(10);
+		panel.add(defaultProjetDirTextField, gbc_textField);
+		defaultProjetDirTextField.setColumns(10);
 		
 		JButton browseButton = new JButton("Browse ...");
+		browseButton.setActionCommand(BROWSE_COMMAND);
+		browseButton.addActionListener(this);
+		
 		GridBagConstraints gbc_browseButton = new GridBagConstraints();
 		gbc_browseButton.insets = new Insets(0, 0, 5, 0);
 		gbc_browseButton.gridx = 3;
@@ -108,26 +122,28 @@ public class GlobalSettingsDialog extends JDialog implements ActionListener {
 		gbc_lblNewLabel_1.gridy = 2;
 		panel.add(lblNewLabel_1, gbc_lblNewLabel_1);
 		
-		JSpinner spinner = new JSpinner();
-		spinner.setPreferredSize(new Dimension(80, 20));
-		spinner.setModel(new SpinnerNumberModel(3, 1, 16, 1));
+		maxThreadsSpinner = new JSpinner();
+		maxThreadsSpinner.setPreferredSize(new Dimension(80, 20));
+		maxThreadsSpinner.setModel(new SpinnerNumberModel(3, 1, 16, 1));
+		maxThreadsSpinner.setValue(BatchMatchConfiguration.getMaxWorkingThreads());
 		GridBagConstraints gbc_spinner = new GridBagConstraints();
 		gbc_spinner.anchor = GridBagConstraints.WEST;
 		gbc_spinner.insets = new Insets(0, 0, 0, 5);
 		gbc_spinner.gridx = 1;
 		gbc_spinner.gridy = 2;
-		panel.add(spinner, gbc_spinner);
+		panel.add(maxThreadsSpinner, gbc_spinner);
 		
 		JPanel panel_1 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
 		panel_1.setBorder(new EmptyBorder(10, 5, 10, 5));
 		getContentPane().add(panel_1, BorderLayout.SOUTH);
 		
-		JButton saveButton = new JButton("Save");
+		JButton saveButton = new JButton(BMActionCommands.SAVE_SETTINGS_COMMAND.getName());
+		saveButton.setActionCommand(BMActionCommands.SAVE_SETTINGS_COMMAND.getName());
+		saveButton.addActionListener(this);
 		panel_1.add(saveButton);
 		
 		JButton cancelButton = new JButton("Cancel");
-		panel_1.add(cancelButton);
-		
+		panel_1.add(cancelButton);		
 		KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 		ActionListener al = new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -135,10 +151,7 @@ public class GlobalSettingsDialog extends JDialog implements ActionListener {
 			}
 		};
 		cancelButton.addActionListener(al);
-
-		saveButton = new JButton("Save");
-		saveButton.addActionListener(this);
-		panel.add(saveButton);
+		
 		JRootPane rootPane = SwingUtilities.getRootPane(saveButton);
 		rootPane.registerKeyboardAction(al, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 		rootPane.setDefaultButton(saveButton);
@@ -146,7 +159,48 @@ public class GlobalSettingsDialog extends JDialog implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 
+		if(e.getActionCommand().equals(BROWSE_COMMAND))
+				selectDefaultProjectDirectory();
+		
+		if(e.getActionCommand().equals(BMActionCommands.SAVE_SETTINGS_COMMAND.getName()))
+			saveNewGlobalSettings();
+	}
+
+	private void selectDefaultProjectDirectory() {
+
+		JnaFileChooser fileChooser = 
+				new JnaFileChooser(BatchMatchConfiguration.getProjectDirectory());
+		fileChooser.setMode(JnaFileChooser.Mode.Directories);
+		fileChooser.setTitle("Select default project directory");
+		fileChooser.setMultiSelectionEnabled(true);
+		if (fileChooser.showOpenDialog(this)) {
+			
+			if(fileChooser.getSelectedFile() != null) {
+				defaultProjectDirectory = fileChooser.getSelectedFile();
+				defaultProjetDirTextField.setText(defaultProjectDirectory.getAbsolutePath());
+			}
+		}
+	}
+
+	private void saveNewGlobalSettings() {
+
+		BatchMatchConfiguration.setDefaultProjectDirectory(defaultProjectDirectory);
+		BatchMatchConfiguration.setMaxWorkingThreads((Integer)maxThreadsSpinner.getValue());
+		this.dispose();
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

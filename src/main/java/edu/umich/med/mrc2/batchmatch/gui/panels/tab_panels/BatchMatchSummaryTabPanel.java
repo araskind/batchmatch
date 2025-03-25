@@ -26,7 +26,7 @@ import javax.swing.border.TitledBorder;
 
 import edu.umich.med.mrc2.batchmatch.data.orig.FeatureFromFile;
 import edu.umich.med.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutUtils;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutUtils;
 import edu.umich.med.mrc2.batchmatch.gui.panels.orig.AbstractStickyFileLocationPanel;
 import edu.umich.med.mrc2.batchmatch.gui.panels.orig.BatchFileListLoaderPanel;
 import edu.umich.med.mrc2.batchmatch.gui.panels.orig.BatchMatchCSVReportLoaderPanel;

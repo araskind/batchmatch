@@ -36,8 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import edu.umich.med.mrc2.batchmatch.gui.BatchMatchMainWindow;
-import edu.umich.med.mrc2.batchmatch.gui.GuiUtils;
 import edu.umich.med.mrc2.batchmatch.gui.table.BasicTable;
+import edu.umich.med.mrc2.batchmatch.gui.utils.GuiUtils;
 import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.Task;

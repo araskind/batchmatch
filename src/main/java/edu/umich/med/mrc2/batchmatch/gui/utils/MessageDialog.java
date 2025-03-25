@@ -19,7 +19,7 @@
  *
  ******************************************************************************/
 
-package edu.umich.med.mrc2.batchmatch.gui;
+package edu.umich.med.mrc2.batchmatch.gui.utils;
 
 import java.awt.Component;
 

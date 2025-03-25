@@ -23,8 +23,10 @@ package edu.umich.med.mrc2.batchmatch.gui;
 
 import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
 import javax.swing.JMenu;
 
+import edu.umich.med.mrc2.batchmatch.gui.utils.GuiUtils;
 import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 
 public class BatchMatchMenuBar extends CommonMenuBar {
@@ -33,27 +35,38 @@ public class BatchMatchMenuBar extends CommonMenuBar {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private static final Icon newProjectIcon = GuiUtils.getIcon("newProject", 24);
+	private static final Icon openProjectIcon = GuiUtils.getIcon("open", 24);
+	private static final Icon saveProjectIcon = GuiUtils.getIcon("save", 24);
+	private static final Icon settingsIcon = GuiUtils.getIcon("preferences", 24);
+	private static final Icon aboutIcon = GuiUtils.getIcon("help", 24);
+	private static final Icon exitIcon = GuiUtils.getIcon("shutDown", 24);
 
 	public BatchMatchMenuBar(ActionListener listener) {
 		
 		super(listener);
 		
 		JMenu projectMenu = new JMenu("Project");
-		addItem(projectMenu, BMActionCommands.CREATE_NEW_PROJECT_COMMAND);
+		addItem(projectMenu, BMActionCommands.CREATE_NEW_PROJECT_COMMAND, newProjectIcon);
 
 		projectMenu.addSeparator();
 		
-		addItem(projectMenu, BMActionCommands.OPEN_PROJECT_COMMAND);
-		addItem(projectMenu, BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND);
+		addItem(projectMenu, BMActionCommands.OPEN_PROJECT_COMMAND, openProjectIcon);
+		addItem(projectMenu, BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND, saveProjectIcon);
 		
 		projectMenu.addSeparator();
 		
-		addItem(projectMenu, BMActionCommands.SET_DEFAULT_PROJECT_DIRECTORY_COMMAND);
+		addItem(projectMenu, BMActionCommands.GLOBAL_SETTINGS_COMMAND, settingsIcon);
+		
+		projectMenu.addSeparator();
+		
+		addItem(projectMenu, BMActionCommands.EXIT_COMMAND, exitIcon);
 		
 		add(projectMenu);
 
 		JMenu helpMenu = new JMenu("Help");
-		addItem(helpMenu, BMActionCommands.SHOW_ABOUT_DIALOG_COMMAND);		
+		addItem(helpMenu, BMActionCommands.SHOW_ABOUT_DIALOG_COMMAND, aboutIcon);		
 		add(helpMenu);
 	}
 }

@@ -17,19 +17,28 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 public class AboutDialog extends JDialog {
+	
 	public AboutDialog() {
+		
 		setTitle("About BatchMatch");
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setSize(600, 300);
 		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
 		add(Box.createRigidArea(new Dimension(0, 10)));
 
-		JLabel name = new JLabel("BatchMatch v.0.0.3");
-		JLabel handsoff = new JLabel("Created by Jan Wigginton, Bill Duren and Maureen Kachman");
-		JLabel handsoff2 = new JLabel("September 2019.");
+		Font newFont = new Font("Arial", Font.PLAIN, 18);
+		
+		JLabel name = new JLabel("BatchMatch v.0.1a");
+		//	JLabel handsoff = new JLabel("Created by Jan Wigginton, Bill Duren and Maureen Kachman");
+		JLabel handsoff = new JLabel("Work in progress ...");
+		JLabel handsoff2 = new JLabel("2019 - 2025 ...");
 
-		name.setFont(new Font("Courier New", Font.BOLD, 16));
-		handsoff.setFont(new Font("Courier New", Font.BOLD, 16));
-		handsoff2.setFont(new Font("Courier New", Font.BOLD, 16));
+		name.setFont(newFont);
+		handsoff.setFont(newFont);
+		handsoff2.setFont(newFont);
+		
 		name.setAlignmentX(0.5f);
 		handsoff.setAlignmentX(0.5f);
 		handsoff2.setAlignmentX(0.5f);
@@ -53,11 +62,8 @@ public class AboutDialog extends JDialog {
 				dispose();
 			}
 		});
-
 		close.setAlignmentX(0.5f);
 		add(close);
-		setModalityType(ModalityType.APPLICATION_MODAL);
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setSize(600, 300);
+
 	}
 }

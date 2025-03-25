@@ -34,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import edu.umich.med.mrc2.batchmatch.gui.utils.GuiUtils;
 import edu.umich.med.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.med.mrc2.batchmatch.preferences.BackedByPreferences;
 

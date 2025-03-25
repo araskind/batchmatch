@@ -23,10 +23,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.TransferHandler;
 
-import edu.umich.med.mrc2.batchmatch.gui.LayoutGrid;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutItem;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutUtils;
-import edu.umich.med.mrc2.batchmatch.gui.WhiteYellowCellRenderer;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutGrid;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutItem;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutUtils;
+import edu.umich.med.mrc2.batchmatch.gui.orig.WhiteYellowCellRenderer;
 
 public abstract class DraggableListViewPanel extends JPanel {
 

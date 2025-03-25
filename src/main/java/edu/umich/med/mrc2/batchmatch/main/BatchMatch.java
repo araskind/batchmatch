@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import edu.umich.med.mrc2.batchmatch.gui.BatchMatchMainWindow;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
 import edu.umich.med.mrc2.batchmatch.main.config.FilePreferencesFactory;
+import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.impl.TaskControllerImpl;
 
 public class BatchMatch {
@@ -28,6 +29,7 @@ public class BatchMatch {
 	private static BatchMatchMainWindow mainWindow;
 	private static BatchMatchConfiguration config;
 	private static TaskControllerImpl taskController;
+	private static BatchMatchProject currentProject;
 
 	public static void main(String[] args) {
 
@@ -106,5 +108,13 @@ public class BatchMatch {
 
 	public static TaskControllerImpl getTaskController() {
 		return taskController;
+	}
+
+	public static BatchMatchProject getCurrentProject() {
+		return currentProject;
+	}
+
+	public static void setCurrentProject(BatchMatchProject currentProject) {
+		BatchMatch.currentProject = currentProject;
 	}
 }

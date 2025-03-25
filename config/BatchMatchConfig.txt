@@ -1,0 +1,4 @@
+#FilePreferences
+#Mon Mar 24 13:32:03 EDT 2025
+edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration.MAX_WORKING_THREADS=4
+edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration.Projects=E\:\\Development\\BatchMatch\\Projects

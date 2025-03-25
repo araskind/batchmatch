@@ -21,9 +21,13 @@
 
 package edu.umich.med.mrc2.batchmatch.main.config;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.io.File;
 import java.nio.file.Paths;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.prefs.Preferences;
 
@@ -40,16 +44,25 @@ public class BatchMatchConfiguration implements BackedByPreferences{
 	public static final String PROJECT_DIRECTORY = "Projects";
 	private static File projectDirectory;
 	
+	public static File iconsDirectory = Paths.get(".", "Icons").toFile();
+	
 	public static final DateFormat defaultTimeStampFormat = 
 			new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static final DateFormat defaultFileTimeStampFormat = 
 			new SimpleDateFormat("yyyyMMdd_HHmmss");
+	
+	public static final NumberFormat defaultMzFormat = new DecimalFormat("#.####");
+    public static final NumberFormat defaultRtFormat = new DecimalFormat("#.###");
+    public static final NumberFormat defaultPpmFormat = new DecimalFormat("#.##");
 	
 	public static final String BATCH_MATCH_PROJECT_FILE_EXTENSION = "bmproj";
 	public static final String BINNER_FILES_DIRECTORY = "BinnerFiles";
 	public static final String RAW_INPUT_DATA_DIRECTORY = "RawInputData";
 	public static final String ITERATIVE_ANALYSIS_RESULTS_DIRECTORY = "IntermediateResults";
 	public static final String FINAL_RESULTS_DIRECTORY = "FinalResults";
+	
+	public static final Font panelTitleFont = new Font("Arial", Font.PLAIN, 16);
+	public static final Color panelTitleColor = new Color(0, 0, 205);
 		
 	public BatchMatchConfiguration() {
 		super();

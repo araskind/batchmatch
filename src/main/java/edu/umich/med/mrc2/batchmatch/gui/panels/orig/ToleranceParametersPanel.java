@@ -19,10 +19,10 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.med.mrc2.batchmatch.gui.LayoutGrid;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutItem;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutUtils;
-import edu.umich.med.mrc2.batchmatch.gui.NumberVerifier;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutGrid;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutItem;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutUtils;
+import edu.umich.med.mrc2.batchmatch.gui.orig.NumberVerifier;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.med.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.med.mrc2.batchmatch.main.PostProccessConstants;

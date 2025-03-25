@@ -24,6 +24,7 @@ package edu.umich.med.mrc2.batchmatch.gui;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -31,15 +32,18 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import edu.umich.med.mrc2.batchmatch.gui.panels.BatchMatchProjectSetupPanel;
+import edu.umich.med.mrc2.batchmatch.gui.utils.GuiUtils;
 import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
@@ -58,7 +62,8 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 	
 	private static JDialog progressDialogue;
 	private static TaskProgressPanel progressPanel;
-
+	public static StatusBar statusBar;
+	
 	private JTabbedPane workflowTabbbedPanel;
 	private BatchMatchProjectSetupPanel projectSetupPanel;
 	
@@ -87,9 +92,26 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 		workflowTabbbedPanel = new JTabbedPane();
 		
 		projectSetupPanel = new BatchMatchProjectSetupPanel();
-		workflowTabbbedPanel.addTab("Project setup", projectSetupPanel);
+
+		JPanel wrapper = new JPanel(new BorderLayout(0, 0));
+		wrapper.add(projectSetupPanel, BorderLayout.CENTER);
+		JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		JButton runBatchMatchButton = 
+				new JButton(BMActionCommands.RUN_BATCH_MATCH_COMMAND.getName());
+		runBatchMatchButton.setActionCommand(
+				BMActionCommands.RUN_BATCH_MATCH_COMMAND.getName());
+		runBatchMatchButton.setIcon(GuiUtils.getIcon("actions", 24));
+		runBatchMatchButton.addActionListener(this);
+		panel1.add(runBatchMatchButton);
+		wrapper.add(panel1, BorderLayout.SOUTH);
+		
+		workflowTabbbedPanel.addTab("Project setup", wrapper);
 			
 		add(workflowTabbbedPanel, BorderLayout.CENTER);
+		
+		statusBar = new StatusBar();
+		getContentPane().add(statusBar, BorderLayout.SOUTH);
+		
 		initProgressDialog();
 	}
 	
@@ -107,13 +129,30 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 		if(command.equals(BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND.getName()))
 			saveAndCloseProject();
 		
-		if(command.equals(BMActionCommands.SET_DEFAULT_PROJECT_DIRECTORY_COMMAND.getName()))
+		if(command.equals(BMActionCommands.GLOBAL_SETTINGS_COMMAND.getName()))
 			setDefaultProjectDirectory();
 		
 		if(command.equals(BMActionCommands.SHOW_ABOUT_DIALOG_COMMAND.getName()))
 			showAboutDialog();
+		
+		if(command.equals(BMActionCommands.EXIT_COMMAND.getName()))
+			exitSoftware();
+		
+		if(command.equals(BMActionCommands.RUN_BATCH_MATCH_COMMAND.getName()))
+			runBatchMatch();
 	}
 	
+	private void runBatchMatch() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void exitSoftware() {
+		
+		// TODO Deal with existing project
+		BatchMatch.shutDown();
+	}
+
 	public static void showProgressDialog() {
 
 		if (!progressDialogue.isVisible() && !BatchMatch.getTaskController().getTaskQueue().isEmpty()) {

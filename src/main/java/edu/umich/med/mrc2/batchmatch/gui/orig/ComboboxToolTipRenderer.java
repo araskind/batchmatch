@@ -1,4 +1,4 @@
-package edu.umich.med.mrc2.batchmatch.gui;
+package edu.umich.med.mrc2.batchmatch.gui.orig;
 
 import java.awt.Component;
 import java.util.List;

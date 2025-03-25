@@ -33,9 +33,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import edu.umich.med.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutGrid;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutItem;
-import edu.umich.med.mrc2.batchmatch.gui.LayoutUtils;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutGrid;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutItem;
+import edu.umich.med.mrc2.batchmatch.gui.orig.LayoutUtils;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.med.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.med.mrc2.batchmatch.utils.orig.BinnerFileUtils;

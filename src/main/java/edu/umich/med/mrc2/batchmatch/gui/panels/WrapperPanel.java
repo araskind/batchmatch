@@ -21,30 +21,25 @@
 
 package edu.umich.med.mrc2.batchmatch.gui.panels;
 
-import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.CommonFileTypes;
-import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.FileChooserAction;
-import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.api.JnaFileChooser.Mode;
-import edu.umich.med.mrc2.batchmatch.gui.utils.MessageDialog;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 
-public class BatchMatchTestFileSelectorPanel extends BatchMatchFileSelectorPanel {
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class WrapperPanel extends JPanel {
 	
-	public BatchMatchTestFileSelectorPanel(
-			String panelId, 
-			String panelTitle, 
-			Mode selectionMode,
-			CommonFileTypes fileType, 
-			FileChooserAction fcAction) {
-		super(panelId, panelTitle, selectionMode, fileType, fcAction);
-		// TODO Auto-generated constructor stub
+	public WrapperPanel() {
+		
+		super(new BorderLayout(0, 0));
+		
+		JPanel panel = new JPanel();
+		add(panel, BorderLayout.CENTER);
+		JPanel panel1 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		add(panel1, BorderLayout.SOUTH);
+		
+		JButton btnNewButton = new JButton("New button");
+		panel1.add(btnNewButton);
 	}
 
-	@Override
-	protected void fileSelectionChanged() {
-		MessageDialog.showInfoMsg(selectedFile.getPath());
-	}
 }

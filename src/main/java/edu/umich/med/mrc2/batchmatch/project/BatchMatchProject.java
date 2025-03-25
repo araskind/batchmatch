@@ -21,18 +21,42 @@
 
 package edu.umich.med.mrc2.batchmatch.project;
 
+import java.io.File;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
+import edu.umich.med.mrc2.batchmatch.utils.ProjectUtils;
 
 public class BatchMatchProject {
 
+	private String projectName;
 	private Set<BatchMatchInputObject>inputObjects;
+	private Map<AlignmentSettings,Object>alignmentSettings;
+	
+	public BatchMatchProject(String projectName, File parentDirectory) {
+		this();
+		this.projectName = projectName;
+		createProjectDirectoryStructure(parentDirectory);
+	}
+
+	private void createProjectDirectoryStructure(File parentDirectory) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	public BatchMatchProject() {
 		super();
-		inputObjects = new HashSet<BatchMatchInputObject>();
+		inputObjects = new HashSet<BatchMatchInputObject>();		
+		initDefaultAlignmentSettings();
+	}
+	
+	private void initDefaultAlignmentSettings() {
+		
+		alignmentSettings = new TreeMap<AlignmentSettings,Object>();
+		alignmentSettings.putAll(ProjectUtils.getDefaultAlignmentSettings());
 	}
 
 	public Set<BatchMatchInputObject> getInputObjects() {
@@ -55,5 +79,17 @@ public class BatchMatchProject {
 			else
 				o.setTargetBatch(false);
 		}
+	}
+
+	public Map<AlignmentSettings, Object> getAlignmentSettings() {
+		return alignmentSettings;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
 	}
 }

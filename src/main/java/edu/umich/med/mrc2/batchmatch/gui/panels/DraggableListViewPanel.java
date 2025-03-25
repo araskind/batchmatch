@@ -34,9 +34,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
-import edu.umich.med.mrc2.batchmatch.gui.AltColorListCellRenderer;
 import edu.umich.med.mrc2.batchmatch.gui.BatchMatchInputPanel;
 import edu.umich.med.mrc2.batchmatch.gui.ListDNDHandler;
+import edu.umich.med.mrc2.batchmatch.gui.utils.AltColorListCellRenderer;
 
 public class DraggableListViewPanel extends BatchMatchInputPanel {
 

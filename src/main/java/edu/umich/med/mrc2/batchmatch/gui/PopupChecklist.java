@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import edu.umich.med.mrc2.batchmatch.gui.orig.ChecklistParameters;
 import edu.umich.med.mrc2.batchmatch.utils.orig.PostProcessMergeNameExtractor;
 import edu.umich.med.mrc2.batchmatch.utils.orig.RecentSelectionUtils;
 

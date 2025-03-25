@@ -43,7 +43,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.med.mrc2.batchmatch.gui.WhiteYellowCellRenderer;
+import edu.umich.med.mrc2.batchmatch.gui.orig.WhiteYellowCellRenderer;
 
 public class ListDragTest extends JPanel {
 

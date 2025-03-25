@@ -19,18 +19,22 @@
  *
  ******************************************************************************/
 
-package edu.umich.med.mrc2.batchmatch.gui;
+package edu.umich.med.mrc2.batchmatch.gui.utils;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.nio.file.Paths;
 
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -43,6 +47,8 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
 
 public class GuiUtils {
 	
@@ -521,4 +527,20 @@ public class GuiUtils {
 		Font biggerFont = new Font(font.getName(), font.getStyle(), font.getSize() + (makeEvenLarger ? 3 : 1));
 		return biggerFont;
 	}
+	
+	public static Icon getIcon(String iconName, int size) {
+
+		File iconFile = Paths.get(
+				BatchMatchConfiguration.iconsDirectory.getAbsolutePath(), iconName + ".png").toFile();
+		if(iconFile.exists()) {
+			
+			ImageIcon original = new ImageIcon(iconFile.getAbsolutePath());
+			Image newImage = original.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+			return new ImageIcon(newImage);
+		}
+		else
+			return null;
+	}
 }
+
+

@@ -22,6 +22,7 @@
 package edu.umich.med.mrc2.batchmatch.gui.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -35,11 +36,14 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
-import edu.umich.med.mrc2.batchmatch.gui.MessageDialog;
 import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.api.JnaFileChooser;
 import edu.umich.med.mrc2.batchmatch.gui.table.BinnerInputTable;
+import edu.umich.med.mrc2.batchmatch.gui.utils.MessageDialog;
 import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
 
@@ -52,22 +56,28 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 	
 	private BinnerInputTable binnerInputTable;
 	private JnaFileChooser fileChooser;
+	private AlignmentSettingsPanel alignmentSettingsPanel;
 
 	public BatchMatchProjectSetupPanel() {
 		
 		super(new BorderLayout(0, 0));
 		setBorder(new EmptyBorder(10, 0, 10, 10));
 		
+		alignmentSettingsPanel = new AlignmentSettingsPanel();
+		add(alignmentSettingsPanel, BorderLayout.NORTH);
+		
+		JPanel tableWrapper = new JPanel(new BorderLayout(0,0));
+		tableWrapper.setBorder(new CompoundBorder(
+				new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, 
+				new Color(255, 255, 255), new Color(160, 160, 160)),
+				"Select input files", TitledBorder.LEADING, TitledBorder.TOP, 
+				BatchMatchConfiguration.panelTitleFont, BatchMatchConfiguration.panelTitleColor), 
+				new EmptyBorder(10, 10, 10, 10)));
+		
 		binnerInputTable = new BinnerInputTable();
-		add(new JScrollPane(binnerInputTable), BorderLayout.CENTER);
-
+		tableWrapper.add(new JScrollPane(binnerInputTable), BorderLayout.CENTER);
 		
-		JPanel panel = new JPanel();
-		add(panel, BorderLayout.NORTH);
-		
-		JPanel buttonPanel = new JPanel();
-		add(buttonPanel, BorderLayout.SOUTH);
-		
+		JPanel buttonPanel = new JPanel();		
 		JButton selectAreaFilesButton = new JButton(
 				BMActionCommands.SELECT_PEAK_AREA_FILES_COMMAND.getName());
 		selectAreaFilesButton.setActionCommand(
@@ -93,7 +103,8 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 				BMActionCommands.CLEAR_FILE_SELECTION_COMMAND.getName());
 		clearTableButton.addActionListener(this);
 		buttonPanel.add(clearTableButton);
-		// TODO Auto-generated constructor stub
+		tableWrapper.add(buttonPanel, BorderLayout.SOUTH);
+		add(tableWrapper, BorderLayout.CENTER);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ import java.text.NumberFormat;
 
 import javax.swing.JTextField;
 
-import edu.umich.med.mrc2.batchmatch.gui.NumberWithRangeVerifier3;
+import edu.umich.med.mrc2.batchmatch.gui.orig.NumberWithRangeVerifier3;
 import edu.umich.med.mrc2.batchmatch.utils.orig.BinnerNumUtils;
 
 public class BinnerDecimalTextFieldPair3 {

@@ -19,8 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import edu.umich.med.mrc2.batchmatch.gui.ChecklistParameters;
 import edu.umich.med.mrc2.batchmatch.gui.PopupChecklist;
+import edu.umich.med.mrc2.batchmatch.gui.orig.ChecklistParameters;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.med.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.med.mrc2.batchmatch.utils.orig.ListUtils;
