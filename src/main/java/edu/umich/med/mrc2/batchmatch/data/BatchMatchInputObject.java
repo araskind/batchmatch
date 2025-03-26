@@ -22,11 +22,13 @@
 package edu.umich.med.mrc2.batchmatch.data;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import org.jdom2.Element;
 
 import edu.umich.med.mrc2.batchmatch.data.store.BatchMatchInputObjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.XmlStorable;
+import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 
 public class BatchMatchInputObject implements XmlStorable, Comparable<BatchMatchInputObject>{
 
@@ -117,9 +119,24 @@ public class BatchMatchInputObject implements XmlStorable, Comparable<BatchMatch
         return binnerizedDataFile.hashCode() + peakAreasFile.hashCode();
     }
 
-    //	TODO
-    public BatchMatchInputObject(Element xmlElement) {
+    public BatchMatchInputObject(
+    		Element batchMatchInputObjectElement, 
+    		BatchMatchProject batchMatchProject) {
     	
+    	batchNumber = Integer.parseInt(
+    			batchMatchInputObjectElement.getAttributeValue(
+    					BatchMatchInputObjectFields.BatchMatchInputObject.name()));
+    	isTargetBatch = Boolean.getBoolean(
+    			batchMatchInputObjectElement.getAttributeValue(
+    					BatchMatchInputObjectFields.IsTarget.name()));
+    	binnerizedDataFile = 
+    			Paths.get(batchMatchProject.getBinnerFilesDirectory().getAbsolutePath(),
+    					batchMatchInputObjectElement.getChild(
+    						BatchMatchInputObjectFields.BinnerizedDataFile.name()).getText()).toFile();
+    	peakAreasFile = 
+    			Paths.get(batchMatchProject.getRawInputFilesDirectory().getAbsolutePath(),
+    					batchMatchInputObjectElement.getChild(
+    						BatchMatchInputObjectFields.PeakAreasFile.name()).getText()).toFile();
     }
     
 	@Override

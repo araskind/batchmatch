@@ -29,8 +29,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -42,16 +48,22 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.api.JnaFileChooser;
 import edu.umich.med.mrc2.batchmatch.gui.panels.BatchMatchProjectSetupPanel;
 import edu.umich.med.mrc2.batchmatch.gui.utils.GuiUtils;
+import edu.umich.med.mrc2.batchmatch.gui.utils.MessageDialog;
 import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
+import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
+import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskEvent;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskListener;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.gui.TaskProgressPanel;
-import edu.umich.med.mrc2.batchmatch.taskcontrol.tasks.TestTask;
+import edu.umich.med.mrc2.batchmatch.utils.FIOUtils;
+import edu.umich.med.mrc2.batchmatch.utils.ProjectUtils;
 import edu.umich.med.mrc2.batchmatch.utils.TextUtils;
+
 
 public class BatchMatchMainWindow  extends JFrame implements ActionListener, WindowListener, TaskListener {
 
@@ -130,7 +142,7 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 			saveAndCloseProject();
 		
 		if(command.equals(BMActionCommands.GLOBAL_SETTINGS_COMMAND.getName()))
-			setDefaultProjectDirectory();
+			adjustGlobalSettings();
 		
 		if(command.equals(BMActionCommands.SHOW_ABOUT_DIALOG_COMMAND.getName()))
 			showAboutDialog();
@@ -187,23 +199,102 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 	}
 	
 	private void createNewProject() {
-		// TODO Auto-generated method stub
-		TestTask task = new TestTask();
-		task.addTaskListener(this);
-		BatchMatch.getTaskController().addTask(task);
+
+		JnaFileChooser fileChooser = 
+				new JnaFileChooser(BatchMatchConfiguration.getProjectDirectory());
+		fileChooser.setMode(JnaFileChooser.Mode.Files);
+		fileChooser.setTitle("Create new project");
+		fileChooser.setSaveButtonText("Create new project");
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.setDefaultFileName("New BatchMatch project " + 
+		BatchMatchConfiguration.defaultFileTimeStampFormat.format(new Date()));
+		if (fileChooser.showSaveDialog(this)) {
+			
+			if(fileChooser.getSelectedFile() != null) {
+
+				BatchMatchProject proj = null;
+				try {
+					proj = new BatchMatchProject(fileChooser.getSelectedFile().getName(), 
+							fileChooser.getSelectedFile().getParentFile());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(proj != null)
+					ProjectUtils.saveProject(proj);
+									
+				BatchMatch.setCurrentProject(proj);
+				setGUIfromProject(proj);
+			}
+		}
 	}
 
 	private void openProject() {
-		// TODO Auto-generated method stub
 		
+		if(BatchMatch.getCurrentProject() != null) {
+			MessageDialog.showWarningMsg(
+					"Please close the current project \"" + 
+							BatchMatch.getCurrentProject().getProjectName() + "\" first.", this);
+			return;
+		}		
+		File projectFile = null;
+
+		JnaFileChooser fileChooser = 
+				new JnaFileChooser(BatchMatchConfiguration.getProjectDirectory());
+		fileChooser.setMode(JnaFileChooser.Mode.FilesAndDirectories);
+		fileChooser.setTitle("Open project");
+		fileChooser.setOpenButtonText("Open project");
+		fileChooser.setMultiSelectionEnabled(false);
+		fileChooser.addFilter("BatchMatch projects", BatchMatchConfiguration.BATCH_MATCH_PROJECT_FILE_EXTENSION);
+		if (fileChooser.showOpenDialog(this)) {
+			
+			if(fileChooser.getSelectedFile() != null) {
+				
+				File selectedFile = fileChooser.getSelectedFile();
+				if(selectedFile.isDirectory()) {
+					List<Path> pfList = FIOUtils.findFilesByExtension(
+							Paths.get(selectedFile.getAbsolutePath()), 
+							BatchMatchConfiguration.BATCH_MATCH_PROJECT_FILE_EXTENSION);
+					if(pfList == null || pfList.isEmpty()) {
+						MessageDialog.showWarningMsg(selectedFile.getName() + 
+								" is not a valid batchMatch project", BatchMatch.getMainWindow());
+						return;
+					}
+					projectFile = pfList.get(0).toFile();
+				}
+				else {
+					projectFile = selectedFile;
+				}				
+				BatchMatchProject proj = ProjectUtils.readProjectFromFile(projectFile);
+				BatchMatch.setCurrentProject(proj);
+				setGUIfromProject(proj);
+			}
+		}		
 	}
 
 	private void saveAndCloseProject() {
-		// TODO Auto-generated method stub
+
+		BatchMatchProject proj = BatchMatch.getCurrentProject();
+		if(proj != null) 
+			ProjectUtils.saveProject(proj);
+
+		BatchMatch.setCurrentProject(null);
+		setGUIfromProject(null);
+	}
+	
+	private void setGUIfromProject(BatchMatchProject proj) {
 		
+		String title = "BatchMatch v" + BatchMatchConstants.VERSION;
+		if(proj != null)
+			title += " | " + proj.getProjectName();
+		
+		setTitle(title);
+		StatusBar.showRawDataAnalysisExperimentData(proj);
+		
+		// 	Load project settings and data files
 	}
 
-	private void setDefaultProjectDirectory() {
+	private void adjustGlobalSettings() {
 
 		GlobalSettingsDialog dialog = new GlobalSettingsDialog();
 		dialog.setLocationRelativeTo(this);

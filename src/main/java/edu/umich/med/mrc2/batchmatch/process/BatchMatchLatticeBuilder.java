@@ -46,8 +46,8 @@ import edu.umich.med.mrc2.batchmatch.data.comparators.SortDirection;
 import edu.umich.med.mrc2.batchmatch.data.comparators.SortProperty;
 import edu.umich.med.mrc2.batchmatch.data.enums.BinnerExportFields;
 import edu.umich.med.mrc2.batchmatch.data.enums.RTValueSource;
+import edu.umich.med.mrc2.batchmatch.utils.BinnerIOUtils;
 import edu.umich.med.mrc2.batchmatch.utils.DelimitedTextParser;
-import edu.umich.med.mrc2.batchmatch.utils.IOUtils;
 import edu.umich.med.mrc2.batchmatch.utils.Range;
 
 public class BatchMatchLatticeBuilder {
@@ -215,14 +215,14 @@ public class BatchMatchLatticeBuilder {
 		String[][] fileData = DelimitedTextParser.parseTextFile(
 				dataFile, DelimitedTextParser.TAB_DELIMITER);
 		Map<BinnerExportFields,Integer>headerMap = 
-				IOUtils.mapBinnerInputFileHeader(fileData[0]);
+				BinnerIOUtils.mapBinnerInputFileHeader(fileData[0]);
 		
 		if(headerMap.get(BinnerExportFields.MZ) == null 
 				|| headerMap.get(BinnerExportFields.RT_OBSERVED) == null)		
 			throw new IllegalArgumentException("No MZ or RT column found.");
 		
 		Set<Integer>pooledColumnIndices = 
-				IOUtils.getPooledSampleIndices(fileData[0], pooledSampleIdentifier);
+				BinnerIOUtils.getPooledSampleIndices(fileData[0], pooledSampleIdentifier);
 		DescriptiveStatistics ds = new DescriptiveStatistics();
 		
 		for(int i=1; i<fileData.length; i++) {

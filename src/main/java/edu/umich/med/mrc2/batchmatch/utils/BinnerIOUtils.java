@@ -28,7 +28,7 @@ import java.util.TreeSet;
 
 import edu.umich.med.mrc2.batchmatch.data.enums.BinnerExportFields;
 
-public class IOUtils {
+public class BinnerIOUtils {
 
 	public static Map<BinnerExportFields,Integer>mapBinnerInputFileHeader(String[]header){
 		

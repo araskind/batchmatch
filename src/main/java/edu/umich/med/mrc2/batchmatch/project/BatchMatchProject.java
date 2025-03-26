@@ -22,7 +22,10 @@
 package edu.umich.med.mrc2.batchmatch.project;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -32,6 +35,7 @@ import org.jdom2.Element;
 
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
 import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
+import edu.umich.med.mrc2.batchmatch.data.store.BatchMatchInputObjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.ProjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.XmlStorable;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
@@ -39,22 +43,28 @@ import edu.umich.med.mrc2.batchmatch.utils.ProjectUtils;
 
 public class BatchMatchProject implements XmlStorable{
 
-	private String projectName;
-	private Set<BatchMatchInputObject>inputObjects;
-	private Map<AlignmentSettings,Object>alignmentSettings;
+	protected String projectName;
+	protected File projectDirectory;
+	protected File projectFile;
+	protected Set<BatchMatchInputObject>inputObjects;
+	protected Map<AlignmentSettings,Object>alignmentSettings;
+	protected static final String VALUE_FIELD = "value";
 	
-	public BatchMatchProject(String projectName, File parentDirectory) {
+	public BatchMatchProject(String projectName, File parentDirectory) throws IOException {
 		this();
 		this.projectName = projectName;
-		createProjectDirectoryStructure(parentDirectory);
-	}
-
-	private void createProjectDirectoryStructure(File parentDirectory) {
-		// TODO Auto-generated method stub
+		projectDirectory = ProjectUtils.createProjectDirectoryStructure(parentDirectory, projectName);
 		
+		if(projectDirectory == null) {
+			throw new IOException("Failed to create project");
+		}
+		projectFile = 
+				Paths.get(projectDirectory.getAbsolutePath(), 
+						projectName.replaceAll("[\\\\/:*?\"<>|]", "-") + "." + 
+						BatchMatchConfiguration.BATCH_MATCH_PROJECT_FILE_EXTENSION).toFile();
 	}
 
-	public BatchMatchProject() {
+	private BatchMatchProject() {
 		super();
 		inputObjects = new HashSet<BatchMatchInputObject>();		
 		initDefaultAlignmentSettings();
@@ -100,9 +110,87 @@ public class BatchMatchProject implements XmlStorable{
 		this.projectName = projectName;
 	}
 	
-	//	TODO
-	public BatchMatchProject(Element xmlElement) {
+	public File getRawInputFilesDirectory() {
+		 return Paths.get(projectDirectory.getAbsolutePath(), 
+				 BatchMatchConfiguration.RAW_INPUT_DATA_DIRECTORY).toFile();
+	}
+	
+	public File getBinnerFilesDirectory() {
+		 return Paths.get(projectDirectory.getAbsolutePath(), 
+				 BatchMatchConfiguration.BINNER_FILES_DIRECTORY).toFile();
+	}	
+	
+	public File getIterativeResultsDirectory() {
+		 return Paths.get(projectDirectory.getAbsolutePath(), 
+				 BatchMatchConfiguration.ITERATIVE_ANALYSIS_RESULTS_DIRECTORY).toFile();
+	}
 		
+	public File getFinalResultsDirectory() {
+		 return Paths.get(projectDirectory.getAbsolutePath(), 
+				 BatchMatchConfiguration.FINAL_RESULTS_DIRECTORY).toFile();
+	}
+
+	public BatchMatchProject(Element experimentElement, File projFile) {
+		
+		this();
+		this.projectFile  = projFile;
+		projectDirectory = projectFile.getParentFile();
+		projectName = experimentElement.getAttributeValue(ProjectFields.Name.name());
+		parseSettings(experimentElement.getChild(ProjectFields.Settings.name()).getChildren());
+		
+		List<Element>inputObjectElementList = 
+				experimentElement.getChildren(BatchMatchInputObjectFields.BatchMatchInputObject.name());
+		if(!inputObjectElementList.isEmpty()) {
+			
+			for(Element inputObjectElement : inputObjectElementList) {
+				
+				BatchMatchInputObject ipObj = null;
+				try {
+					ipObj = new BatchMatchInputObject(inputObjectElement, this);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(ipObj != null)
+					inputObjects.add(ipObj);
+			}
+		}
+	}
+	
+	private void parseSettings(List<Element> settingsListElements) {
+		
+		if(!settingsListElements.isEmpty()) {
+			
+			for(Element setting : settingsListElements) {
+				
+				AlignmentSettings field = 
+						AlignmentSettings.getValueByName(setting.getName());
+				String value = setting.getAttributeValue(VALUE_FIELD);
+				if(field != null) {
+					
+					if(field.getClazz().equals(Double.class)) {
+						
+						Double parValue = null;
+						if(!value.isBlank()) {
+							try {
+								parValue = Double.parseDouble(value);
+							} catch (NumberFormatException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						if(parValue != null)
+							alignmentSettings.put(field, parValue);
+					}
+					if(field.getClazz().equals(MassErrorType.class) && !value.isBlank()) {
+						
+						MassErrorType et = MassErrorType.getTypeByName(value);
+						if(et != null)
+							alignmentSettings.put(field, et);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -110,10 +198,9 @@ public class BatchMatchProject implements XmlStorable{
 
 		Element experimentElement = 
 				new Element(ProjectFields.BatchMatchProject.name());
-	
-		if(projectName != null)
-			experimentElement.setAttribute(
-					ProjectFields.Name.name(), projectName);
+		experimentElement.setAttribute("version", "1.0.0.0");
+
+		experimentElement.setAttribute(ProjectFields.Name.name(), projectName);
 
 		Element inputObjectsListElement = 
 				new Element(ProjectFields.InputObjects.name());
@@ -135,11 +222,19 @@ public class BatchMatchProject implements XmlStorable{
 						BatchMatchConfiguration.defaultMzFormat.format((Double)ae.getValue()));
 			}
 			if(ae.getValue() instanceof MassErrorType) {
-				aeElement.setAttribute("value", ((MassErrorType)ae.getValue()).name());
+				aeElement.setAttribute(VALUE_FIELD, ((MassErrorType)ae.getValue()).name());
 			}
 			settingsListElement.addContent(aeElement);
 		}		
 		experimentElement.addContent(settingsListElement);
 		return experimentElement;
+	}
+
+	public File getProjectFile() {
+		return projectFile;
+	}
+
+	public void setProjectFile(File projectFile) {
+		this.projectFile = projectFile;
 	}
 }
