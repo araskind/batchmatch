@@ -43,6 +43,7 @@ import javax.swing.border.TitledBorder;
 import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
 import edu.umich.med.mrc2.batchmatch.project.AlignmentSettings;
+import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 import edu.umich.med.mrc2.batchmatch.utils.ProjectUtils;
 
 public class AlignmentSettingsPanel extends JPanel {
@@ -293,6 +294,10 @@ public class AlignmentSettingsPanel extends JPanel {
 				((Double)settings.get(AlignmentSettings.EXCLUDE_DELTA_RT_ABOVE)).toString());
 		excludeRTbelowField.setText(
 				((Double)settings.get(AlignmentSettings.EXCLUDE_DELTA_RT_BELOW)).toString());
+	}
+	
+	public void loadSettingsFromProject(BatchMatchProject project) {
+		loadSettings(project.getAlignmentSettings());
 	}
 	
 	public double getMassTolerance(){

@@ -139,7 +139,8 @@ public class BatchMatchProject implements XmlStorable{
 		parseSettings(experimentElement.getChild(ProjectFields.Settings.name()).getChildren());
 		
 		List<Element>inputObjectElementList = 
-				experimentElement.getChildren(BatchMatchInputObjectFields.BatchMatchInputObject.name());
+				experimentElement.getChild(ProjectFields.InputObjects.name()).
+				getChildren(BatchMatchInputObjectFields.BatchMatchInputObject.name());
 		if(!inputObjectElementList.isEmpty()) {
 			
 			for(Element inputObjectElement : inputObjectElementList) {

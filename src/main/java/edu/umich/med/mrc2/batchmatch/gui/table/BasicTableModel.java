@@ -113,6 +113,10 @@ public class BasicTableModel extends DefaultTableModel implements Reorderable {
 	
 	@Override
 	public void reorder(int fromIndex, int toIndex) {
+		
+		if(toIndex >= dataVector.size())
+			toIndex = dataVector.size() - 1;
+		
 		moveRow(fromIndex, fromIndex, toIndex);
 	}
 	

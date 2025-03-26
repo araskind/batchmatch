@@ -125,8 +125,8 @@ public class BatchMatchInputObject implements XmlStorable, Comparable<BatchMatch
     	
     	batchNumber = Integer.parseInt(
     			batchMatchInputObjectElement.getAttributeValue(
-    					BatchMatchInputObjectFields.BatchMatchInputObject.name()));
-    	isTargetBatch = Boolean.getBoolean(
+    					BatchMatchInputObjectFields.BatchNumber.name()));
+    	isTargetBatch = Boolean.parseBoolean(
     			batchMatchInputObjectElement.getAttributeValue(
     					BatchMatchInputObjectFields.IsTarget.name()));
     	binnerizedDataFile = 

@@ -30,6 +30,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -41,11 +43,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
 import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.api.JnaFileChooser;
-import edu.umich.med.mrc2.batchmatch.gui.table.BinnerInputTable;
+import edu.umich.med.mrc2.batchmatch.gui.table.BatchMatchInputTable;
+import edu.umich.med.mrc2.batchmatch.gui.table.BatchMatchInputTableModel;
 import edu.umich.med.mrc2.batchmatch.gui.utils.MessageDialog;
 import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
+import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
+import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 
 public class BatchMatchProjectSetupPanel extends JPanel implements ActionListener {
 
@@ -54,7 +60,7 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private BinnerInputTable binnerInputTable;
+	private BatchMatchInputTable batchMatchInputTable;
 	private JnaFileChooser fileChooser;
 	private AlignmentSettingsPanel alignmentSettingsPanel;
 
@@ -74,8 +80,8 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 				BatchMatchConfiguration.panelTitleFont, BatchMatchConfiguration.panelTitleColor), 
 				new EmptyBorder(10, 10, 10, 10)));
 		
-		binnerInputTable = new BinnerInputTable();
-		tableWrapper.add(new JScrollPane(binnerInputTable), BorderLayout.CENTER);
+		batchMatchInputTable = new BatchMatchInputTable();
+		tableWrapper.add(new JScrollPane(batchMatchInputTable), BorderLayout.CENTER);
 		
 		JPanel buttonPanel = new JPanel();		
 		JButton selectAreaFilesButton = new JButton(
@@ -112,6 +118,11 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 
 		String command = e.getActionCommand();
 		
+		BatchMatchProject project = BatchMatch.getCurrentProject();
+		if(project == null) {
+			MessageDialog.showWarningMsg("No active project", this);
+			return;
+		}		
 		if(command.equals(BMActionCommands.SELECT_PEAK_AREA_FILES_COMMAND.getName())
 				|| command.equals(BMActionCommands.SELECT_BINNER_FILES_COMMAND.getName()))
 			selectFiles(command);
@@ -123,9 +134,9 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 	private void clearFileSelectionTable() {
 
 		String message = "Do you want to clear setup table?";
-		int res = MessageDialog.showChoiceWithWarningMsg(message, binnerInputTable);
+		int res = MessageDialog.showChoiceWithWarningMsg(message, batchMatchInputTable);
 		if(res == JOptionPane.YES_OPTION)
-			binnerInputTable.clearTable();
+			batchMatchInputTable.clearTable();
 	}
 
 	private void selectFiles(String command) {
@@ -133,45 +144,79 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 		fileChooser = new JnaFileChooser(BatchMatchConfiguration.getProjectDirectory());
 		fileChooser.setMode(JnaFileChooser.Mode.Files);
 		
-		if(command.equals(BMActionCommands.SELECT_BINNER_FILES_COMMAND.getName()))
+		if(command.equals(BMActionCommands.SELECT_BINNER_FILES_COMMAND.getName())) {
 			fileChooser.addFilter("Comma-separated files", "csv", "CSV");
-		
-		if(command.equals(BMActionCommands.SELECT_PEAK_AREA_FILES_COMMAND.getName()))
+			fileChooser.setCurrentDirectory(
+					BatchMatch.getCurrentProject().getBinnerFilesDirectory().getAbsolutePath());
+		}
+		if(command.equals(BMActionCommands.SELECT_PEAK_AREA_FILES_COMMAND.getName())) {
 			fileChooser.addFilter("Text files", "txt", "TXT", "tsv", "TSV");
-				
+			fileChooser.setCurrentDirectory(
+					BatchMatch.getCurrentProject().getRawInputFilesDirectory().getAbsolutePath());
+		}				
 		fileChooser.setTitle(command);
 		fileChooser.setMultiSelectionEnabled(true);
 		if (fileChooser.showOpenDialog(this.getTopLevelAncestor())) {
 			
 			File[]selectedFiles = fileChooser.getSelectedFiles();
 			if(command.equals(BMActionCommands.SELECT_BINNER_FILES_COMMAND.getName()))
-				binnerInputTable.setBinnerFiles(selectedFiles);
+				batchMatchInputTable.setBinnerFiles(selectedFiles);
 			
 			if(command.equals(BMActionCommands.SELECT_PEAK_AREA_FILES_COMMAND.getName()))
-				binnerInputTable.setPeakAreaFiles(selectedFiles);
+				batchMatchInputTable.setPeakAreaFiles(selectedFiles);
 		}
 	}
 	
-	public Collection<String>validateProjectSetup(){
+	public Collection<String>validateProjectSetup(boolean ignoreNoInput){
 	    
 	    Collection<String>errors = new ArrayList<String>();
 	    
-//	    if(getProjectName().isEmpty())
-//	        errors.add("Project name cannot be empty.");
-//	    
-//	    if(baseDirectory == null || !baseDirectory.exists())
-//	        errors.add("Invalid project directory.");
-//	    
-//	    if(!getProjectName().isEmpty() && baseDirectory != null) {
-//	        
-//	        File newProjectDir = 
-//	                Paths.get(baseDirectory.getAbsolutePath(), getProjectName()).toFile();
-//	        if(newProjectDir.exists()) {
-//	            errors.add("Project \"" + getProjectName() + "\" already exists\n"
-//	                    + "in the directory \"" + baseDirectory.getAbsolutePath() + "\"");
-//	        }
-//	    }		
+	    Collection<BatchMatchInputObject>bmioSet = 
+	    		batchMatchInputTable.getBatchMatchInputObject();
+	    
+	    if(bmioSet.isEmpty() && !ignoreNoInput)
+	    	errors.add("No input data specified or specification incomplete:\n\n"
+	    			+ "Peak area file and binnerized file must be present for each batch\n"
+	    			+ "Primary batch for alignment must be selected\n");
+	    
+	    Set<File>distinctPeakAreaFiles = 
+	    		bmioSet.stream().map(o -> o.getPeakAreasFile()).
+	    		collect(Collectors.toSet());
+	    if(distinctPeakAreaFiles.size() < bmioSet.size())
+	    	errors.add("Duplicate values in \"" + 
+	    			BatchMatchInputTableModel.PEAK_AREAS_FILE_COLUMN + "\" column");
+		
+	    Set<File>distinctBinnerFiles = 
+	    		bmioSet.stream().map(o -> o.getBinnerizedDataFile()).
+	    		collect(Collectors.toSet());
+	    if(distinctBinnerFiles.size() < bmioSet.size())
+	    	errors.add("Duplicate values in \"" + 
+	    			BatchMatchInputTableModel.BINNER_OUTPUT_FILE_COLUMN + "\" column");
+	    
+	    BatchMatchInputObject targetBatch = 
+	    		bmioSet.stream().filter(o -> o.isTargetBatch()).
+	    		findFirst().orElse(null);
+	    if(targetBatch == null)
+	    	errors.add("Primary batch not selected");
+	    
+	    errors.addAll(alignmentSettingsPanel.validateProjectSetup());
+	    
 	    return errors;
+	}
+	
+	public void clearPanel() {
+		batchMatchInputTable.clearTable();
+	}
+	
+	public void loadProjectData(BatchMatchProject project) {
+		
+		batchMatchInputTable.setTableModelFromBatchMatchInputObjectCollection(
+				project.getInputObjects());
+		alignmentSettingsPanel.loadSettingsFromProject(project);
+	}
+	
+	public Collection<BatchMatchInputObject>getBatchMatchInputObject(){
+	    return batchMatchInputTable.getBatchMatchInputObject();
 	}
 
 }

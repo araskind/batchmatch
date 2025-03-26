@@ -48,6 +48,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import org.apache.commons.lang3.StringUtils;
+
+import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
 import edu.umich.med.mrc2.batchmatch.gui.jnafilechooser.api.JnaFileChooser;
 import edu.umich.med.mrc2.batchmatch.gui.panels.BatchMatchProjectSetupPanel;
 import edu.umich.med.mrc2.batchmatch.gui.utils.GuiUtils;
@@ -275,9 +278,21 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 	private void saveAndCloseProject() {
 
 		BatchMatchProject proj = BatchMatch.getCurrentProject();
-		if(proj != null) 
+		if(proj != null) {
+			
+			Collection<String>errors = projectSetupPanel.validateProjectSetup(true);
+			if(!errors.isEmpty()) {
+			    MessageDialog.showErrorMsg(
+			            StringUtils.join(errors, "\n"), this);
+			    return;
+			}
+			Collection<BatchMatchInputObject>bmioSet = 
+					projectSetupPanel.getBatchMatchInputObject();
+			
+			proj.getInputObjects().clear();
+			proj.getInputObjects().addAll(bmioSet);
 			ProjectUtils.saveProject(proj);
-
+		}
 		BatchMatch.setCurrentProject(null);
 		setGUIfromProject(null);
 	}
@@ -291,7 +306,11 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 		setTitle(title);
 		StatusBar.showRawDataAnalysisExperimentData(proj);
 		
-		// 	Load project settings and data files
+		// 	Load project settings and data files		
+		if(proj == null)
+			projectSetupPanel.clearPanel();
+		else
+			projectSetupPanel.loadProjectData(proj);
 	}
 
 	private void adjustGlobalSettings() {
@@ -310,7 +329,7 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 	public Collection<String>validateProjectSetup(){
 	    
 	    Collection<String>errors = new ArrayList<String>();
-	    errors.addAll(projectSetupPanel.validateProjectSetup());
+	    errors.addAll(projectSetupPanel.validateProjectSetup(false));
 	    
 	    
 //	    if(getProjectName().isEmpty())

@@ -22,8 +22,15 @@
 package edu.umich.med.mrc2.batchmatch.gui.table;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-public class BinnerInputTableModel extends BasicTableModel {
+import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
+
+public class BatchMatchInputTableModel extends BasicTableModel {
 
 	/**
 	 * 
@@ -35,7 +42,7 @@ public class BinnerInputTableModel extends BasicTableModel {
 	public static final String BINNER_OUTPUT_FILE_COLUMN = "Binner output file";
 	public static final String PRIMARY_BATCH_COLUMN = "Primary";
 	
-	public BinnerInputTableModel() {
+	public BatchMatchInputTableModel() {
 
 		super();
 
@@ -47,5 +54,36 @@ public class BinnerInputTableModel extends BasicTableModel {
 		};
 	}
 	
-	
+	public void setTableModelFromBatchMatchInputObjectCollection(
+			Collection<BatchMatchInputObject> inputObjects) {
+
+		setRowCount(0);
+		if(!inputObjects.isEmpty()) {
+			
+			Set<BatchMatchInputObject>sorted = 
+					new TreeSet<BatchMatchInputObject>(inputObjects);
+			List<Object[]>rowData = new ArrayList<Object[]>();
+			for(BatchMatchInputObject io : sorted) {
+				
+				Object[]row = new Object[] {
+					io.getBatchNumber(),
+					io.getPeakAreasFile(),
+					io.getBinnerizedDataFile(),
+					io.isTargetBatch(),
+				};
+				rowData.add(row);
+			}
+			if(!rowData.isEmpty())
+				addRows(rowData);	
+		}
+	}
 }
+
+
+
+
+
+
+
+
+
