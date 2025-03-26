@@ -23,14 +23,19 @@ package edu.umich.med.mrc2.batchmatch.data;
 
 import java.io.File;
 
-public class BatchMatchInputObject implements Comparable<BatchMatchInputObject>{
+import org.jdom2.Element;
+
+import edu.umich.med.mrc2.batchmatch.data.store.BatchMatchInputObjectFields;
+import edu.umich.med.mrc2.batchmatch.data.store.XmlStorable;
+
+public class BatchMatchInputObject implements XmlStorable, Comparable<BatchMatchInputObject>{
 
 	private int batchNumber;
 	private File binnerizedDataFile;
 	private File peakAreasFile;
 	private boolean isTargetBatch;
 		
-	public BatchMatchInputObject() {
+	public BatchMatchInputObject(){
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -111,4 +116,48 @@ public class BatchMatchInputObject implements Comparable<BatchMatchInputObject>{
     public int hashCode() {
         return binnerizedDataFile.hashCode() + peakAreasFile.hashCode();
     }
+
+    //	TODO
+    public BatchMatchInputObject(Element xmlElement) {
+    	
+    }
+    
+	@Override
+	public Element getXmlElement() {
+
+		Element batchMatchInputObjectElement = 
+				new Element(BatchMatchInputObjectFields.BatchMatchInputObject.name());
+	
+		batchMatchInputObjectElement.setAttribute(
+				BatchMatchInputObjectFields.BatchNumber.name(), Integer.toString(batchNumber));
+		
+		batchMatchInputObjectElement.setAttribute(
+				BatchMatchInputObjectFields.IsTarget.name(), Boolean.toString(isTargetBatch));
+		
+		Element peakAreasFileElement = 
+				new Element(BatchMatchInputObjectFields.PeakAreasFile.name());
+		if(peakAreasFile != null) 
+			peakAreasFileElement.setText(peakAreasFile.getName());
+		
+		batchMatchInputObjectElement.addContent(peakAreasFileElement);
+		
+		Element binnerizedDataFileElement = 
+				new Element(BatchMatchInputObjectFields.BinnerizedDataFile.name());
+		if(binnerizedDataFile != null) 
+			binnerizedDataFileElement.setText(binnerizedDataFile.getName());
+		
+		batchMatchInputObjectElement.addContent(binnerizedDataFileElement);
+		
+		return batchMatchInputObjectElement;
+	}
 }
+
+
+
+
+
+
+
+
+
+

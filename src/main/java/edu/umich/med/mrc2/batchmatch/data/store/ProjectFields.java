@@ -19,39 +19,13 @@
  *
  ******************************************************************************/
 
-package edu.umich.med.mrc2.batchmatch.project;
+package edu.umich.med.mrc2.batchmatch.data.store;
 
-import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
-
-public enum AlignmentSettings {
-
-	MASS_TOLERANCE(Double.class),
-	MASS_TOLERANCE_TYPE(MassErrorType.class),
-	RT_TOLERANCE(Double.class),
-	ANNEALING_STRETCH_FACTOR(Double.class),
-	MAX_SD_FROM_CURVE(Double.class),
-	MIN_SEPARATION(Double.class),
-	EXCLUDE_DELTA_RT_ABOVE(Double.class),
-	EXCLUDE_DELTA_RT_BELOW(Double.class),
+public enum ProjectFields {
+	
+	BatchMatchProject,
+	Name,
+	Settings,
+	InputObjects,
 	;
-	
-	private final Class clazz;
-
-	AlignmentSettings(Class clazz) {
-		this.clazz = clazz;
-	}
-
-	public Class getClazz() {
-		return clazz;
-	}
-	
-	public static AlignmentSettings getValueByName(String name) {
-
-		for(AlignmentSettings source : AlignmentSettings.values()) {
-
-			if(source.name().equals(name))
-				return source;
-		}
-		return null;
-	}
 }
