@@ -22,6 +22,7 @@
 package edu.umich.med.mrc2.batchmatch.data;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -29,6 +30,7 @@ import org.jdom2.Element;
 import edu.umich.med.mrc2.batchmatch.data.store.LatticeObjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.XmlStorable;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
+import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 
 public class LatticeObject  implements XmlStorable{
 
@@ -89,4 +91,39 @@ public class LatticeObject  implements XmlStorable{
 		
 		return latticeObjectElement;
 	}
+	
+
+	public LatticeObject(
+			Element latticeObjectElement, 
+			BatchMatchProject batchMatchProject) {
+		
+		int referenceBatchIndex = Integer.parseInt(
+				latticeObjectElement.getAttributeValue(
+						LatticeObjectFields.ReferenceBatchIndex.name()));
+		referenceBatchData = batchMatchProject.getInputObjects().
+				stream().filter(o -> o.getBatchNumber() == referenceBatchIndex).
+				findFirst().orElse(null);
+		
+		int batchOneIndex = Integer.parseInt(
+				latticeObjectElement.getAttributeValue(
+						LatticeObjectFields.BatchOneIndex.name()));
+		batchOneData = batchMatchProject.getInputObjects().
+				stream().filter(o -> o.getBatchNumber() == batchOneIndex).
+				findFirst().orElse(null);
+		
+		rtPairs = new ArrayList<RtPair>();
+		List<Element>rtPairElementList = 
+				latticeObjectElement.getChild(LatticeObjectFields.RTPairList.name()).
+				getChildren(LatticeObjectFields.RTPair.name());
+		for(Element rtPairElement : rtPairElementList) {
+			
+			double rt1 = Double.parseDouble(
+					rtPairElement.getAttributeValue(LatticeObjectFields.RT1.name()));
+			double rt2 = Double.parseDouble(
+					rtPairElement.getAttributeValue(LatticeObjectFields.RT2.name()));
+			RtPair pair = new RtPair(rt1, rt2);
+			rtPairs.add(pair);
+		}
+	}
+
 }

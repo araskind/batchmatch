@@ -51,6 +51,7 @@ import edu.umich.med.mrc2.batchmatch.gui.utils.MessageDialog;
 import edu.umich.med.mrc2.batchmatch.main.BMActionCommands;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
+import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchParametersContainer;
 import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 
 public class BatchMatchProjectSetupPanel extends JPanel implements ActionListener {
@@ -219,6 +220,19 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 	    return batchMatchInputTable.getBatchMatchInputObject();
 	}
 
+	public void updateAlignmentSettingsForProject(BatchMatchProject proj) {
+
+		BatchMatchParametersContainer settings = proj.getAlignmentSettings();
+		settings.setMassTolerance(alignmentSettingsPanel.getMassTolerance());
+		settings.setMassErrorType(alignmentSettingsPanel.getMassErrorType());
+		settings.setRtTolerance(alignmentSettingsPanel.getRtTolerance());
+		settings.setAnnealingStretchFactor(alignmentSettingsPanel.getAnnealingStretchFactor());
+		settings.setMaxSDfromCurve(alignmentSettingsPanel.getMaxSDfromCurve());
+		settings.setMinSeparation(alignmentSettingsPanel.getMinSeparation());
+		settings.setUpperDeltaRTexclusionLimit(alignmentSettingsPanel.getUpperDeltaRTexclusionLimit());
+		settings.setLowerDeltaRTexclusionLimit(alignmentSettingsPanel.getLowerDeltaRTexclusionLimit());
+		settings.setDefaultLatticeSize(alignmentSettingsPanel.getDefaultLatticeSize());
+	}
 }
 
 

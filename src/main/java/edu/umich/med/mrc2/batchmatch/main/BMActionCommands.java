@@ -37,6 +37,7 @@ public enum BMActionCommands {
 	//	Project
 	CREATE_NEW_PROJECT_COMMAND("Create new BatchMatch project"),
 	OPEN_PROJECT_COMMAND("Open BatchMatch project"),
+	SAVE_PROJECT_COMMAND("Save BatchMatch project"),
 	SAVE_AND_CLOSE_PROJECT_COMMAND("Save and close BatchMatch project"),	
 	GLOBAL_SETTINGS_COMMAND("Global settings"),
 	EXIT_COMMAND("Exit"),

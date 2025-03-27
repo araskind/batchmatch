@@ -34,6 +34,7 @@ import org.jdom2.Element;
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
 import edu.umich.med.mrc2.batchmatch.data.LatticeObject;
 import edu.umich.med.mrc2.batchmatch.data.store.BatchMatchInputObjectFields;
+import edu.umich.med.mrc2.batchmatch.data.store.LatticeObjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.ProjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.XmlStorable;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
@@ -136,9 +137,13 @@ public class BatchMatchProject implements XmlStorable{
 		this.projectFile  = projFile;
 		projectDirectory = projectFile.getParentFile();
 		projectName = experimentElement.getAttributeValue(ProjectFields.Name.name());
+		
+		//	Settings
 		Element settingsElement = 
 				experimentElement.getChild(BatchMatchParametersContainer.xmlNode);
 		alignmentSettings = new BatchMatchParametersContainer(settingsElement);
+		
+		//	Input objects
 		List<Element>inputObjectElementList = 
 				experimentElement.getChild(ProjectFields.InputObjects.name()).
 				getChildren(BatchMatchInputObjectFields.BatchMatchInputObject.name());
@@ -157,6 +162,25 @@ public class BatchMatchProject implements XmlStorable{
 					inputObjects.add(ipObj);
 			}
 		}
+		//	Lattice objects
+		List<Element>latticeObjectElementList = 
+				experimentElement.getChild(ProjectFields.LatticeObjects.name()).
+				getChildren(LatticeObjectFields.LatticeObject.name());
+		if(!latticeObjectElementList.isEmpty()) {
+			
+			for(Element latticeObjectElement : latticeObjectElementList) {
+				
+				LatticeObject latticeObj = null;
+				try {
+					latticeObj = new LatticeObject(latticeObjectElement, this);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if(latticeObj != null)
+					latticeObjects.add(latticeObj);
+			}
+		}
 	}
 	
 	@Override
@@ -167,7 +191,7 @@ public class BatchMatchProject implements XmlStorable{
 		experimentElement.setAttribute("version", "1.0.0.0");
 
 		experimentElement.setAttribute(ProjectFields.Name.name(), projectName);
-
+		//	Input elements
 		Element inputObjectsListElement = 
 				new Element(ProjectFields.InputObjects.name());
 		
@@ -176,8 +200,22 @@ public class BatchMatchProject implements XmlStorable{
 			for(BatchMatchInputObject ipObj : inputObjects)
 				inputObjectsListElement.addContent(ipObj.getXmlElement());
 		}	
-		experimentElement.addContent(inputObjectsListElement);		
+		experimentElement.addContent(inputObjectsListElement);	
+		
+		//	Settings
 		experimentElement.addContent(alignmentSettings.getXmlElement());
+		
+		//	Lattice elements
+		Element latticeObjectsListElement = 
+				new Element(ProjectFields.LatticeObjects.name());
+		
+		if(latticeObjects != null && !latticeObjects.isEmpty()) {
+			
+			for(LatticeObject latticeObj : latticeObjects)
+				latticeObjectsListElement.addContent(latticeObj.getXmlElement());
+		}
+		experimentElement.addContent(latticeObjectsListElement);
+		
 		return experimentElement;
 	}
 

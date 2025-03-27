@@ -22,16 +22,14 @@
 package edu.umich.med.mrc2.batchmatch.taskcontrol.tasks;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
 import edu.umich.med.mrc2.batchmatch.data.LatticeObject;
-import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
+import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchParametersContainer;
 import edu.umich.med.mrc2.batchmatch.process.BatchMatchLatticeBuilder;
-import edu.umich.med.mrc2.batchmatch.project.AlignmentSettings;
 import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.AbstractTask;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.Task;
@@ -39,15 +37,15 @@ import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskStatus;
 
 public class LatticeGenerationTask extends AbstractTask {
 	
-	private Map<AlignmentSettings, Object> alignmentSettings;
+	private BatchMatchProject project;
+	private BatchMatchParametersContainer alignmentSettings;
 	private Set<BatchMatchInputObject>inputObjects;
 	
-	public LatticeGenerationTask(
-			Map<AlignmentSettings, Object> alignmentSettings,
-			Set<BatchMatchInputObject> inputObjects) {
+	public LatticeGenerationTask(BatchMatchProject project) {
 		super();
-		this.alignmentSettings = alignmentSettings;
-		this.inputObjects = inputObjects;
+		this.project = project;
+		this.alignmentSettings = project.getAlignmentSettings();
+		this.inputObjects = project.getInputObjects();
 	}
 
 
@@ -72,10 +70,10 @@ public class LatticeGenerationTask extends AbstractTask {
 			BatchMatchLatticeBuilder latticeBuilder = new BatchMatchLatticeBuilder(
 					iobj, 
 					target,
-					(int)Math.round((Double)alignmentSettings.get(AlignmentSettings.DEFAULT_LATTICE_SIZE)), 
-					(double)alignmentSettings.get(AlignmentSettings.MASS_TOLERANCE), 
-					(MassErrorType)alignmentSettings.get(AlignmentSettings.MASS_TOLERANCE_TYPE),
-					(double)alignmentSettings.get(AlignmentSettings.RT_TOLERANCE));
+					alignmentSettings.getDefaultLatticeSize(), 
+					alignmentSettings.getMassTolerance(), 
+					alignmentSettings.getMassErrorType(),
+					alignmentSettings.getRtTolerance());
 			latticeBuilder.buildLattice();
 			LatticeObject lattice = latticeBuilder.getLatticeObject();
 			if(lattice != null)
@@ -88,6 +86,6 @@ public class LatticeGenerationTask extends AbstractTask {
 
 	@Override
 	public Task cloneTask() {
-		return new LatticeGenerationTask(alignmentSettings, inputObjects);
+		return new LatticeGenerationTask(project);
 	}
 }

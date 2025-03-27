@@ -27,5 +27,6 @@ public enum ProjectFields {
 	Name,
 	Settings,
 	InputObjects,
+	LatticeObjects,
 	;
 }

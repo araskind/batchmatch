@@ -58,8 +58,8 @@ public class AlignmentSettingsPanel extends JPanel {
 	private JComboBox<MassErrorType> massErrorTypeComboBox;
 	private JFormattedTextField annealingStretchFactorField;
 	private JFormattedTextField maxSDfromCurveField;
-	private JFormattedTextField excludeRTaboveField;
-	private JFormattedTextField excludeRTbelowField;
+	private JFormattedTextField upperDeltaRTexclusionLimitField;
+	private JFormattedTextField lowerDeltaRTexclusionLimitField;
 	private JFormattedTextField minSeparationField;
 	private JSpinner latticeSizeSpinner;
 	
@@ -255,16 +255,16 @@ public class AlignmentSettingsPanel extends JPanel {
 		gbc_lblNewLabel_6.gridy = 2;
 		panel_1.add(lblNewLabel_6, gbc_lblNewLabel_6);
 		
-		excludeRTaboveField = 
+		upperDeltaRTexclusionLimitField = 
 				new JFormattedTextField(BatchMatchConfiguration.defaultRtFormat);
-		excludeRTaboveField.setPreferredSize(new Dimension(80, 20));
-		excludeRTaboveField.setColumns(10);
+		upperDeltaRTexclusionLimitField.setPreferredSize(new Dimension(80, 20));
+		upperDeltaRTexclusionLimitField.setColumns(10);
 		GridBagConstraints gbc_formattedTextField_3 = new GridBagConstraints();
 		gbc_formattedTextField_3.insets = new Insets(0, 0, 0, 5);
 		gbc_formattedTextField_3.fill = GridBagConstraints.HORIZONTAL;
 		gbc_formattedTextField_3.gridx = 1;
 		gbc_formattedTextField_3.gridy = 2;
-		panel_1.add(excludeRTaboveField, gbc_formattedTextField_3);
+		panel_1.add(upperDeltaRTexclusionLimitField, gbc_formattedTextField_3);
 		
 		JLabel lblNewLabel_7 = new JLabel(" or <= ");
 		GridBagConstraints gbc_lblNewLabel_7 = new GridBagConstraints();
@@ -273,17 +273,17 @@ public class AlignmentSettingsPanel extends JPanel {
 		gbc_lblNewLabel_7.gridy = 2;
 		panel_1.add(lblNewLabel_7, gbc_lblNewLabel_7);
 		
-		excludeRTbelowField = 
+		lowerDeltaRTexclusionLimitField = 
 				new JFormattedTextField(BatchMatchConfiguration.defaultRtFormat);
-		excludeRTbelowField.setMinimumSize(new Dimension(80, 20));
-		excludeRTbelowField.setPreferredSize(new Dimension(80, 20));
-		excludeRTbelowField.setColumns(10);
+		lowerDeltaRTexclusionLimitField.setMinimumSize(new Dimension(80, 20));
+		lowerDeltaRTexclusionLimitField.setPreferredSize(new Dimension(80, 20));
+		lowerDeltaRTexclusionLimitField.setColumns(10);
 		GridBagConstraints gbc_formattedTextField_4 = new GridBagConstraints();
 		gbc_formattedTextField_4.insets = new Insets(0, 0, 0, 5);
 		gbc_formattedTextField_4.fill = GridBagConstraints.HORIZONTAL;
 		gbc_formattedTextField_4.gridx = 3;
 		gbc_formattedTextField_4.gridy = 2;
-		panel_1.add(excludeRTbelowField, gbc_formattedTextField_4);
+		panel_1.add(lowerDeltaRTexclusionLimitField, gbc_formattedTextField_4);
 		
 		JLabel lblNewLabel_8 = new JLabel("min");
 		GridBagConstraints gbc_lblNewLabel_8 = new GridBagConstraints();
@@ -307,8 +307,8 @@ public class AlignmentSettingsPanel extends JPanel {
 		annealingStretchFactorField.setText(Double.toString(settings.getAnnealingStretchFactor()));
 		maxSDfromCurveField.setText(Double.toString(settings.getMaxSDfromCurve()));
 		minSeparationField.setText(Double.toString(settings.getMinSeparation()));
-		excludeRTaboveField.setText(Double.toString(settings.getUpperDeltaRTexclusionLimit()));
-		excludeRTbelowField.setText(Double.toString(settings.getLowerDeltaRTexclusionLimit()));		
+		upperDeltaRTexclusionLimitField.setText(Double.toString(settings.getUpperDeltaRTexclusionLimit()));
+		lowerDeltaRTexclusionLimitField.setText(Double.toString(settings.getLowerDeltaRTexclusionLimit()));		
 		latticeSizeSpinner.setValue(settings.getDefaultLatticeSize());
 	}
 	
@@ -340,12 +340,16 @@ public class AlignmentSettingsPanel extends JPanel {
 		return Double.parseDouble(minSeparationField.getText().trim());
 	}
 
-	public double getExcludeRTabove(){
-		return Double.parseDouble(excludeRTaboveField.getText().trim());
+	public double getUpperDeltaRTexclusionLimit(){
+		return Double.parseDouble(upperDeltaRTexclusionLimitField.getText().trim());
 	}
 
-	public double getExcludeRTbelow(){
-		return Double.parseDouble(excludeRTbelowField.getText().trim());
+	public double getLowerDeltaRTexclusionLimit(){
+		return Double.parseDouble(lowerDeltaRTexclusionLimitField.getText().trim());
+	}
+	
+	public int getDefaultLatticeSize() {
+		return (int)latticeSizeSpinner.getValue();
 	}
 	
 	public Collection<String>validateProjectSetup(){
@@ -367,7 +371,7 @@ public class AlignmentSettingsPanel extends JPanel {
 	    if(getMinSeparation() <= 0)
 	        errors.add("Min. Separation must be > 0.");
 	    
-	    if(getExcludeRTabove() < getExcludeRTbelow())
+	    if(getUpperDeltaRTexclusionLimit() < getLowerDeltaRTexclusionLimit())
 	        errors.add("For RT pair exclusion delta-RT upper limit must be larger than lower one.");
 	
 	    return errors;

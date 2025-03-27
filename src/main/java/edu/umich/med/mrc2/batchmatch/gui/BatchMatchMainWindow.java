@@ -60,15 +60,19 @@ import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
 import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
+import edu.umich.med.mrc2.batchmatch.taskcontrol.AbstractTask;
+import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskControlListener;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskEvent;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskListener;
+import edu.umich.med.mrc2.batchmatch.taskcontrol.TaskStatus;
 import edu.umich.med.mrc2.batchmatch.taskcontrol.gui.TaskProgressPanel;
+import edu.umich.med.mrc2.batchmatch.taskcontrol.tasks.LatticeGenerationTask;
 import edu.umich.med.mrc2.batchmatch.utils.FIOUtils;
 import edu.umich.med.mrc2.batchmatch.utils.ProjectUtils;
 import edu.umich.med.mrc2.batchmatch.utils.TextUtils;
 
-
-public class BatchMatchMainWindow  extends JFrame implements ActionListener, WindowListener, TaskListener {
+public class BatchMatchMainWindow  extends JFrame 
+	implements ActionListener, WindowListener, TaskListener, TaskControlListener {
 
 	/**
 	 * 
@@ -141,6 +145,9 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 		if(command.equals(BMActionCommands.OPEN_PROJECT_COMMAND.getName()))
 			openProject();
 		
+		if(command.equals(BMActionCommands.SAVE_PROJECT_COMMAND.getName()))
+			saveProject();
+		
 		if(command.equals(BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND.getName()))
 			saveAndCloseProject();
 		
@@ -158,8 +165,16 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 	}
 	
 	private void runBatchMatch() {
-		// TODO Auto-generated method stub
+
+		//	Validate inputs, update parameters and save the project
+		if(!saveProject())
+			return;
 		
+		//	Initiate alignment run - generate lattices
+		LatticeGenerationTask task = 
+				new LatticeGenerationTask(BatchMatch.getCurrentProject());
+		task.addTaskListener(this);
+		BatchMatch.getTaskController().addTask(task);
 	}
 
 	private void exitSoftware() {
@@ -277,24 +292,40 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 
 	private void saveAndCloseProject() {
 
-		BatchMatchProject proj = BatchMatch.getCurrentProject();
-		if(proj != null) {
-			
-			Collection<String>errors = projectSetupPanel.validateProjectSetup(true);
-			if(!errors.isEmpty()) {
-			    MessageDialog.showErrorMsg(
-			            StringUtils.join(errors, "\n"), this);
-			    return;
-			}
-			Collection<BatchMatchInputObject>bmioSet = 
-					projectSetupPanel.getBatchMatchInputObject();
-			
-			proj.getInputObjects().clear();
-			proj.getInputObjects().addAll(bmioSet);
-			ProjectUtils.saveProject(proj);
-		}
+		if(!saveProject())
+			return;
+		
 		BatchMatch.setCurrentProject(null);
 		setGUIfromProject(null);
+	}
+	
+	private boolean saveProject() {
+
+		if(BatchMatch.getCurrentProject() == null)
+			return false;
+			
+		Collection<String>errors = validateProjectSetup();
+		if(!errors.isEmpty()) {
+		    MessageDialog.showErrorMsg(StringUtils.join(errors, "\n"), this);
+		    return false;
+		}
+		updateProjectWithNewParameters();
+		ProjectUtils.saveProject(BatchMatch.getCurrentProject());		
+		return true;
+	}
+	
+	private void updateProjectWithNewParameters() {
+
+		//	Input objects
+		BatchMatchProject proj = BatchMatch.getCurrentProject();
+		Collection<BatchMatchInputObject>bmioSet = 
+				projectSetupPanel.getBatchMatchInputObject();
+		
+		proj.getInputObjects().clear();
+		proj.getInputObjects().addAll(bmioSet);
+		
+		//	Alignment parameters
+		projectSetupPanel.updateAlignmentSettingsForProject(proj);
 	}
 	
 	private void setGUIfromProject(BatchMatchProject proj) {
@@ -330,23 +361,7 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 	    
 	    Collection<String>errors = new ArrayList<String>();
 	    errors.addAll(projectSetupPanel.validateProjectSetup(false));
-	    
-	    
-//	    if(getProjectName().isEmpty())
-//	        errors.add("Project name cannot be empty.");
-//	    
-//	    if(baseDirectory == null || !baseDirectory.exists())
-//	        errors.add("Invalid project directory.");
-//	    
-//	    if(!getProjectName().isEmpty() && baseDirectory != null) {
-//	        
-//	        File newProjectDir = 
-//	                Paths.get(baseDirectory.getAbsolutePath(), getProjectName()).toFile();
-//	        if(newProjectDir.exists()) {
-//	            errors.add("Project \"" + getProjectName() + "\" already exists\n"
-//	                    + "in the directory \"" + baseDirectory.getAbsolutePath() + "\"");
-//	        }
-//	    }		
+		
 	    return errors;
 	}
 
@@ -407,7 +422,29 @@ public class BatchMatchMainWindow  extends JFrame implements ActionListener, Win
 
 	@Override
 	public void statusChanged(TaskEvent e) {
+		
+		if (e.getStatus() == TaskStatus.FINISHED) {
+
+			((AbstractTask) e.getSource()).removeTaskListener(this);
+			if (e.getSource().getClass().equals(LatticeGenerationTask.class)) {
+				MessageDialog.showInfoMsg("Lattice generation completed", this);
+			}
+		}
+		if (e.getStatus() == TaskStatus.ERROR || e.getStatus() == TaskStatus.CANCELED) {
+			BatchMatch.getTaskController().getTaskQueue().clear();
+			hideProgressDialog();
+		}
+	}
+
+	@Override
+	public void allTasksFinished(boolean atf) {
 		// TODO Auto-generated method stub
-		hideProgressDialog();
+		
+	}
+
+	@Override
+	public void numberOfWaitingTasksChanged(int numOfTasks) {
+		// TODO Auto-generated method stub
+		
 	}
 }
