@@ -28,7 +28,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -44,9 +43,8 @@ import javax.swing.border.TitledBorder;
 
 import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
-import edu.umich.med.mrc2.batchmatch.project.AlignmentSettings;
+import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchParametersContainer;
 import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
-import edu.umich.med.mrc2.batchmatch.utils.ProjectUtils;
 
 public class AlignmentSettingsPanel extends JPanel {
 
@@ -298,28 +296,20 @@ public class AlignmentSettingsPanel extends JPanel {
 	}
 
 	private void loadDefaultSettings() {		
-		loadSettings(ProjectUtils.getDefaultAlignmentSettings());
+		loadSettings(new BatchMatchParametersContainer());
 	}
 	
-	public void loadSettings(Map<AlignmentSettings, Object> settings) {
+	public void loadSettings(BatchMatchParametersContainer settings) {
 		
-		massToleranceField.setText(
-				((Double)settings.get(AlignmentSettings.MASS_TOLERANCE)).toString());
-		massErrorTypeComboBox.setSelectedItem(
-				(MassErrorType)settings.get(AlignmentSettings.MASS_TOLERANCE_TYPE));
-		rtToleranceField.setText(
-				((Double)settings.get(AlignmentSettings.RT_TOLERANCE)).toString());
-		annealingStretchFactorField.setText(
-				((Double)settings.get(AlignmentSettings.ANNEALING_STRETCH_FACTOR)).toString());
-		maxSDfromCurveField.setText(
-				((Double)settings.get(AlignmentSettings.MAX_SD_FROM_CURVE)).toString());
-		minSeparationField.setText(
-				((Double)settings.get(AlignmentSettings.MIN_SEPARATION)).toString());
-		excludeRTaboveField.setText(
-				((Double)settings.get(AlignmentSettings.EXCLUDE_DELTA_RT_ABOVE)).toString());
-		excludeRTbelowField.setText(
-				((Double)settings.get(AlignmentSettings.EXCLUDE_DELTA_RT_BELOW)).toString());		
-		latticeSizeSpinner.setValue(settings.get(AlignmentSettings.DEFAULT_LATTICE_SIZE));
+		massToleranceField.setText(Double.toString(settings.getMassTolerance()));		
+		massErrorTypeComboBox.setSelectedItem(settings.getMassErrorType());
+		rtToleranceField.setText(Double.toString(settings.getRtTolerance()));
+		annealingStretchFactorField.setText(Double.toString(settings.getAnnealingStretchFactor()));
+		maxSDfromCurveField.setText(Double.toString(settings.getMaxSDfromCurve()));
+		minSeparationField.setText(Double.toString(settings.getMinSeparation()));
+		excludeRTaboveField.setText(Double.toString(settings.getUpperDeltaRTexclusionLimit()));
+		excludeRTbelowField.setText(Double.toString(settings.getLowerDeltaRTexclusionLimit()));		
+		latticeSizeSpinner.setValue(settings.getDefaultLatticeSize());
 	}
 	
 	public void loadSettingsFromProject(BatchMatchProject project) {

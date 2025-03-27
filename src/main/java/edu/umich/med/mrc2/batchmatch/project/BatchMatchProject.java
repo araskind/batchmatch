@@ -27,20 +27,17 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.jdom2.Element;
 
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
 import edu.umich.med.mrc2.batchmatch.data.LatticeObject;
-import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.data.store.BatchMatchInputObjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.ProjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.XmlStorable;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
+import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchParametersContainer;
 import edu.umich.med.mrc2.batchmatch.utils.ProjectUtils;
 
 public class BatchMatchProject implements XmlStorable{
@@ -49,7 +46,7 @@ public class BatchMatchProject implements XmlStorable{
 	protected File projectDirectory;
 	protected File projectFile;
 	protected Set<BatchMatchInputObject>inputObjects;
-	protected Map<AlignmentSettings,Object>alignmentSettings;
+	protected BatchMatchParametersContainer alignmentSettings;
 	protected List<LatticeObject>latticeObjects;
 	
 	protected static final String VALUE_FIELD = "value";
@@ -75,10 +72,8 @@ public class BatchMatchProject implements XmlStorable{
 		initDefaultAlignmentSettings();
 	}
 	
-	private void initDefaultAlignmentSettings() {
-		
-		alignmentSettings = new TreeMap<AlignmentSettings,Object>();
-		alignmentSettings.putAll(ProjectUtils.getDefaultAlignmentSettings());
+	private void initDefaultAlignmentSettings() {		
+		alignmentSettings = new BatchMatchParametersContainer();
 	}
 
 	public Set<BatchMatchInputObject> getInputObjects() {
@@ -103,7 +98,7 @@ public class BatchMatchProject implements XmlStorable{
 		}
 	}
 
-	public Map<AlignmentSettings, Object> getAlignmentSettings() {
+	public BatchMatchParametersContainer getAlignmentSettings() {
 		return alignmentSettings;
 	}
 
@@ -141,8 +136,9 @@ public class BatchMatchProject implements XmlStorable{
 		this.projectFile  = projFile;
 		projectDirectory = projectFile.getParentFile();
 		projectName = experimentElement.getAttributeValue(ProjectFields.Name.name());
-		parseSettings(experimentElement.getChild(ProjectFields.Settings.name()).getChildren());
-		
+		Element settingsElement = 
+				experimentElement.getChild(BatchMatchParametersContainer.xmlNode);
+		alignmentSettings = new BatchMatchParametersContainer(settingsElement);
 		List<Element>inputObjectElementList = 
 				experimentElement.getChild(ProjectFields.InputObjects.name()).
 				getChildren(BatchMatchInputObjectFields.BatchMatchInputObject.name());
@@ -163,42 +159,6 @@ public class BatchMatchProject implements XmlStorable{
 		}
 	}
 	
-	private void parseSettings(List<Element> settingsListElements) {
-		
-		if(!settingsListElements.isEmpty()) {
-			
-			for(Element setting : settingsListElements) {
-				
-				AlignmentSettings field = 
-						AlignmentSettings.getValueByName(setting.getName());
-				String value = setting.getAttributeValue(VALUE_FIELD);
-				if(field != null) {
-					
-					if(field.getClazz().equals(Double.class)) {
-						
-						Double parValue = null;
-						if(!value.isBlank()) {
-							try {
-								parValue = Double.parseDouble(value);
-							} catch (NumberFormatException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						if(parValue != null)
-							alignmentSettings.put(field, parValue);
-					}
-					if(field.getClazz().equals(MassErrorType.class) && !value.isBlank()) {
-						
-						MassErrorType et = MassErrorType.getTypeByName(value);
-						if(et != null)
-							alignmentSettings.put(field, et);
-					}
-				}
-			}
-		}
-	}
-
 	@Override
 	public Element getXmlElement() {
 
@@ -216,23 +176,8 @@ public class BatchMatchProject implements XmlStorable{
 			for(BatchMatchInputObject ipObj : inputObjects)
 				inputObjectsListElement.addContent(ipObj.getXmlElement());
 		}	
-		experimentElement.addContent(inputObjectsListElement);
-		
-		Element settingsListElement = 
-				new Element(ProjectFields.Settings.name());
-		for(Entry<AlignmentSettings, Object>ae :alignmentSettings.entrySet()) {
-			
-			Element aeElement = new Element(ae.getKey().name());
-			if(ae.getValue() instanceof Double) {
-				aeElement.setAttribute("value", 
-						BatchMatchConfiguration.defaultMzFormat.format((Double)ae.getValue()));
-			}
-			if(ae.getValue() instanceof MassErrorType) {
-				aeElement.setAttribute(VALUE_FIELD, ((MassErrorType)ae.getValue()).name());
-			}
-			settingsListElement.addContent(aeElement);
-		}		
-		experimentElement.addContent(settingsListElement);
+		experimentElement.addContent(inputObjectsListElement);		
+		experimentElement.addContent(alignmentSettings.getXmlElement());
 		return experimentElement;
 	}
 

@@ -26,8 +26,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -36,33 +34,13 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.gui.utils.MessageDialog;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.config.BatchMatchConfiguration;
-import edu.umich.med.mrc2.batchmatch.project.AlignmentSettings;
 import edu.umich.med.mrc2.batchmatch.project.BatchMatchProject;
 
 public class ProjectUtils {
 
-	public static Map<AlignmentSettings,Object> getDefaultAlignmentSettings() {
-		
-		Map<AlignmentSettings,Object>alignmentSettings = 
-				new TreeMap<AlignmentSettings,Object>();
-		
-		alignmentSettings.put(AlignmentSettings.MASS_TOLERANCE, 5.0d);
-		alignmentSettings.put(AlignmentSettings.MASS_TOLERANCE_TYPE, MassErrorType.mDa);
-		alignmentSettings.put(AlignmentSettings.RT_TOLERANCE, 1.0d);
-		alignmentSettings.put(AlignmentSettings.ANNEALING_STRETCH_FACTOR, 1.7d);
-		alignmentSettings.put(AlignmentSettings.MAX_SD_FROM_CURVE, 0.1d);
-		alignmentSettings.put(AlignmentSettings.MIN_SEPARATION, 0.1d);
-		alignmentSettings.put(AlignmentSettings.EXCLUDE_DELTA_RT_ABOVE, 1.7d);
-		alignmentSettings.put(AlignmentSettings.EXCLUDE_DELTA_RT_BELOW, 0.0d);
-		alignmentSettings.put(AlignmentSettings.DEFAULT_LATTICE_SIZE, 30.0d);
-		
-		return alignmentSettings;
-	}
-	
 	public static File createProjectDirectoryStructure(File parentDirectory, String projectName) {
 
 		File projectDirectory = 
