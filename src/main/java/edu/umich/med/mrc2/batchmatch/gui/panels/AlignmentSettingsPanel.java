@@ -35,6 +35,8 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -61,6 +63,7 @@ public class AlignmentSettingsPanel extends JPanel {
 	private JFormattedTextField excludeRTaboveField;
 	private JFormattedTextField excludeRTbelowField;
 	private JFormattedTextField minSeparationField;
+	private JSpinner latticeSizeSpinner;
 	
 	public AlignmentSettingsPanel() {
 		super();
@@ -91,9 +94,9 @@ public class AlignmentSettingsPanel extends JPanel {
 		add(panel, gbc_panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 0, 0, 0};
-		gbl_panel.rowHeights = new int[]{0, 0, 0, 0};
+		gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0};
 		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
 		JLabel lblNewLabel = new JLabel("Mass tolerance");
@@ -153,7 +156,7 @@ public class AlignmentSettingsPanel extends JPanel {
 		JLabel lblNewLabel_3 = new JLabel("Annealing stretch factor");
 		GridBagConstraints gbc_lblNewLabel_3 = new GridBagConstraints();
 		gbc_lblNewLabel_3.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel_3.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNewLabel_3.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewLabel_3.gridx = 0;
 		gbc_lblNewLabel_3.gridy = 2;
 		panel.add(lblNewLabel_3, gbc_lblNewLabel_3);
@@ -163,11 +166,31 @@ public class AlignmentSettingsPanel extends JPanel {
 		annealingStretchFactorField.setColumns(10);
 		annealingStretchFactorField.setPreferredSize(new Dimension(80, 20));
 		GridBagConstraints gbc_formattedTextField = new GridBagConstraints();
-		gbc_formattedTextField.insets = new Insets(0, 0, 0, 5);
+		gbc_formattedTextField.insets = new Insets(0, 0, 5, 5);
 		gbc_formattedTextField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_formattedTextField.gridx = 1;
 		gbc_formattedTextField.gridy = 2;
 		panel.add(annealingStretchFactorField, gbc_formattedTextField);
+		
+		JLabel lblNewLabel_9 = new JLabel("Lattice size");
+		GridBagConstraints gbc_lblNewLabel_9 = new GridBagConstraints();
+		gbc_lblNewLabel_9.anchor = GridBagConstraints.EAST;
+		gbc_lblNewLabel_9.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNewLabel_9.gridx = 0;
+		gbc_lblNewLabel_9.gridy = 3;
+		panel.add(lblNewLabel_9, gbc_lblNewLabel_9);
+		
+		latticeSizeSpinner = new JSpinner();
+		latticeSizeSpinner.setModel(
+				new SpinnerNumberModel(Integer.valueOf(30), 
+						Integer.valueOf(10), null, Integer.valueOf(1)));
+		latticeSizeSpinner.setPreferredSize(new Dimension(80, 20));
+		GridBagConstraints gbc_spinner = new GridBagConstraints();
+		gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
+		gbc_spinner.insets = new Insets(0, 0, 0, 5);
+		gbc_spinner.gridx = 1;
+		gbc_spinner.gridy = 3;
+		panel.add(latticeSizeSpinner, gbc_spinner);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new CompoundBorder(
@@ -197,6 +220,7 @@ public class AlignmentSettingsPanel extends JPanel {
 		
 		maxSDfromCurveField = 
 				new JFormattedTextField(BatchMatchConfiguration.defaultPpmFormat);
+		maxSDfromCurveField.setMinimumSize(new Dimension(80, 20));
 		maxSDfromCurveField.setPreferredSize(new Dimension(80, 20));
 		maxSDfromCurveField.setColumns(10);
 		GridBagConstraints gbc_formattedTextField_1 = new GridBagConstraints();
@@ -253,6 +277,7 @@ public class AlignmentSettingsPanel extends JPanel {
 		
 		excludeRTbelowField = 
 				new JFormattedTextField(BatchMatchConfiguration.defaultRtFormat);
+		excludeRTbelowField.setMinimumSize(new Dimension(80, 20));
 		excludeRTbelowField.setPreferredSize(new Dimension(80, 20));
 		excludeRTbelowField.setColumns(10);
 		GridBagConstraints gbc_formattedTextField_4 = new GridBagConstraints();
@@ -293,7 +318,8 @@ public class AlignmentSettingsPanel extends JPanel {
 		excludeRTaboveField.setText(
 				((Double)settings.get(AlignmentSettings.EXCLUDE_DELTA_RT_ABOVE)).toString());
 		excludeRTbelowField.setText(
-				((Double)settings.get(AlignmentSettings.EXCLUDE_DELTA_RT_BELOW)).toString());
+				((Double)settings.get(AlignmentSettings.EXCLUDE_DELTA_RT_BELOW)).toString());		
+		latticeSizeSpinner.setValue(settings.get(AlignmentSettings.DEFAULT_LATTICE_SIZE));
 	}
 	
 	public void loadSettingsFromProject(BatchMatchProject project) {

@@ -58,6 +58,7 @@ public class ProjectUtils {
 		alignmentSettings.put(AlignmentSettings.MIN_SEPARATION, 0.1d);
 		alignmentSettings.put(AlignmentSettings.EXCLUDE_DELTA_RT_ABOVE, 1.7d);
 		alignmentSettings.put(AlignmentSettings.EXCLUDE_DELTA_RT_BELOW, 0.0d);
+		alignmentSettings.put(AlignmentSettings.DEFAULT_LATTICE_SIZE, 30.0d);
 		
 		return alignmentSettings;
 	}

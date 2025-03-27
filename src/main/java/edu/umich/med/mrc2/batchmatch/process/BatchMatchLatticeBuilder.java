@@ -22,11 +22,6 @@
 package edu.umich.med.mrc2.batchmatch.process;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +33,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchFeatureInfo;
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
+import edu.umich.med.mrc2.batchmatch.data.LatticeObject;
 import edu.umich.med.mrc2.batchmatch.data.RtPair;
 import edu.umich.med.mrc2.batchmatch.data.comparators.BatchMatchFeatureInfoComparator;
 import edu.umich.med.mrc2.batchmatch.data.comparators.ObjectCompatrator;
@@ -45,9 +41,11 @@ import edu.umich.med.mrc2.batchmatch.data.comparators.RtPairComparator;
 import edu.umich.med.mrc2.batchmatch.data.comparators.SortDirection;
 import edu.umich.med.mrc2.batchmatch.data.comparators.SortProperty;
 import edu.umich.med.mrc2.batchmatch.data.enums.BinnerExportFields;
+import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.data.enums.RTValueSource;
 import edu.umich.med.mrc2.batchmatch.utils.BinnerIOUtils;
 import edu.umich.med.mrc2.batchmatch.utils.DelimitedTextParser;
+import edu.umich.med.mrc2.batchmatch.utils.MSUtils;
 import edu.umich.med.mrc2.batchmatch.utils.Range;
 
 public class BatchMatchLatticeBuilder {
@@ -55,22 +53,26 @@ public class BatchMatchLatticeBuilder {
 	private static final String pooledSampleIdentifier = "CS00000MP";
 	
 	private BatchMatchInputObject batchOneData;
-	private BatchMatchInputObject batchTwoData;
+	private BatchMatchInputObject referenceBatchData;
 	private int latticeSize;
 	private double massError;
+	private MassErrorType massErrorType;
 	private double rtError;
+	private LatticeObject latticeObject;
 	
 	public BatchMatchLatticeBuilder(
 			BatchMatchInputObject batchOneData, 
-			BatchMatchInputObject batchTwoData,
+			BatchMatchInputObject referenceBatchData,
 			int latticeSize, 
 			double massError, 
+			MassErrorType massErrorType,
 			double rtError) {
 		super();
 		this.batchOneData = batchOneData;
-		this.batchTwoData = batchTwoData;
+		this.referenceBatchData = referenceBatchData;
 		this.latticeSize = latticeSize;
 		this.massError = massError;
+		this.massErrorType = massErrorType;
 		this.rtError = rtError;
 	}
 
@@ -86,13 +88,14 @@ public class BatchMatchLatticeBuilder {
 				sorted(massComparator).collect(Collectors.toList());
 		
 		List<BatchMatchFeatureInfo>batchTwoFeatures = 
-				extractFeaturesFromDataFile(batchTwoData.getPeakAreasFile());
-		batchTwoFeatures.stream().forEach(f -> f.setBatch(batchTwoData.getBatchNumber()));
+				extractFeaturesFromDataFile(referenceBatchData.getPeakAreasFile());
+		batchTwoFeatures.stream().forEach(f -> f.setBatch(referenceBatchData.getBatchNumber()));
 		batchTwoFeatures = batchTwoFeatures.stream().
 				sorted(massComparator).collect(Collectors.toList());
 		
-		int maxFeatureNumber = Math.min(batchOneFeatures.size(), batchTwoFeatures.size());
-		latticeSize = Math.min(latticeSize, maxFeatureNumber);
+		//	int maxFeatureNumber = Math.min(batchOneFeatures.size(), batchTwoFeatures.size());		
+		//	latticeSize = Math.min(latticeSize, maxFeatureNumber);
+		
 		BatchMatchFeatureInfoComparator reverseIntensityComparator = 
 				new BatchMatchFeatureInfoComparator(SortProperty.Intensity, SortDirection.DESC);
 		
@@ -117,7 +120,8 @@ public class BatchMatchLatticeBuilder {
 		
 		rtPairsForLattice = sortAndRemoveDuplicatePairs(rtPairsForLattice);
 		
-		System.out.println("***");
+		latticeObject = new LatticeObject(
+				batchOneData, referenceBatchData, rtPairsForLattice);
 	}
 	
 	private List<RtPair> sortAndRemoveDuplicatePairs(List<RtPair> rtPairsForLattice) {
@@ -143,19 +147,19 @@ public class BatchMatchLatticeBuilder {
 				sorted(new RtPairComparator(SortProperty.RT)).
 				collect(Collectors.toList());
 		
-		List<String>sorted = rtPairsForLatticeSorted.stream().
-				map(p -> p.toString()).collect(Collectors.toList());
-		
-		String outDirPath = "E:\\Development\\BatchMatch\\BatchMatch_Process_Demo_02_11_25\\_OUT";
-		try {
-			Files.write(Paths.get(outDirPath, "newSorterCleanedResult.txt"), 
-				sorted,
-				StandardCharsets.UTF_8,
-				StandardOpenOption.CREATE, 
-				StandardOpenOption.TRUNCATE_EXISTING);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}	
+//		List<String>sorted = rtPairsForLatticeSorted.stream().
+//				map(p -> p.toString()).collect(Collectors.toList());
+//		
+//		String outDirPath = "E:\\Development\\BatchMatch\\BatchMatch_Process_Demo_02_11_25\\_OUT";
+//		try {
+//			Files.write(Paths.get(outDirPath, "newSorterCleanedResult.txt"), 
+//				sorted,
+//				StandardCharsets.UTF_8,
+//				StandardOpenOption.CREATE, 
+//				StandardOpenOption.TRUNCATE_EXISTING);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}	
 		return rtPairsForLatticeSorted;
 	}
 
@@ -168,7 +172,7 @@ public class BatchMatchLatticeBuilder {
 		for(BatchMatchFeatureInfo topFeature : batchOneTopIntensityFeatures) {
 			
 			double tfMass = topFeature.getMass();
-			Range mzRange = new Range(tfMass - massError, tfMass + massError);
+			Range mzRange = MSUtils.createMassRange(tfMass, massError, massErrorType);
 			Range rtRange = new Range(					
 					topFeature.getObservedRt() - rtError, topFeature.getObservedRt() + rtError);
 			
@@ -255,5 +259,9 @@ public class BatchMatchLatticeBuilder {
 			}
 		}
 		return featureList;
+	}
+
+	public LatticeObject getLatticeObject() {
+		return latticeObject;
 	}
 }

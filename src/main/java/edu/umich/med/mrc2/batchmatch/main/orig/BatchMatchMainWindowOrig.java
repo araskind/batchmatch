@@ -4,7 +4,7 @@
 // September 2019
 ////////////////////////////////////////////////////////////
 
-package edu.umich.med.mrc2.batchmatch.gui;
+package edu.umich.med.mrc2.batchmatch.main.orig;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -26,6 +26,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import edu.umich.med.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
+import edu.umich.med.mrc2.batchmatch.gui.AboutDialog;
+import edu.umich.med.mrc2.batchmatch.gui.BatchMatchMenuBar;
 import edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchAutomationTabPanel;
 import edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchNamedUnnamedComparisonTabPanel;
 import edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels.BatchMatchNewWorkflowTabPanel;

@@ -24,6 +24,7 @@ package edu.umich.med.mrc2.batchmatch.project;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import java.util.TreeMap;
 import org.jdom2.Element;
 
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
+import edu.umich.med.mrc2.batchmatch.data.LatticeObject;
 import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.data.store.BatchMatchInputObjectFields;
 import edu.umich.med.mrc2.batchmatch.data.store.ProjectFields;
@@ -48,6 +50,8 @@ public class BatchMatchProject implements XmlStorable{
 	protected File projectFile;
 	protected Set<BatchMatchInputObject>inputObjects;
 	protected Map<AlignmentSettings,Object>alignmentSettings;
+	protected List<LatticeObject>latticeObjects;
+	
 	protected static final String VALUE_FIELD = "value";
 	
 	public BatchMatchProject(String projectName, File parentDirectory) throws IOException {
@@ -66,7 +70,8 @@ public class BatchMatchProject implements XmlStorable{
 
 	private BatchMatchProject() {
 		super();
-		inputObjects = new HashSet<BatchMatchInputObject>();		
+		inputObjects = new HashSet<BatchMatchInputObject>();	
+		latticeObjects = new ArrayList<LatticeObject>();
 		initDefaultAlignmentSettings();
 	}
 	
@@ -237,5 +242,13 @@ public class BatchMatchProject implements XmlStorable{
 
 	public void setProjectFile(File projectFile) {
 		this.projectFile = projectFile;
+	}
+
+	public List<LatticeObject> getLatticeObjects() {
+		return latticeObjects;
+	}
+	
+	public void addLatticeObject(LatticeObject newLatticeObject) {
+		latticeObjects.add(newLatticeObject);
 	}
 }

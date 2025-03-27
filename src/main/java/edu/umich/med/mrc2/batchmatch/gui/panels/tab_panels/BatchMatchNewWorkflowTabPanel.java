@@ -142,7 +142,11 @@ public class BatchMatchNewWorkflowTabPanel extends StickySettingsPanel {
 		rawFileListLoaderPanel.setShowBatchLabelBtn(false);
 		rawFileListLoaderPanel.setupPanel(
 				"Select Raw Feature Data Files To Compute Lattice Set and Write Lattice  List (Drag and drop to map filename to batch)",
-				"Create Lattice Files", outputDirectoryPanel.getOutputDirectoryPath(), false, "Update Labels");
+				"Create Lattice Files", //	Button label
+				outputDirectoryPanel.getOutputDirectoryPath(), 
+				false, 
+				"Update Labels" //	Second button label
+				);
 
 		namedFileListLoaderPanel = new FileListLoaderDisplayPanel() {
 
@@ -573,12 +577,11 @@ public class BatchMatchNewWorkflowTabPanel extends StickySettingsPanel {
 		Integer poolSampleSize = poolSampleSizePanel.getIntSelected();
 		String targetedFileName = batchFileMap.get(targetKey);
 
-		Integer rtToUse = BatchMatchConstants.RT_FROM_BATCH_EXPECTED; // atchMatchConstants.RT_FROM_BINNER_NAME;
-		Boolean dataWritten = false;
+		Integer rtToUse = BatchMatchConstants.RT_FROM_BATCH_EXPECTED; // BatchMatchConstants.RT_FROM_BINNER_NAME;
+		boolean dataWritten = false;
 
 		List<String> outputFileNames = new ArrayList<String>();
 		List<String> fileTags = new ArrayList<String>();
-
 		List<String> keyStrings = new ArrayList<String>();
 
 		try {
@@ -603,15 +606,21 @@ public class BatchMatchNewWorkflowTabPanel extends StickySettingsPanel {
 			if (fileName.equals(targetedFileName))
 				continue;
 
-			BatchMatchLatticeBuilder batchMatch = new BatchMatchLatticeBuilder();
+			BatchMatchLatticeBuilder batchMatchLatticeBuilder = new BatchMatchLatticeBuilder();
 
-			dataWritten = batchMatch.buildLatticeFile(fileName, targetedFileName, outputDirectory, key,
-					targetKey.toString(), poolSampleSize, rtToUse);
+			dataWritten = batchMatchLatticeBuilder.buildLatticeFile(
+					fileName, 
+					targetedFileName, 
+					outputDirectory, 
+					key,
+					targetKey, 
+					poolSampleSize, 
+					rtToUse);
 
 			if (!dataWritten)
 				return false;
 
-			outputFileNames.add(batchMatch.getOutputFileName());
+			outputFileNames.add(batchMatchLatticeBuilder.getOutputFileName());
 			fileTags.add(key);
 		}
 

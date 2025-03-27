@@ -19,40 +19,30 @@
  *
  ******************************************************************************/
 
-package edu.umich.med.mrc2.batchmatch.project;
+package edu.umich.med.mrc2.batchmatch.main.orig;
 
-import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
-public enum AlignmentSettings {
-
-	MASS_TOLERANCE(Double.class),
-	MASS_TOLERANCE_TYPE(MassErrorType.class),
-	RT_TOLERANCE(Double.class),
-	ANNEALING_STRETCH_FACTOR(Double.class),
-	MAX_SD_FROM_CURVE(Double.class),
-	MIN_SEPARATION(Double.class),
-	EXCLUDE_DELTA_RT_ABOVE(Double.class),
-	EXCLUDE_DELTA_RT_BELOW(Double.class),
-	DEFAULT_LATTICE_SIZE(Double.class),
-	;
+public class BatchMatchOrig {
 	
-	private final Class clazz;
+	private static Logger logger = LogManager.getLogger(BatchMatchOrig.class.getName());
+	
+	private static BatchMatchMainWindowOrig mainWindow;
 
-	AlignmentSettings(Class clazz) {
-		this.clazz = clazz;
-	}
+	public static void main(String[] args) {
 
-	public Class getClazz() {
-		return clazz;
+		logger.info("Starting original BatchMatch");
+
+		mainWindow = new BatchMatchMainWindowOrig();
+		mainWindow.setVisible(true);
 	}
 	
-	public static AlignmentSettings getValueByName(String name) {
-
-		for(AlignmentSettings source : AlignmentSettings.values()) {
-
-			if(source.name().equals(name))
-				return source;
-		}
-		return null;
+	public static void shutDown() {
+		
+		mainWindow.dispose();
+		System.gc();
+		System.exit(0);
 	}
+
 }

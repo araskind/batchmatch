@@ -24,6 +24,7 @@ package edu.umich.med.mrc2.batchmatch.testpkg;
 import java.io.File;
 
 import edu.umich.med.mrc2.batchmatch.data.BatchMatchInputObject;
+import edu.umich.med.mrc2.batchmatch.data.enums.MassErrorType;
 import edu.umich.med.mrc2.batchmatch.process.BatchMatchLatticeBuilder;
 
 public class FunctionTestClass {
@@ -49,7 +50,8 @@ public class FunctionTestClass {
 		BatchMatchInputObject objTwo = new BatchMatchInputObject(1, null, areasFileTwo, false);
 				
 		BatchMatchLatticeBuilder builder = 
-				new BatchMatchLatticeBuilder(objOne, objTwo, 30, 0.005d, 0.5d);
+				new BatchMatchLatticeBuilder(
+						objOne, objTwo, 30, 5.0d, MassErrorType.mDa, 0.5d);
 		builder.buildLattice();
 		
 	}
