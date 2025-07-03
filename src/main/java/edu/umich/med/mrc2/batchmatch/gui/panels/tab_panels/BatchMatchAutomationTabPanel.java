@@ -9,6 +9,11 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +31,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
+
+import org.apache.commons.compress.utils.FileNameUtils;
 
 import edu.umich.med.mrc2.batchmatch.data.comparators.orig.RtPairComparator;
 import edu.umich.med.mrc2.batchmatch.data.orig.AnchorMap;
@@ -49,6 +56,7 @@ import edu.umich.med.mrc2.batchmatch.io.sheetwriters.BatchMatchExcelOutputContai
 import edu.umich.med.mrc2.batchmatch.io.sheetwriters.BatchMatchExpandedFeatureCSVWriter;
 import edu.umich.med.mrc2.batchmatch.io.sheetwriters.BatchMatchNamedResultsWriter;
 import edu.umich.med.mrc2.batchmatch.io.sheetwriters.RecursiveLatticeFileWriter;
+import edu.umich.med.mrc2.batchmatch.main.BatchMatch;
 import edu.umich.med.mrc2.batchmatch.main.BatchMatchConstants;
 import edu.umich.med.mrc2.batchmatch.main.BinnerConstants;
 import edu.umich.med.mrc2.batchmatch.process.orig.BatchDataMerger;
@@ -83,14 +91,15 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 	private JCheckBox anchorColumnSecond;
 
-	private String reportFileName;
-	private Integer breakIncrement = 8;
+	private File reportFile;
+	private int breakIncrement = 8;
 
-	private String originalLatticeSpace = null, temporaryLatticeSpace;
+	private File originalLatticeSpace = null;
+	private File temporaryLatticeSpace = null;
 
 	private Map<String, List<RtPair>> filteredPairs;
-	private List<String> temporaryLatticeFiles;
-	private Map<Integer, String> tempLatticeFilesToKeep;
+	private List<File> temporaryLatticeFiles;
+	private Map<Integer, File> tempLatticeFilesToKeep;
 	private List<Integer> stepWiseUnambiguous, stepWiseAmbiguous, stepWiseBestAt1, stepWiseBestAt2;
 
 	public BatchMatchAutomationTabPanel(SharedAnalysisSettings sharedAnalysisSettings) {
@@ -103,16 +112,17 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 		initializeArrays();
 
-		temporaryLatticeSpace = PostProcessUtils.getTempDirectoryName();
+		temporaryLatticeSpace = BatchMatch.tmpDir;
 
-		outputDirectoryPanel = new AbstractStickyFileLocationPanel("Specify Report Output Directory ",
+		outputDirectoryPanel = new AbstractStickyFileLocationPanel(
+				"Specify Report Output Directory ",
 				"batchmatch_reports.directory") {
 
 			@Override
 			protected void updateInterfaceForNewSelection() {
-				binnerResultLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectoryPath());
-				batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectoryPath());
-				namedUnnamedMappingPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectoryPath());// .setInitialDirectory(
+				binnerResultLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectory());
+				batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectory());
+				namedUnnamedMappingPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectory());
 			}
 		};
 		outputDirectoryPanel.setupPanel();
@@ -129,15 +139,17 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 		binnerResultLoaderPanel.setupPanel();
 		binnerResultLoaderPanel.setVisible(false); // !multiplicityPanel.useMultipleFormat());
 
+		//	Load the list of binnerized files with assigned batch numbers and selected primary batch
+		//	
 		batchFileListLoaderPanel = new BatchFileListLoaderPanel(
 				"Specify File Containing List of Batch Files to Convert and Merge (With Path)", null, true) {
 
 			@Override
 			protected void updateInterfaceForNewData() {
-				Map<Integer, String> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
+				Map<Integer, File> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
 			}
 		};
-		batchFileListLoaderPanel.setupPanel(outputDirectoryPanel.getOutputDirectoryPath());
+		batchFileListLoaderPanel.setupPanel(outputDirectoryPanel.getOutputDirectory());
 		batchFileListLoaderPanel.setOpeningMessage(BatchMatchConstants.LINE_SEPARATOR + "Batch files"
 				+ BatchMatchConstants.LINE_SEPARATOR + "=======================================");
 
@@ -146,10 +158,10 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 			@Override
 			protected void updateInterfaceForNewData() {
-				Map<Integer, String> batchFileMap = anchorFileListLoaderPanel.grabBatchFileMap();
+				Map<Integer, File> batchFileMap = anchorFileListLoaderPanel.grabBatchFileMap();
 			}
 		};
-		anchorFileListLoaderPanel.setupPanel(outputDirectoryPanel.getOutputDirectoryPath());
+		anchorFileListLoaderPanel.setupPanel(outputDirectoryPanel.getOutputDirectory());
 		anchorFileListLoaderPanel.setVisible(true);
 		anchorFileListLoaderPanel.setOpeningMessage(
 				"Anchor files" + BatchMatchConstants.LINE_SEPARATOR + "=======================================");
@@ -165,7 +177,7 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 		matchTolerancesPanel.setEnabled(false);
 
 		namedUnnamedMappingPanel = new FeatureMappingLoaderPanel("Specify a Feature Mapping File", null);
-		namedUnnamedMappingPanel.setupPanel(outputDirectoryPanel.getOutputDirectoryPath());
+		namedUnnamedMappingPanel.setupPanel(outputDirectoryPanel.getOutputDirectory());
 
 		annealTargetStepPanel = new IntegerPickerPanel("annealTargetStep") {
 
@@ -273,14 +285,14 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 	}
 
 	private Boolean verifyInputFiles(Map<Integer, String> filesToConvertByBatchNoMap,
-			Map<Integer, String> anchorFilesNamesByBatchNoMap, Map<Integer, Integer> fileOrderMap,
+			Map<Integer, String> anchorFilesByBatchNoMap, Map<Integer, Integer> fileOrderMap,
 			Integer targetBatchNo) {
 
 		List<Integer> missingFilesToConvertBatchList = new ArrayList<Integer>();
 
 		for (Integer batchNo : filesToConvertByBatchNoMap.keySet()) {
 			if (!batchNo.equals(targetBatchNo))
-				if (!anchorFilesNamesByBatchNoMap.containsKey(batchNo))
+				if (!anchorFilesByBatchNoMap.containsKey(batchNo))
 					missingFilesToConvertBatchList.add(batchNo);
 		}
 		if (missingFilesToConvertBatchList.size() > 0) {
@@ -296,7 +308,7 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 		}
 
 		for (Integer batchNo : filesToConvertByBatchNoMap.keySet()) {
-			if (!anchorFilesNamesByBatchNoMap.containsKey(batchNo))
+			if (!anchorFilesByBatchNoMap.containsKey(batchNo))
 				if (!batchNo.equals(targetBatchNo))
 					missingFilesToConvertBatchList.add(batchNo);
 		}
@@ -317,13 +329,18 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 	// AndMZ
 
+	/**
+	 * Iterative merge of Binner output files
+	 * @return
+	 * @throws Exception
+	 */
 	private Boolean mergeDataSetsSerially() throws Exception {
 		try {
-			temporaryLatticeFiles = new ArrayList<String>();
-			tempLatticeFilesToKeep = new HashMap<Integer, String>();
+			temporaryLatticeFiles = new ArrayList<File>();
+			tempLatticeFilesToKeep = new HashMap<Integer, File>();
 
-			Map<Integer, String> filesToConvertByBatchNoMap = this.batchFileListLoaderPanel.grabBatchFileMap();
-			Integer completeMergeSize = filesToConvertByBatchNoMap.size();
+			Map<Integer, File> filesToConvertByBatchNoMap = this.batchFileListLoaderPanel.grabBatchFileMap();
+			Integer completeMergeSize = filesToConvertByBatchNoMap.size();	//	Total # of batches to merge
 
 			stepWiseBestAt1 = new ArrayList<Integer>();
 			stepWiseBestAt2 = new ArrayList<Integer>();
@@ -331,6 +348,8 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 			stepWiseUnambiguous = new ArrayList<Integer>();
 
 			PostProcessDataSet mergedData = null;
+			
+			//	Add batches one by one
 			for (int i = 2; i <= completeMergeSize; i++) {
 				System.out.println("Setting up merge with " + (i) + " files");
 				mergedData = runSerialMergeStepCodeClean(i, completeMergeSize.equals(i));
@@ -340,19 +359,9 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 			if (mergedData != null) {
 
 				mergedData.setMaxPossibleMatchCt(completeMergeSize);
-
-				// BatchMatchMatchGroupFilteringEngine.disambiguateGroups(mergedData);
-
-				// checkForNamedDataAndReport(mergedData, completeMergeSize);
 				cleanUpLatticeSpace();
-				// %.3f
 				CompoundMatchDisambiguationEngine.recommendAmbiguousFeaturesToRemove(mergedData, completeMergeSize);
-				// gap size
-
-				// justUpdateForNamed(mergedData);
 				writeMergedData(mergedData);
-
-				// BatchMatchMatchGroupFilteringEngine.disambiguateGroups(mergedData);
 
 				for (int i = 0; i < stepWiseBestAt1.size(); i++) {
 					Double OneARatio = (100.0 * stepWiseAmbiguous.get(i)) / (1.0 * stepWiseBestAt1.get(i));
@@ -361,7 +370,8 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 					Double TwoURatio = (100.0 * stepWiseUnambiguous.get(i)) / (1.0 * stepWiseBestAt2.get(i));
 
 					String reportLine = String.format(
-							"RT Window 1.0: %5d/%5d  = %5.2f%% Unambiguous,  %5d/%5d  = %5.2f%% Ambiguous,   RT Window 2.0: %5d/%5d  = %5.2f%% Unambiguous,  %5d/%5d  = %5.2f%% Ambiguous",
+							"RT Window 1.0: %5d/%5d  = %5.2f%% Unambiguous,  %5d/%5d  = %5.2f%% Ambiguous,   "
+							+ "RT Window 2.0: %5d/%5d  = %5.2f%% Unambiguous,  %5d/%5d  = %5.2f%% Ambiguous",
 							stepWiseUnambiguous.get(i), stepWiseBestAt1.get(i), OneURatio, stepWiseAmbiguous.get(i),
 							stepWiseBestAt1.get(i), OneARatio, stepWiseUnambiguous.get(i), stepWiseBestAt2.get(i),
 							TwoURatio, stepWiseAmbiguous.get(i), stepWiseBestAt2.get(i), TwoARatio);
@@ -371,18 +381,16 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 			}
 			if (mergedData == null)
 				throw new Exception("Error -- merged data is null");
-
-			// checkForNamedDataAndReport(mergedData, completeMergeSize);
-			// CompoundMatchDisambiguationEngine.recommendAmbiguousFeaturesToRemove(mergedData,
-			// completeMergeSize);
-
 		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 		return true;
 	}
 
 	private void justUpdateForNamed(PostProcessDataSet dataSet) {
+		
 		List<FeatureMatch> namedUnnamedFeatureMatches = namedUnnamedMappingPanel.grabNonMissingFeatureMapping();
 
 		for (int i = 0; i < namedUnnamedFeatureMatches.size(); i++)
@@ -484,16 +492,22 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 	 * shiftWriter.writeShiftMapForMerge(shiftReportName, dataSet); }
 	 */
 
+	/**
+	 * Iterative merge of two PostProcessDataSet objects
+	 * @param nthMerge
+	 * @param finalMerge
+	 * @return
+	 * @throws Exception
+	 */
 	private PostProcessDataSet runSerialMergeStepCodeClean(int nthMerge, Boolean finalMerge) throws Exception {
 
 		Map<Integer, Integer> fileOrderMap = batchFileListLoaderPanel.grabFileOrderMap();
-		Map<Integer, String> filesToConvertByBatchNoMap = this.batchFileListLoaderPanel
-				.grabBatchFileMapSegment(nthMerge);
+		Map<Integer, File> filesToConvertByBatchNoMap = 
+				this.batchFileListLoaderPanel.grabBatchFileMapSegment(nthMerge);
 
 		Boolean haveUpdates = true, doBreaks = false;
-		;
 		Integer nRepeats = 0, targetBatchNo = null, nSmallUpdates = 0;
-		Map<Integer, String> anchorFilesNamesByBatchNoMap = null;
+		Map<Integer, File> anchorFilesByBatchNoMap = null;
 		PostProcessDataSet mergedData = null;
 
 		filesToConvertByBatchNoMap = null;
@@ -506,22 +520,27 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 			if (nRepeats.equals(0)) {
 				filesToConvertByBatchNoMap = this.batchFileListLoaderPanel.grabBatchFileMapSegment(nthMerge);
-				anchorFilesNamesByBatchNoMap = this.anchorFileListLoaderPanel.grabBatchFileMap();
+				anchorFilesByBatchNoMap = this.anchorFileListLoaderPanel.grabBatchFileMap();
 				fileOrderMap = this.batchFileListLoaderPanel.grabFileOrderMapSegment(nthMerge);
 			}
 
-			updateBoards(nRepeats);
+			updateBoards(nRepeats);	//	GUI update to monitor progress
 
 			targetBatchNo = fileOrderMap.get(0);
-			String mergeTargetFileName = filesToConvertByBatchNoMap.get(targetBatchNo);
+			File mergeTargetFile = filesToConvertByBatchNoMap.get(targetBatchNo);
 
-			if (!screenFiles(targetBatchNo, filesToConvertByBatchNoMap, anchorFilesNamesByBatchNoMap))
+			//	Check if all necessary files are present
+			if (!screenFiles(targetBatchNo, filesToConvertByBatchNoMap, anchorFilesByBatchNoMap))
 				return null; // false;
 
-			updateLatticeSpace(targetBatchNo, anchorFilesNamesByBatchNoMap, filesToConvertByBatchNoMap);
-			binnerResultLoaderPanel.handleFileNameSelection2(mergeTargetFileName);
+			//	Update location of lattice (anchor) files
+			updateLatticeSpace(targetBatchNo, anchorFilesByBatchNoMap, filesToConvertByBatchNoMap);
+			
+			//	 Read Binner4batchMatch output file into PostProcessDataSet object mergedData
+			binnerResultLoaderPanel.handleFileSelection2(mergeTargetFile);
 			mergedData = binnerResultLoaderPanel.getLoadedData();
 
+			//	Add MZ and batch # to each feature name in the batch
 			mergedData.updateNamesForBatchAndMZ();
 
 			List<Integer> sortedKeys = ListUtils.makeListFromCollection(fileOrderMap.keySet());
@@ -539,11 +558,14 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 				if (batchNo == null || batchNo.equals(targetBatchNo))
 					continue;
 
-				if (filesToConvertByBatchNoMap.get(batchNo).startsWith("None"))
+				if (filesToConvertByBatchNoMap.get(batchNo).getName().startsWith("None"))
 					continue;
 
-				this.anchorLoaderPanel.updateForNewFileName(anchorFilesNamesByBatchNoMap.get(batchNo));
-				this.binnerResultLoaderPanel.handleFileNameSelection2(filesToConvertByBatchNoMap.get(batchNo));
+				//	Build anchor map from selected anchor file
+				this.anchorLoaderPanel.updateForNewFile(anchorFilesByBatchNoMap.get(batchNo));
+				
+				//	Read Binner4batchMatch output file for the new batch to mergr into PostProcessDataSet object
+				this.binnerResultLoaderPanel.handleFileSelection2(filesToConvertByBatchNoMap.get(batchNo));
 
 				PostProcessDataSet shiftedData = getShiftedData();
 				PostProcessDataSet newMergedData = justRunMerge(shiftedData, mergedData);
@@ -552,7 +574,6 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 				mergedData = newMergedData;
 				mergedData.updateNamesForBatchAndMZ();
-
 			}
 
 			String freqsFileNameTag = "";
@@ -561,8 +582,11 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 			Integer nFullMatchesBeforeUpdate = this.getNFullMatchesLastIter();
 
-			Map<String, List<RtPair>> backTrackedPairsByBatch = createBatchSummaryReport(mergedData,
-					freqsFileNameTag + "-" + nRepeats, filesToConvertByBatchNoMap);
+			Map<String, List<RtPair>> backTrackedPairsByBatch = 
+					createBatchSummaryReport(
+						mergedData,
+						freqsFileNameTag + "-" + nRepeats,
+						filesToConvertByBatchNoMap);
 
 			haveUpdates = (backTrackedPairsByBatch != null && backTrackedPairsByBatch.size() > 0);
 
@@ -597,9 +621,10 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 			if (!haveUpdates)
 				break;
 
-			writeNewLatticesAndUpdateAnchorFileNameMap(anchorFilesNamesByBatchNoMap, backTrackedPairsByBatch, nRepeats);
+			writeNewLatticesAndUpdateAnchorFileNameMap(
+					anchorFilesByBatchNoMap, backTrackedPairsByBatch, nRepeats);
 
-			tempLatticeFilesToKeep = anchorFilesNamesByBatchNoMap;
+			tempLatticeFilesToKeep = anchorFilesByBatchNoMap;
 			runProgressPanel.setInt1Selected(0);
 
 			if (nRepeats.equals(0)) {
@@ -621,45 +646,41 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 				nSmallUpdates = 0;
 				break;
 			}
-
-			System.out.println();
-			System.out.println();
 		}
-
 		return mergedData;
 	}
 
-	// .005
-	private Boolean screenFiles(Integer targetBatchNo, Map<Integer, String> filesToConvertByBatchNoMap,
-			Map<Integer, String> anchorFilesNamesByBatchNoMap) {
+	private Boolean screenFiles(
+			int targetBatchNo, 
+			Map<Integer, File> filesToConvertByBatchNoMap,
+			Map<Integer, File> anchorFilesByBatchNoMap) {
 
 		List<Integer> missingFilesToConvertBatchList = new ArrayList<Integer>();
 
-		for (Integer batchNo : filesToConvertByBatchNoMap.keySet()) {
-			if (!batchNo.equals(targetBatchNo))
-				if (!anchorFilesNamesByBatchNoMap.containsKey(batchNo))
+		for (int batchNo : filesToConvertByBatchNoMap.keySet()) {
+			
+			if (batchNo != targetBatchNo && !anchorFilesByBatchNoMap.containsKey(batchNo))
 					missingFilesToConvertBatchList.add(batchNo);
 		}
-
-		if (missingFilesToConvertBatchList.size() > 0) {
+		if (!missingFilesToConvertBatchList.isEmpty()) {
+			
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < missingFilesToConvertBatchList.size(); i++) {
+			for (int i = 0; i < missingFilesToConvertBatchList.size(); i++)
 				sb.append(missingFilesToConvertBatchList.get(i) + (i > 0 ? ", " : ""));
-			}
+			
 			JOptionPane.showMessageDialog(null,
 					"A file name for converted data was not specified for batch " + (sb.length() > 1 ? "es" : "")
 							+ sb.toString() + BinnerConstants.LINE_SEPARATOR
 							+ BinnerConstants.LINE_SEPARATOR + "was not specified.");
 			return false;
 		}
-
-		for (Integer batchNo : filesToConvertByBatchNoMap.keySet()) {
-			if (!anchorFilesNamesByBatchNoMap.containsKey(batchNo))
-				if (!batchNo.equals(targetBatchNo))
+		for (int batchNo : filesToConvertByBatchNoMap.keySet()) {
+			
+			if (!anchorFilesByBatchNoMap.containsKey(batchNo) && batchNo != targetBatchNo)
 					missingFilesToConvertBatchList.add(batchNo);
 		}
-
-		if (missingFilesToConvertBatchList.size() > 0) {
+		if (!missingFilesToConvertBatchList.isEmpty()) {
+			
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < missingFilesToConvertBatchList.size(); i++) {
 				sb.append(missingFilesToConvertBatchList.get(i) + (i > 0 ? ", " : ""));
@@ -669,20 +690,25 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 							+ BinnerConstants.LINE_SEPARATOR + "was not specified.");
 			return false;
 		}
-
 		return true;
 	}
 
-	private void updateLatticeSpace(Integer targetBatchNo, Map<Integer, String> anchorFilesNamesByBatchNoMap,
-			Map<Integer, String> filesToConvertByBatchNoMap) {
+	private void updateLatticeSpace(
+			int targetBatchNo, 
+			Map<Integer, File> anchorFilesByBatchNoMap,
+			Map<Integer, File> filesToConvertByBatchNoMap) {
+		
 		if (originalLatticeSpace == null) {
-			for (Integer batchNo : filesToConvertByBatchNoMap.keySet()) {
-				if (!batchNo.equals(targetBatchNo)) {
-					if (!anchorFilesNamesByBatchNoMap.containsKey(batchNo))
+			
+			for (int  batchNo : filesToConvertByBatchNoMap.keySet()) {
+				
+				if (batchNo != targetBatchNo) {
+					
+					if (!anchorFilesByBatchNoMap.containsKey(batchNo))
 						continue;
 					else {
-						String firstLatticeName = anchorFilesNamesByBatchNoMap.get(batchNo);
-						originalLatticeSpace = firstLatticeName.substring(0, firstLatticeName.lastIndexOf("/") + 1);
+						File firstLatticeFile = anchorFilesByBatchNoMap.get(batchNo);
+						originalLatticeSpace = firstLatticeFile.getParentFile();
 						if (originalLatticeSpace != null)
 							break;
 					}
@@ -691,10 +717,11 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 		}
 	}
 
-	private void writeNewLatticesAndUpdateAnchorFileNameMap(Map<Integer, String> anchorFileNamesByBatchNoMap,
-			Map<String, List<RtPair>> backTrackedPairsByBatch, Integer nRepeats) {
+	private void writeNewLatticesAndUpdateAnchorFileNameMap(
+			Map<Integer, File> anchorFilesByBatchNoMap,
+			Map<String, List<RtPair>> backTrackedPairsByBatch, 
+			int nRepeats) {
 
-		List<String> outputFileNames = new ArrayList<String>();
 		List<Integer> outputBatchIndices = new ArrayList<Integer>();
 
 		int i = 0;
@@ -707,15 +734,12 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 				continue;
 			}
 
-			String oldFileName = anchorFileNamesByBatchNoMap.get(batch);
-			if (oldFileName == null)
+			File oldFile = anchorFilesByBatchNoMap.get(batch);
+			if (oldFile == null)
 				continue;
 
-			String newFileName = grabNewFileName(oldFileName, nRepeats);
-
 			List<RtPair> pairsToMerge = backTrackedPairsByBatch.get(batchStr);
-
-			anchorLoaderPanel.updateForNewFileName(oldFileName);
+			anchorLoaderPanel.updateForNewFile(oldFile);
 
 			AnchorMap oldAnchorMap = anchorLoaderPanel.grabFreshAnchorMap();
 			oldAnchorMap.filterOutliers(getOutlierFilteringThreshold(), 3, getOutlierFilteringBuddySpacingCutoff(),
@@ -725,7 +749,7 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 			backtrackAnchorPoints.addRtPairs(pairsToMerge);
 
 			if (oldAnchorMap == null || backtrackAnchorPoints == null) {
-				JOptionPane.showMessageDialog(null, "Something wrong with anchor read" + reportFileName);
+				JOptionPane.showMessageDialog(null, "Something wrong with anchor read" + reportFile);
 				return;
 			}
 
@@ -744,16 +768,18 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 
 			i++;
 
+			File newFile = grabNewFile(oldFile, nRepeats);
 			AnchorFileWriter writer = new AnchorFileWriter(true);
-			writer.outputResults(newFileName, combinedMap.getAsRtPairs());
+			writer.outputResults(newFile, combinedMap.getAsRtPairs());
 
-			anchorFileNamesByBatchNoMap.put(batch, newFileName);
+			anchorFilesByBatchNoMap.put(batch, newFile);
 			outputBatchIndices.add(batch);
-			outputFileNames.add(newFileName);
 		}
 
 		AnchorFileWriter writer = new AnchorFileWriter(true);
-		writer.outputFileList(outputDirectoryPanel.getOutputDirectoryPath(), anchorFileNamesByBatchNoMap,
+		writer.outputFileList(
+				outputDirectoryPanel.getOutputDirectory(), 
+				anchorFilesByBatchNoMap,
 				"most_recent_lattice_list.csv");
 	}
 
@@ -771,67 +797,71 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 		runProgressPanel.setInt2Selected(nRepeats);
 	}
 
-	private String grabNewFileName(String oldFileName, Integer nRepeats) {
+	private File grabNewFile(File oldFile, int nRepeats) {
 
-		String oldFileRoot = oldFileName.substring(oldFileName.lastIndexOf(BatchMatchConstants.FILE_SEPARATOR) + 1,
-				oldFileName.length());
+		File oldFileRoot = oldFile.getParentFile();
+		String newFileName = FileNameUtils.getBaseName(oldFile.toPath()) + "." + nRepeats + ".csv";		
+		File newFile = Paths.get(oldFileRoot.getAbsolutePath(), newFileName).toFile();
 
-		String newFileRoot = oldFileRoot.substring(0, oldFileRoot.lastIndexOf(".")) + "." + nRepeats + ".csv";
+//		String newFileRoot = oldFileRoot.substring(0, oldFileRoot.lastIndexOf(".")) + "." + nRepeats + ".csv";
+//
+//		String newFileName = this.temporaryLatticeSpace + BatchMatchConstants.FILE_SEPARATOR + newFileRoot;
 
-		String newFileName = this.temporaryLatticeSpace + BatchMatchConstants.FILE_SEPARATOR + newFileRoot;
-
-		if (newFileName.length() > 180) {
-
-			// String.valueOf((char)(i + 64))
-			String suffix = ".b.";
-			if (oldFileName.contains(".b."))
-				suffix = ".c.";
-			else if (oldFileName.contains(".c."))
-				suffix = ".d.";
-			else if (oldFileName.contains(".d."))
-				suffix = ".e.";
-			else if (oldFileName.contains(".e."))
-				suffix = ".f.";
-			else if (oldFileName.contains(".f."))
-				suffix = ".g.";
-			else if (oldFileName.contains(".g."))
-				suffix = ".h.";
-
-			newFileRoot = oldFileRoot.substring(0, oldFileRoot.lastIndexOf("_") + 6) + suffix + nRepeats + ".csv";
-			newFileName = this.temporaryLatticeSpace + BatchMatchConstants.FILE_SEPARATOR + newFileRoot;
-		}
-		this.temporaryLatticeFiles.add(newFileName);
-		return newFileName;
+//		if (newFileName.length() > 180) {
+//
+//			// String.valueOf((char)(i + 64))
+//			String suffix = ".b.";
+//			if (oldFileName.contains(".b."))
+//				suffix = ".c.";
+//			else if (oldFileName.contains(".c."))
+//				suffix = ".d.";
+//			else if (oldFileName.contains(".d."))
+//				suffix = ".e.";
+//			else if (oldFileName.contains(".e."))
+//				suffix = ".f.";
+//			else if (oldFileName.contains(".f."))
+//				suffix = ".g.";
+//			else if (oldFileName.contains(".g."))
+//				suffix = ".h.";
+//
+//			newFileRoot = oldFileRoot.substring(0, oldFileRoot.lastIndexOf("_") + 6) + suffix + nRepeats + ".csv";
+//			newFileName = this.temporaryLatticeSpace + BatchMatchConstants.FILE_SEPARATOR + newFileRoot;
+//		}
+		
+		this.temporaryLatticeFiles.add(newFile);
+		
+		return newFile;
 	}
 
 	private void cleanUpLatticeSpace() {
 
 		for (int i = 0; i < this.temporaryLatticeFiles.size(); i++) {
 
-			String name = temporaryLatticeFiles.get(i);
-			if (name != null && !tempLatticeFilesToKeep.containsValue(name)) {
-				File f = new File(name);
-				if (f.delete()) {
+			File existingLatticeFile = temporaryLatticeFiles.get(i);
+			if (existingLatticeFile != null && !tempLatticeFilesToKeep.containsValue(existingLatticeFile)) {
+
+				try {
+					Files.delete(existingLatticeFile.toPath());
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				// else {
-				// System.err.printf("Unable to delete file or directory : %s", f.getPath());
-				// }
 			}
 		}
 
-		for (String fileName : tempLatticeFilesToKeep.values()) {
-			File file = new File(fileName);
-			String oldFileRoot = fileName.substring(fileName.lastIndexOf(BatchMatchConstants.FILE_SEPARATOR) + 1,
-					fileName.length());
-			String oldStub = oldFileRoot.substring(0, oldFileRoot.indexOf("."));
-			String newLabelName = "Most_Recent_" + oldStub + ".csv";
+		for (File file : tempLatticeFilesToKeep.values()) {
 
-			String newFileName = this.originalLatticeSpace + newLabelName;
-
-			if (file.renameTo(new File(newFileName))) {
-				file.delete();
-			} else {
-				System.out.println("Failed to move the file" + fileName + " to location " + newFileName);
+			String oldStub = FileNameUtils.getBaseName(file.toPath());  //	fileName.substring(fileName.lastIndexOf(BatchMatchConstants.FILE_SEPARATOR) + 1, fileName.length());
+			// String oldStub = oldFileRoot.substring(0, oldFileRoot.indexOf("."));
+			String newFileName = "Most_Recent_" + oldStub + ".csv";
+			//	String newFileName = this.originalLatticeSpace + newLabelName;
+			
+			Path newPath = Paths.get(originalLatticeSpace.getAbsolutePath(), newFileName);
+			try {
+				Files.move(file.toPath(), newPath, StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				System.err.println("Failed to rename the file" + file.getName() + " to " + newFileName);
+				e.printStackTrace();
 			}
 		}
 	}
@@ -850,21 +880,37 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 		}
 	}
 
-	private Map<String, List<RtPair>> createBatchSummaryReport(PostProcessDataSet data, String fileName,
-			Map<Integer, String> filesToConvertByBatchNoMap) {
+	/**
+	 * Summarize alignment results
+	 * @param data
+	 * @param fileName
+	 * @param filesToConvertByBatchNoMap
+	 * @return
+	 */
+	private Map<String, List<RtPair>> createBatchSummaryReport(
+			PostProcessDataSet data, 
+			String fileName,
+			Map<Integer, File> filesToConvertByBatchNoMap) {
 
-		BatchMatchDataSetSummaryCSVWriter writer = new BatchMatchDataSetSummaryCSVWriter(this.getMassTolerance());
+		BatchMatchDataSetSummaryCSVWriter writer = 
+				new BatchMatchDataSetSummaryCSVWriter(this.getMassTolerance());
+		
+		File outputFile = Paths.get(outputDirectoryPanel.getOutputDirectory().getAbsolutePath(), 
+				"batch_freqs_" + fileName.toLowerCase() + ".csv").toFile();
 
-		Map<String, List<RtPair>> backTrackedPairsByBatch = writer.writeSummaryToFile(
-				data, outputDirectoryPanel.getOutputDirectoryPath() + BatchMatchConstants.FILE_SEPARATOR
-						+ "batch_freqs_" + fileName.toLowerCase() + ".csv",
-				getMinDesertSize(), filesToConvertByBatchNoMap);
+		Map<String, List<RtPair>> backTrackedPairsByBatch = 
+				writer.writeSummaryToFile(
+						data, 
+						outputFile,
+						getMinDesertSize(), //	Not clear what it is
+						filesToConvertByBatchNoMap);
 
 		setNFullMatchesLastIter(writer.getnFullMatches());
 		setNAmbiguousMatchesLastIter(writer.getnAmbiguousFullMatches());
 
 		return backTrackedPairsByBatch;
 	}
+	
 	/*
 	 * BatchMatchProgressLogWriter writer = new
 	 * BatchMatchProgressLogWriter(this.getMassTolerance());
@@ -882,6 +928,11 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 	 * 
 	 */
 
+	/**
+	 * Shift RT values in the new batch to be matched using supplied anchor map
+	 * @return
+	 * @throws Exception
+	 */
 	private PostProcessDataSet getShiftedData() throws Exception {
 
 		PostProcessDataSet shiftedData = null;
@@ -892,11 +943,21 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 			PostProcessDataSet data = binnerResultLoaderPanel.getLoadedData();
 			shiftedData = shifter.shiftSet(data, this.anchorLoaderPanel.grabAnchorMap());
 		}
+		else {
+			System.err.println("No anchor map");
+		}
 		return shiftedData;
 	}
 
-	private PostProcessDataSet justRunMerge(PostProcessDataSet mergingData, PostProcessDataSet targetData)
-			throws Exception {
+	/**
+	 * @param mergingData - new data set to merge
+	 * @param targetData - previously merged data set
+	 * @return
+	 * @throws Exception
+	 */
+	private PostProcessDataSet justRunMerge(
+			PostProcessDataSet mergingData, 
+			PostProcessDataSet targetData) throws Exception {
 
 		// IMPORTANT : Batch 1 is merged into existing batch so we remove any prior
 		// redundancy information
@@ -904,40 +965,50 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 			feature.setRedundancyGroup(null);
 
 		BatchDataMerger merger = new BatchDataMerger();
-		PostProcessDataSet batch1Batch2Data = merger.identifyMatchedFeaturesAndMergeHeaders(mergingData, targetData,
-				true, getMassTolerance(), this.getRTTolerance(), this.getAnnealingStretch(),
-				annealTargetStepPanel.getIntSelected(), true);
+		PostProcessDataSet batch1Batch2Data = 
+				merger.identifyMatchedFeaturesAndMergeHeaders(
+						mergingData, 
+						targetData,
+						true, getMassTolerance(), 
+						this.getRTTolerance(), 
+						this.getAnnealingStretch(),
+						annealTargetStepPanel.getIntSelected(), 
+						true);
 
 		return batch1Batch2Data;
 	}
 
 	private void writeMergedData(PostProcessDataSet mergeData) throws Exception {
+		
+		File outputDir = outputDirectoryPanel.getOutputDirectory();
+		if(outputDir == null || !outputDir.exists()) {
+			
+			JOptionPane.showMessageDialog(null, "Invalid or missing output directory!");
+			return;
+		}
 		String fileNameTag = "merged.xlsx";
 		if (!StringUtils.isEmptyOrNull(outputFileNameTagPanel.getFileNameTag()))
 			fileNameTag = outputFileNameTagPanel.getFileNameTag() + ".xlsx";
 
-		String completeFileName = fileNameTag;
-		if (!StringUtils.isEmptyOrNull(outputDirectoryPanel.getOutputDirectoryPath()))
-			completeFileName = outputDirectoryPanel.getOutputDirectoryPath() + BinnerConstants.FILE_SEPARATOR
-					+ fileNameTag;
-
-		BatchMatchExcelOutputContainer outputContainer = new BatchMatchExcelOutputContainer(completeFileName);
-
-		FileOutputStream output = null;
-		try {
-			reportFileName = outputContainer.grabIncrementedOutputName();
-			output = new FileOutputStream(reportFileName);
-		} catch (FileNotFoundException f) {
-			throw f;
+//		String completeFileName = fileNameTag;
+//		if (!StringUtils.isEmptyOrNull(outputDirectoryPanel.getOutputDirectoryPath()))
+//			completeFileName = outputDirectoryPanel.getOutputDirectoryPath() + BinnerConstants.FILE_SEPARATOR
+//					+ fileNameTag;
+		
+		File outputFile = Paths.get(outputDir.getAbsolutePath(), fileNameTag).toFile();
+		BatchMatchExcelOutputContainer outputContainer = 
+				new BatchMatchExcelOutputContainer(outputFile);
+		reportFile = outputContainer.grabIncrementedOutputFile();
+		try(FileOutputStream output = new FileOutputStream(reportFile)) {
+			outputContainer.writeBatchMatchDataSet(mergeData, null, output, false);			
+		} catch (Exception f) {
+			f.printStackTrace();
 		}
-
-		outputContainer.writeBatchMatchDataSet(mergeData, null, output, false);
-
-		BatchMatchExpandedFeatureCSVWriter csvWriter = new BatchMatchExpandedFeatureCSVWriter(null);
+		BatchMatchExpandedFeatureCSVWriter csvWriter = 
+				new BatchMatchExpandedFeatureCSVWriter(null);
 		csvWriter.setDerivedColNameMapping(mergeData.getDerivedNameToHeaderMap());
-
-		String csvReportName = csvWriter.grabCSVforXLSXName(reportFileName);
-		csvWriter.writeExpandedFeatureSheet(csvReportName, mergeData);
+		File csvReportFile = csvWriter.grabCSVforXLSXName(reportFile);
+		csvWriter.writeExpandedFeatureSheet(csvReportFile, mergeData);
 	}
 
 	private void setupRunConvertPanel() {
@@ -1016,7 +1087,7 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 					} else {
 						JOptionPane.showMessageDialog(null,
 								"Merge complete and results have been written to "
-										+ BinnerConstants.LINE_SEPARATOR + reportFileName
+										+ BinnerConstants.LINE_SEPARATOR + reportFile
 										+ BinnerConstants.LINE_SEPARATOR);
 					}
 				} catch (InterruptedException ignore) {
@@ -1116,8 +1187,12 @@ public class BatchMatchAutomationTabPanel extends StickySettingsPanel {
 		this.sharedAnalysisSettings = sharedAnalysisSettings;
 	}
 
-	private void createRecursiveLattices(PostProcessDataSet mergedData, Integer targetBatch, Integer completeSetSize) {
+	private void createRecursiveLattices(
+			PostProcessDataSet mergedData, 
+			int targetBatch, 
+			int completeSetSize) {
+		
 		RecursiveLatticeFileWriter writer = new RecursiveLatticeFileWriter(completeSetSize);
-		writer.writeLatticeSetRelativeTo(targetBatch, outputDirectoryPanel.getOutputDirectoryPath(), mergedData);
+		writer.writeLatticeSetRelativeTo(targetBatch, outputDirectoryPanel.getOutputDirectory(), mergedData);
 	}
 }

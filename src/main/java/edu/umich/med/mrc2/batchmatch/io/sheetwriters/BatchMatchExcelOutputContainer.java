@@ -8,10 +8,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -26,23 +28,29 @@ public class BatchMatchExcelOutputContainer extends BinnerSpreadSheetWriter impl
 
 	private static final long serialVersionUID = 488660231889571100L;
 
-	private String fileName;
+	private File baseFile;
 	private SXSSFWorkbook workBook = null;
 	private List<XSSFCellStyle> styleList = new ArrayList<XSSFCellStyle>();
 
-	public BatchMatchExcelOutputContainer(String fileName) {
+	public BatchMatchExcelOutputContainer(File baseFile) {
 		super();
-		this.fileName = fileName;
-		// this.havePosNegData = havePosNegData;
+		this.baseFile = baseFile;
 	}
 
-	public void writeBatchMatchDataSet(PostProcessDataSet data, BatchMatchSummaryInfo summaryInfo, OutputStream output,
+	public void writeBatchMatchDataSet(
+			PostProcessDataSet data, 
+			BatchMatchSummaryInfo summaryInfo, 
+			OutputStream output,
 			Boolean writeCollapsed) throws Exception {
 		writeBatchMatchDataSet(data, summaryInfo, output, writeCollapsed, true);
 	}
 
-	public void writeBatchMatchDataSet(PostProcessDataSet data, BatchMatchSummaryInfo summaryInfo, OutputStream output,
-			Boolean writeCollapsed, Boolean writeGrid) throws Exception {
+	public void writeBatchMatchDataSet(
+			PostProcessDataSet data, 
+			BatchMatchSummaryInfo summaryInfo, 
+			OutputStream output,
+			Boolean writeCollapsed, 
+			Boolean writeGrid) throws Exception {
 
 		workBook = new SXSSFWorkbook(100);
 		workBook.setCompressTempFiles(true);
@@ -80,8 +88,6 @@ public class BatchMatchExcelOutputContainer extends BinnerSpreadSheetWriter impl
 		for (XSSFCellStyle style : styleList)
 			style.setFont(font);
 
-		// data.initializeRSDs(colsForRSD);
-
 		if (summaryInfo != null) {
 			BatchMatchSummarySheetWriter summaryWriter = new BatchMatchSummarySheetWriter(workBook);
 			summaryWriter.fillSummaryTab(summaryInfo);
@@ -99,13 +105,11 @@ public class BatchMatchExcelOutputContainer extends BinnerSpreadSheetWriter impl
 				e.printStackTrace();
 			}
 		}
-
-		if (writeCollapsed) {
+		if (writeCollapsed)
 			writeCollapsedSummaries(data, writeGrid);
-		}
+		
 		workBook.write(output);
-		workBook.dispose();
-		output.close();
+		workBook.close();
 	}
 
 	private void writeCollapsedSummaries(PostProcessDataSet data, Boolean writeGrid) throws Exception {
@@ -168,32 +172,32 @@ public class BatchMatchExcelOutputContainer extends BinnerSpreadSheetWriter impl
 		}
 	}
 
-	public String grabIncrementedOutputName() throws FileNotFoundException {
+	public File grabIncrementedOutputFile() {
+		
+		String parentDirPath = baseFile.getParentFile().getAbsolutePath();
+		String baseName = FileNameUtils.getBaseName(baseFile.toPath());
 		String altName = "";
 		try {
-			String baseName = getFileName().substring(0, getFileName().lastIndexOf('.'));
 			altName = baseName + ".xlsx";
-			File outputWithName = new File(altName);
-
+			File outputWithName = Paths.get(parentDirPath, altName).toFile();
 			Integer suffix = 1;
 			while (outputWithName.length() > 0L) {
 				altName = baseName + "." + suffix + ".xlsx";
-				outputWithName = new File(altName);
+				outputWithName = Paths.get(parentDirPath, altName).toFile();
 				suffix++;
 			}
 		} catch (Exception fnfe) {
 			fnfe.printStackTrace();
-			throw fnfe;
 		}
-		return altName;
+		return Paths.get(parentDirPath, altName).toFile();
 	}
 
 	public String getFileName() {
-		return fileName;
+		return baseFile.getAbsolutePath();
 	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	
+	public File getBaseFile() {
+		return baseFile;
 	}
 
 	public SXSSFWorkbook getWorkBook() {
@@ -203,4 +207,5 @@ public class BatchMatchExcelOutputContainer extends BinnerSpreadSheetWriter impl
 	public void setWorkBook(SXSSFWorkbook workBook) {
 		this.workBook = workBook;
 	}
+
 }

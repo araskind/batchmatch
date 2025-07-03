@@ -6,8 +6,10 @@ package edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
+
+import org.apache.commons.compress.utils.FileNameUtils;
 
 import edu.umich.med.mrc2.batchmatch.data.orig.FeatureFromFile;
 import edu.umich.med.mrc2.batchmatch.data.orig.SharedAnalysisSettings;
@@ -71,7 +75,7 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 	private JPanel batchReportWrapPanel, runMergeWrapPanel, progPanel;
 	private JProgressBar progBar;
 
-	private String reportFileName;
+	private File reportFile;
 
 	public BatchMatchSummaryTabPanel(SharedAnalysisSettings sharedAnalysisSettings) {
 		super();
@@ -89,8 +93,8 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 			@Override
 			protected void updateInterfaceForNewSelection() {
 				batchMatchReportLoaderPanel
-						.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectoryPath());
-				batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectoryPath());
+						.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectory());
+				batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectory());
 			}
 		};
 
@@ -100,14 +104,14 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 
 			@Override
 			protected void updateInterfaceForNewData() {
-				Map<Integer, String> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
+				Map<Integer, File> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
 
 				MetabolomicsIntensityDataLoader intensitiesLoader = new MetabolomicsIntensityDataLoader();
 				List<String> intensityHeaders = intensitiesLoader.preReadIntensityHeaders(batchFileMap);
 			}
 		};
 		batchFileListLoaderPanel.setupPanel();
-		batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectoryPath());
+		batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectory());
 
 		batchMatchReportLoaderPanel = new BatchMatchCSVReportLoaderPanel("Select BatchMatch Report") {
 			private static final long serialVersionUID = -7375967852968326658L;
@@ -119,7 +123,7 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 			}
 		};
 		batchMatchReportLoaderPanel.setupPanel();
-		batchMatchReportLoaderPanel.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectoryPath());
+		batchMatchReportLoaderPanel.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectory());
 
 		targetedMatchRangePanel = new IntegerRangePickerPanel("targetedMatchRange") {
 
@@ -394,7 +398,7 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 					} else {
 						JOptionPane.showMessageDialog(null,
 								"Merge complete and results have been written to "
-										+ BinnerConstants.LINE_SEPARATOR + reportFileName
+										+ BinnerConstants.LINE_SEPARATOR + reportFile
 										+ BinnerConstants.LINE_SEPARATOR);
 					}
 				} catch (InterruptedException ignore) {
@@ -424,27 +428,36 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 	}
 
 	private void createMatchSummary() {
+		
 		BatchMatchDataSetSummaryCSVWriter writer = new BatchMatchDataSetSummaryCSVWriter();
-		String fileName = batchMatchReportLoaderPanel.getFileName(); // updateControlsForNewFileSelection(fileName);
+		//	String fileName = batchMatchReportLoaderPanel.getFileName(); // updateControlsForNewFileSelection(fileName);
 		// PostProcessDataSet data = batchMatchReportLoaderPanel.getLoadedData();
+		
+		String baseName = FileNameUtils.getBaseName(
+				batchMatchReportLoaderPanel.getCurrentBatchFile().toPath());
+		String summaryFileName = "batch_freqs_" + baseName.toLowerCase() + ".csv";
+		
+		File summaryOutputFile = Paths.get(outputDirectoryPanel.getOutputDirectory().getAbsolutePath(), 
+				summaryFileName).toFile();
 		writer.writeSummaryToFile(
-				batchMatchReportLoaderPanel.getLoadedData(), outputDirectoryPanel.getOutputDirectoryPath()
-						+ BatchMatchConstants.FILE_SEPARATOR + "batch_freqs_" + fileName.toLowerCase() + ".csv",
+				batchMatchReportLoaderPanel.getLoadedData(), 
+				summaryOutputFile,
 				minDesertSizePanel.getIntSelected());
 	}
 
 	private void filterBinnerFiles() {
-		Map<Integer, String> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
+		Map<Integer, File> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
 
 		for (Integer batch : batchFileMap.keySet()) {
-			String binnerFileName = batchFileMap.get(batch);
+			
+			File binnerFile = batchFileMap.get(batch);
 
 			BinnerInputDataHandler handler = new BinnerInputDataHandler();
-			PostProcessDataSet data = handler.readFeatureData(binnerFileName);
+			PostProcessDataSet data = handler.readFeatureData(binnerFile);
 			data.filterPutativeSalts(50.0, .5, 500.0, 5.0);
 			data.filterDuplicates(batch);
 			String filteredFileName = "SaltDupFiltered_" + batch + ".csv";
-			handler.writeDataInBinnerInputFormat(data, outputDirectoryPanel.getOutputDirectoryPath(), filteredFileName);
+			handler.writeDataInBinnerInputFormat(data, outputDirectoryPanel.getOutputDirectory(), filteredFileName);
 		}
 	}
 
@@ -477,119 +490,129 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 	}
 
 	private void writeMergedData(PostProcessDataSet mergeData) throws Exception {
+		
+		File outputDir = outputDirectoryPanel.getOutputDirectory();
+		if(outputDir == null || !outputDir.exists()) {
+			
+			JOptionPane.showMessageDialog(null, "Invalid or missing output directory!");
+			return;
+		}
 		String fileNameTag = "merged.xlsx";
 		if (!StringUtils.isEmptyOrNull(outputFileNameTagPanel.getFileNameTag()))
 			fileNameTag = outputFileNameTagPanel.getFileNameTag() + ".xlsx";
+		
+		File outputFile = Paths.get(outputDir.getAbsolutePath(), fileNameTag).toFile();
 
-		String completeFileName = fileNameTag;
-		if (!StringUtils.isEmptyOrNull(outputDirectoryPanel.getOutputDirectoryPath()))
-			completeFileName = outputDirectoryPanel.getOutputDirectoryPath() + BinnerConstants.FILE_SEPARATOR
-					+ fileNameTag;
+//		String completeFileName = fileNameTag;
+//		if (outputDirectoryPanel.getOutputDirectory() != null)
+//			completeFileName = outputDirectoryPanel.getOutputDirectory() + BinnerConstants.FILE_SEPARATOR
+//					+ fileNameTag;
 
-		BatchMatchExcelOutputContainer outputContainer = new BatchMatchExcelOutputContainer(completeFileName);
+		BatchMatchExcelOutputContainer outputContainer = 
+				new BatchMatchExcelOutputContainer(outputFile);
 
-		FileOutputStream output = null;
-		try {
-			reportFileName = outputContainer.grabIncrementedOutputName();
-			output = new FileOutputStream(reportFileName);
-		} catch (FileNotFoundException f) {
-			throw f;
+		reportFile = outputContainer.grabIncrementedOutputFile();
+		try(FileOutputStream output = new FileOutputStream(reportFile)) {
+			outputContainer.writeBatchMatchDataSet(mergeData, null, output, false);			
+		} catch (Exception f) {
+			f.printStackTrace();
 		}
-
-		outputContainer.writeBatchMatchDataSet(mergeData, null, output, false);
-
 		BatchMatchExpandedFeatureCSVWriter csvWriter = new BatchMatchExpandedFeatureCSVWriter(null);
 		csvWriter.setDerivedColNameMapping(mergeData.getDerivedNameToHeaderMap());
-
-		String csvReportName = csvWriter.grabCSVforXLSXName(reportFileName);
-		csvWriter.writeExpandedFeatureSheet(csvReportName, mergeData);
+		File csvReportFile = csvWriter.grabCSVforXLSXName(reportFile);
+		csvWriter.writeExpandedFeatureSheet(csvReportFile, mergeData);
 	}
 
 	private void filterDuplicates() {
-		Map<Integer, String> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
+		
+		Map<Integer, File> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
 
 		for (Integer batch : batchFileMap.keySet()) {
-			String binnerFileName = batchFileMap.get(batch);
-
+			
+			File binnerFile = batchFileMap.get(batch);
 			BinnerInputDataHandler handler = new BinnerInputDataHandler();
-			PostProcessDataSet data = handler.readFeatureData(binnerFileName);
+			PostProcessDataSet data = handler.readFeatureData(binnerFile);
 			// data.filterPutativeSalts(50.0, .5, 500.0, 5.0);
 			data.filterDuplicates(batch);
 			String filteredFileName = "DupFiltered_" + batch + ".csv";
-			handler.writeDataInBinnerInputFormat(data, outputDirectoryPanel.getOutputDirectoryPath(), filteredFileName);
+			handler.writeDataInBinnerInputFormat(data, outputDirectoryPanel.getOutputDirectory(), filteredFileName);
 		}
 	}
 
 	private void createRecursiveLattices() {
+		
 		RecursiveLatticeFileWriter writer = new RecursiveLatticeFileWriter(
 				this.recursiveLatticeBaseSizePanel.getIntSelected());
 		PostProcessDataSet data = batchMatchReportLoaderPanel.getLoadedData();
 		// recursive rt lattice
 		writer.writeLatticeSetRelativeTo(recursiveBatchTargetPanel.getIntSelected(),
-				outputDirectoryPanel.getOutputDirectoryPath(), data, false);
+				outputDirectoryPanel.getOutputDirectory(), data, false);
 		// recursive mass lattice
 		writer.writeLatticeSetRelativeTo(recursiveBatchTargetPanel.getIntSelected(),
-				outputDirectoryPanel.getOutputDirectoryPath(), data, true);
+				outputDirectoryPanel.getOutputDirectory(), data, true);
 	}
 
 	private void loadCollapseAndWriteData(PostProcessDataSet dataSet) {
 
-		Map<Integer, String> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
+		Map<Integer, File> batchFileMap = batchFileListLoaderPanel.grabBatchFileMap();
 		MetabolomicsIntensityDataLoader intensitiesLoader = new MetabolomicsIntensityDataLoader();
-		intensitiesLoader.completeDataSetFromBatchFilesList(dataSet, batchFileMap, fileLayoutPanel.getControlLabels());
-		// for(String header : dataSet.getOrderedIntensityHeaders()) {
-		// System.out.println(header);
-		// }
-
-		// BatchMatchMatchGroupFilteringEngine.disambiguateGroups(dataSet);
+		intensitiesLoader.completeDataSetFromBatchFilesList(
+				dataSet, batchFileMap, fileLayoutPanel.getControlLabels());
+		
 		writeCompleteCollapsedDataSet(dataSet, batchFileMap); // Map<Integer, String> batchFileMap);
 	}
 
-	private void writeCompleteCollapsedDataSet(PostProcessDataSet dataSet, Map<Integer, String> batchFileMap) {
-
+	private void writeCompleteCollapsedDataSet(
+			PostProcessDataSet dataSet, 
+			Map<Integer, File> batchFileMap) {
+		
+		File outputDir = outputDirectoryPanel.getOutputDirectory();
+		if(outputDir == null || !outputDir.exists()) {
+			
+			JOptionPane.showMessageDialog(null, "Invalid or missing output directory!");
+			return;
+		}
 		String fileNameTag = "";
 		if (!StringUtils.isEmptyOrNull(outputFileNameTagPanel.getFileNameTag()))
 			fileNameTag = outputFileNameTagPanel.getFileNameTag() + ".xlsx";
 
-		String completeFileName = fileNameTag;
-		if (!StringUtils.isEmptyOrNull(outputDirectoryPanel.getOutputDirectoryPath()))
-			completeFileName = outputDirectoryPanel.getOutputDirectoryPath() + BinnerConstants.FILE_SEPARATOR
-					+ fileNameTag;
+//		String completeFileName = fileNameTag;
+//		if (!StringUtils.isEmptyOrNull(outputDirectoryPanel.getOutputDirectory()))
+//			completeFileName = outputDirectoryPanel.getOutputDirectory() + BinnerConstants.FILE_SEPARATOR
+//					+ fileNameTag;
 
+		File outputFile = Paths.get(outputDir.getAbsolutePath(), fileNameTag).toFile();		
 		BatchMatchSummaryInfo summaryInfo = initializeSummaryInfo(dataSet, batchFileMap);
-
-		BatchMatchExcelOutputContainer outputContainer = new BatchMatchExcelOutputContainer(completeFileName);
-		FileOutputStream output = null, output2 = null;
-		try {
-			reportFileName = outputContainer.grabIncrementedOutputName();
-			output = new FileOutputStream(reportFileName);
-
+		BatchMatchExcelOutputContainer outputContainer = new BatchMatchExcelOutputContainer(outputFile);
+		reportFile = outputContainer.grabIncrementedOutputFile();
+		try(FileOutputStream output = new FileOutputStream(reportFile)) {			
 			outputContainer.writeBatchMatchDataSet(dataSet, summaryInfo, output, true, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		fileNameTag = "";
 		if (!StringUtils.isEmptyOrNull(outputFileNameTagPanel.getFileNameTag()))
 			fileNameTag = outputFileNameTagPanel.getFileNameTag() + "_grid" + ".xlsx";
 
-		completeFileName = fileNameTag;
-		if (!StringUtils.isEmptyOrNull(outputDirectoryPanel.getOutputDirectoryPath()))
-			completeFileName = outputDirectoryPanel.getOutputDirectoryPath() + BinnerConstants.FILE_SEPARATOR
-					+ fileNameTag;
-
-		BatchMatchExcelOutputContainer outputContainer2 = new BatchMatchExcelOutputContainer(completeFileName);
-
-		try {
-			reportFileName = outputContainer2.grabIncrementedOutputName();
-			output2 = new FileOutputStream(reportFileName);
-
-			outputContainer2.writeBatchMatchDataSet(dataSet, summaryInfo, output2, true, true);
+//		completeFileName = fileNameTag;
+//		if (!StringUtils.isEmptyOrNull(outputDirectoryPanel.getOutputDirectory()))
+//			completeFileName = outputDirectoryPanel.getOutputDirectory() + BinnerConstants.FILE_SEPARATOR
+//					+ fileNameTag;
+		
+		outputFile = Paths.get(outputDir.getAbsolutePath(), fileNameTag).toFile();
+		BatchMatchExcelOutputContainer outputContainer2 = new BatchMatchExcelOutputContainer(outputFile);
+		reportFile = outputContainer2.grabIncrementedOutputFile();
+		try(FileOutputStream output = new FileOutputStream(reportFile)) {
+			outputContainer2.writeBatchMatchDataSet(dataSet, summaryInfo, output, true, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private BatchMatchSummaryInfo initializeSummaryInfo(PostProcessDataSet dataSet, Map<Integer, String> batchFileMap) {
+	private BatchMatchSummaryInfo initializeSummaryInfo(
+			PostProcessDataSet dataSet, 
+			Map<Integer, File> batchFileMap) {
+		
 		BatchMatchSummaryInfo summaryInfo = new BatchMatchSummaryInfo();
 
 		summaryInfo.setTitleWithVersion("BatchMatch v" + BatchMatchConstants.VERSION);
@@ -616,7 +639,7 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 
 		String confirmDirMsg = "Are you sure that you want to write your report to "
 				+ BinnerConstants.LINE_SEPARATOR + BinnerConstants.LINE_SEPARATOR
-				+ outputDirectoryPanel.getOutputDirectoryPath() + "?" + BinnerConstants.LINE_SEPARATOR;
+				+ outputDirectoryPanel.getOutputDirectory().getAbsolutePath() + "?" + BinnerConstants.LINE_SEPARATOR;
 
 		int answer = JOptionPane.showConfirmDialog(null, confirmDirMsg, "Confirm report location ",
 				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -638,37 +661,30 @@ public class BatchMatchSummaryTabPanel extends StickySettingsPanel {
 			// csvWriter.setDerivedColNameMapping(data.getDerivedNameToHeaderMap());
 
 			// String csvReportName = "test_ambiguation.csv";
-			// //csvWriter.grabCSVforXLSXName(reportFileName);
+			// //csvWriter.grabCSVforXLSXName(reportFile);
 			// csvWriter.writeExpandedFeatureSheet(csvReportName, data);
 
 			BatchMatchMatchGroupFilteringEngine
 					.disambiguateGroupsByCurveProximity(batchMatchReportLoaderPanel.getLoadedData());
-
 			return;
 		}
-
 		if (reportTypePanel.createQCReport()) {
 			ungroupAmbiguousFeatures();
 		}
 		// if (false) { // reportTypePanel.createMetaReport()
-		// BatchMatchResultsMetaReporter reporter = new BatchMatchResultsMetaReporter();
+		// 		BatchMatchResultsMetaReporter reporter = new BatchMatchResultsMetaReporter();
 		// }
-
 		if (reportTypePanel.filterBinnerInput()) {
 			filterBinnerFiles();
 			// filterDuplicates();
 			return;
 		}
-
 		if (reportTypePanel.createCollapsed()) {
 			loadCollapseAndWriteData(batchMatchReportLoaderPanel.getLoadedData());
 			return;
 		}
-
-		if (reportTypePanel.createRecursiveLattice()) {
+		if (reportTypePanel.createRecursiveLattice())
 			createRecursiveLattices();
-			return;
-		}
 	}
 
 	private Boolean allFilesImported() {

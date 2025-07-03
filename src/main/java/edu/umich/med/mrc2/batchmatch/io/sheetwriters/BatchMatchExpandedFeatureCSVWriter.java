@@ -28,22 +28,21 @@ public class BatchMatchExpandedFeatureCSVWriter extends CSVWriter {
 		this.derivedColNameMapping = derivedColNameMapping;
 	}
 
-	public void writeExpandedFeatureSheet(String outputFileName, PostProcessDataSet data) {
+	public void writeExpandedFeatureSheet(File outputFile, PostProcessDataSet data) {
 
 		Collections.sort(data.getFeatures(), new FeatureByRedGrpMassAndRtComparator());
-
-		BufferedOutputStream bos = null;
-		try {
-			bos = new BufferedOutputStream(new FileOutputStream(new File(outputFileName)));
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))) {
+			
 			createCSVHeader(bos, data.getOrderedNonStandardHeaders(), data.getOrderedIntensityHeaders()); // ,
 			createCSVFeatureList(bos, data.getFeatures(), data.getOrderedIntensityHeaders());
-			bos.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
 	}
 
-	private void createCSVFeatureList(BufferedOutputStream bos, List<FeatureFromFile> features,
+	private void createCSVFeatureList(
+			BufferedOutputStream bos, 
+			List<FeatureFromFile> features,
 			List<String> intensityHeaders) throws IOException {
 
 		String formatStringNumeric = "%.6f";
@@ -68,7 +67,9 @@ public class BatchMatchExpandedFeatureCSVWriter extends CSVWriter {
 		}
 	}
 
-	private void createCSVHeader(BufferedOutputStream bos, List<String> nonStandardHeadersRead,
+	private void createCSVHeader(
+			BufferedOutputStream bos, 
+			List<String> nonStandardHeadersRead,
 			List<String> intensityHeaders) throws IOException {
 
 		StringBuilder sb = new StringBuilder();
@@ -98,8 +99,13 @@ public class BatchMatchExpandedFeatureCSVWriter extends CSVWriter {
 		bos.write((sb.toString() + BatchMatchConstants.LINE_SEPARATOR).getBytes());
 	}
 
-	private void writeFeatureCSVEntry(StringBuilder sb, FeatureFromFile feature, FeatureFromFile nextFeature,
-			String formatStringNumeric, String formatStringNumericShorter, String formatStringInteger) {
+	private void writeFeatureCSVEntry(
+			StringBuilder sb, 
+			FeatureFromFile feature, 
+			FeatureFromFile nextFeature,
+			String formatStringNumeric, 
+			String formatStringNumericShorter, 
+			String formatStringInteger) {
 
 		String value = createAppropriateRowEntry(
 				feature.getBatchIdx() == null ? "" : String.valueOf(feature.getBatchIdx()), formatStringNumeric,
@@ -188,8 +194,13 @@ public class BatchMatchExpandedFeatureCSVWriter extends CSVWriter {
 		}
 	}
 
-	private void createIntensityCSVSection(StringBuilder sb, FeatureFromFile feature, List<String> intensityHeaders,
-			String formatStringNumeric, String formatStringNumericShorter, String formatStringInteger) {
+	private void createIntensityCSVSection(
+			StringBuilder sb, 
+			FeatureFromFile feature, 
+			List<String> intensityHeaders,
+			String formatStringNumeric, 
+			String formatStringNumericShorter, 
+			String formatStringInteger) {
 
 		String value = null;
 

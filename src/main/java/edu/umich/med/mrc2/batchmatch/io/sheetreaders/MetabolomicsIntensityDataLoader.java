@@ -25,15 +25,12 @@ public class MetabolomicsIntensityDataLoader {
 	public MetabolomicsIntensityDataLoader() {
 	}
 
-	public void completeDataSetFromBatchFilesList(PostProcessDataSet dataSet, Map<Integer, String> batchFileMap,
+	public void completeDataSetFromBatchFilesList(
+			PostProcessDataSet dataSet, 
+			Map<Integer, File> batchFileMap,
 			List<String> selectedSamplesForRSD) {
 
-		// System.out.println();
-		// System.out.println("Main loop making target lists from data read in from
-		// report");
-		// System.out.println("----------------------");
-		// System.out.println();
-		for (Integer batchNo : batchFileMap.keySet()) {
+		for (int batchNo : batchFileMap.keySet()) {
 			Map<String, List<FeatureFromFile>> targetList = makeFeatureTargetListForBatch(dataSet, batchNo);
 			fillIntensitiesForBatch(targetList, batchFileMap.get(batchNo), dataSet, batchNo);
 		}
@@ -58,22 +55,16 @@ public class MetabolomicsIntensityDataLoader {
 		dataSet.setColsForRSDByBatch(filteredColsByBatch);
 	}
 
-	public Map<Integer, List<String>> grabBatchwiseIntensityHeaders(PostProcessDataSet dataSet,
-			Map<Integer, String> batchFileMap) {
+	public Map<Integer, List<String>> grabBatchwiseIntensityHeaders(
+			PostProcessDataSet dataSet,
+			Map<Integer, File> batchFileMap) {
 
 		Map<Integer, List<String>> intensityHeadersByBatchMap = new HashMap<Integer, List<String>>();
-
-		// System.out.println();
-		// System.out.println("Main loop initializing intensity headers from data read
-		// in from report");
-		// System.out.println("----------------------");
-		// System.out.println();
-
 		for (Integer batchNo : batchFileMap.keySet()) {
 
 			Map<String, List<FeatureFromFile>> targetList = makeFeatureTargetListForBatch(dataSet, batchNo);
-			List<String> intensityHeadersForBatch = getIntensityHeadersForBatch(targetList, batchFileMap.get(batchNo),
-					dataSet);
+			List<String> intensityHeadersForBatch = getIntensityHeadersForBatch(
+					targetList, batchFileMap.get(batchNo), dataSet);
 			intensityHeadersByBatchMap.put(batchNo, intensityHeadersForBatch);
 		}
 		return intensityHeadersByBatchMap;
@@ -114,11 +105,13 @@ public class MetabolomicsIntensityDataLoader {
 		return featureNamesForBatch;
 	}
 
-	private void fillIntensitiesForBatch(Map<String, List<FeatureFromFile>> targetFeatures, String fileName,
-			PostProcessDataSet dataSet, Integer batchNo) {
+	private void fillIntensitiesForBatch(
+			Map<String, List<FeatureFromFile>> targetFeatures, 
+			File inputFile,
+			PostProcessDataSet dataSet, 
+			Integer batchNo) {
 
-		File inputFile = new File(fileName);
-		System.out.println("Opening file to fill in intensities " + fileName);
+		System.out.println("Opening file to fill in intensities " + inputFile.getAbsolutePath());
 		TextFile rawTextData = new TextFile();
 		try {
 			rawTextData.open(inputFile);
@@ -129,56 +122,61 @@ public class MetabolomicsIntensityDataLoader {
 		locateFeaturesAndCompleteIntensityData(rawTextData, targetFeatures, dataSet, batchNo);
 	}
 
-	private List<String> getIntensityHeadersForBatch(Map<String, List<FeatureFromFile>> targetFeatures, String fileName,
+	private List<String> getIntensityHeadersForBatch(
+			Map<String, 
+			List<FeatureFromFile>> targetFeatures, 
+			File inputFile,
 			PostProcessDataSet dataSet) {
 
-		File inputFile = new File(fileName);
-		System.out.println("Opening file " + fileName + " t0 preread intensity headers");
+		System.out.println("Opening file " + inputFile.getAbsolutePath() + " t0 preread intensity headers");
 		TextFile rawTextData = new TextFile();
 		try {
 			rawTextData.open(inputFile);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null; // false;
+			return null;
 		}
-
 		List<Integer> intensityHeaderIndices = new ArrayList<Integer>();
 		List<String> intensityHeaders = new ArrayList<String>();
-
 		List<Integer> regularHeaderIndices = new ArrayList<Integer>();
 		List<String> regularHeaders = new ArrayList<String>();
-		// Integer fnInt = -1;
-		preReadIntensityHeadersForFile(rawTextData, intensityHeaderIndices, intensityHeaders, regularHeaderIndices,
-				regularHeaders);
+
+		preReadIntensityHeadersForFile(
+				rawTextData, intensityHeaderIndices, intensityHeaders, regularHeaderIndices, regularHeaders);
 
 		return intensityHeaders;
 	}
 
-	public List<String> preReadIntensityHeaders(Map<Integer, String> batchFileMap) {
+	public List<String> preReadIntensityHeaders(Map<Integer, File> batchFileMap) {
 
 		List<Integer> intensityHeaderIndices = new ArrayList<Integer>();
 		List<String> intensityHeaders = new ArrayList<String>();
 
-		for (Integer batchNo : batchFileMap.keySet()) {
-
-			String fileName = batchFileMap.get(batchNo);
-			File inputFile = new File(fileName);
+		for (int batchNo : batchFileMap.keySet()) {
 
 			TextFile rawTextData = new TextFile();
 			try {
-				rawTextData.open(inputFile);
+				rawTextData.open(batchFileMap.get(batchNo));
 			} catch (Exception e) {
 				e.printStackTrace();
-				return new ArrayList<String>(); // false;
+				return new ArrayList<String>();
 			}
-			preReadIntensityHeadersForFile(rawTextData, intensityHeaderIndices, intensityHeaders,
-					new ArrayList<Integer>(), new ArrayList<String>());
+			preReadIntensityHeadersForFile(
+					rawTextData, 
+					intensityHeaderIndices, 
+					intensityHeaders,
+					new ArrayList<Integer>(), 
+					new ArrayList<String>());
 		}
 		return intensityHeaders;
 	}
 
-	private int preReadIntensityHeadersForFile(TextFile txtData, List<Integer> intensityHeaderIndices,
-			List<String> intensityHeaders, List<Integer> regularHeaderIndices, List<String> regularHeaders) {
+	private int preReadIntensityHeadersForFile(
+			TextFile txtData, 
+			List<Integer> intensityHeaderIndices,
+			List<String> intensityHeaders, 
+			List<Integer> regularHeaderIndices, 
+			List<String> regularHeaders) {
 
 		if (regularHeaderIndices != null)
 			regularHeaderIndices.clear();
@@ -263,17 +261,6 @@ public class MetabolomicsIntensityDataLoader {
 			e.printStackTrace();
 			throw e;
 		}
-
-		// if (newIntensityHeaders.size() < 1)
-		// JOptionPane.showMessageDialog(null, "Warning : No intensity values were found
-		// in your file. Although any text found in your report will be mirrored,"
-		// + BatchMatchConstants.LINE_SEPARATOR + "to the processed output, any actual
-		// intensities will not be recognized as numeric and no shading for outliers"
-		// + BatchMatchConstants.LINE_SEPARATOR + "or missingness will be carried over.
-		// The intensity section of your Binner report "
-		// + BatchMatchConstants.LINE_SEPARATOR + "should be preceded by a single blank
-		// column.");
-
 		int startCol = 0;
 
 		for (int col = 0; col < newIntensityHeaders.size(); col++) {
@@ -283,13 +270,8 @@ public class MetabolomicsIntensityDataLoader {
 		return dataStart;
 	}
 
-	// Called for data driven lattices. It locates master pool intensities and subs
-	// the pool mean intensity
-	// for feature intensity. It reads expected rt for rt. column 0 is the assumed
-	// name column (although it is irrelevant
-	// for lattice building
-
 	public List<FeatureFromFile> grabFeaturesWithMeanMasterPoolForIntensity(TextFile txtData) {
+		
 		List<String> rowContents = null;
 		String value;
 
@@ -303,25 +285,19 @@ public class MetabolomicsIntensityDataLoader {
 				regularHeaderIndices, regularHeaders);
 
 		featureNameCol = 0;
-		for (int col = 0; col < intensityHeaders.size(); col++) {
-			if (StringUtils.isEmptyOrNull(intensityHeaders.get(col)))
-				continue;
-			// System.out.println("Header " + intensityHeaders.get(col));
-		}
 
 		Integer rtMeasurementCol = null;
 		for (int col = 0; col < regularHeaders.size(); col++) {
+
 			if (StringUtils.isEmptyOrNull(regularHeaders.get(col)))
 				continue;
-			// System.out.println("Regular Header " + regularHeaders.get(col));
+
 			if (PostProccessConstants.SPECIAL_EXPECTED_RETENTION_TIME_CHOICES_ARRAY
 					.contains(StringUtils.removeSpaces(regularHeaders.get(col).toLowerCase()))) {
 				rtMeasurementCol = col;
 				break;
 			}
 		}
-
-		// CS00000MP
 		List<Integer> poolColumnIndices = new ArrayList<Integer>();
 		for (int i = 0; i < intensityHeaders.size(); i++)
 			if (intensityHeaders.get(i).contains(PostProccessConstants.MASTER_POOL_ID_FORMAT))
@@ -330,7 +306,6 @@ public class MetabolomicsIntensityDataLoader {
 		List<FeatureFromFile> features = new ArrayList<FeatureFromFile>();
 
 		try {
-			// String keyForIntensity;
 			int rowEnd = txtData.getEndRowIndex() + 1;
 			for (int rowNum = dataStart; rowNum < rowEnd; rowNum++) {
 
@@ -396,10 +371,11 @@ public class MetabolomicsIntensityDataLoader {
 		return features;
 	}
 
-	// 02/28/22 : Limited to assume Feature name, Monoisotopic M/Z and RT expected,
-	// no break for intensities since we search on sample name tags
-	private void locateFeaturesAndCompleteIntensityData(TextFile txtData,
-			Map<String, List<FeatureFromFile>> targetFeaturesMap, PostProcessDataSet featureData, Integer batchNo) {
+	private void locateFeaturesAndCompleteIntensityData(
+			TextFile txtData,
+			Map<String, List<FeatureFromFile>> targetFeaturesMap, 
+			PostProcessDataSet featureData, 
+			int batchNo) {
 
 		List<String> rowContents = null;
 		String value;
@@ -416,11 +392,14 @@ public class MetabolomicsIntensityDataLoader {
 		for (String header : intensityHeaders)
 			System.out.println(header);
 
-		String val = null, lcVal = null;
+		String val = null;
+		String lcVal = null;
+		
 		for (int col = 0; col < intensityHeaders.size(); col++) {
+			
 			if (StringUtils.isEmptyOrNull(intensityHeaders.get(col)))
 				continue;
-			// System.out.println("Header " + intensityHeaders.get(col));
+
 			lcVal = intensityHeaders.get(col).toLowerCase();
 			val = StringUtils.removeNonPrintable(lcVal);
 			if (PostProccessConstants.LIMITED_COMPOUND_CHOICES_ARRAY
@@ -429,23 +408,20 @@ public class MetabolomicsIntensityDataLoader {
 				break;
 			}
 		}
-
 		massMeasurementCol = -1;
 		for (int col = 0; col < regularHeaders.size(); col++) {
+			
 			if (StringUtils.isEmptyOrNull(regularHeaders.get(col)))
 				continue;
-			// System.out.println("Regular Header " + regularHeaders.get(col));
 
 			lcVal = regularHeaders.get(col).toLowerCase();
 			val = StringUtils.removeNonPrintable(lcVal);
-
 			if (PostProccessConstants.LIMITED_MASS_MEASUREMENT_CHOICES_ARRAY
 					.contains(StringUtils.removeSpaces(regularHeaders.get(col).toLowerCase()))) {
 				this.massMeasurementCol = col;
 				break;
 			}
 		}
-
 		int otherMassCol = -1;
 		for (int col = 0; col < regularHeaders.size(); col++) {
 			if (StringUtils.isEmptyOrNull(regularHeaders.get(col)))
@@ -453,14 +429,12 @@ public class MetabolomicsIntensityDataLoader {
 
 			lcVal = regularHeaders.get(col).toLowerCase();
 			val = StringUtils.removeNonPrintable(lcVal);
-
 			if (PostProccessConstants.MASS_CHOICES_ARRAY
 					.contains(StringUtils.removeSpaces(regularHeaders.get(col).toLowerCase()))) {
 				otherMassCol = col;
 				break;
 			}
 		}
-
 		try {
 			String keyForIntensity;
 			int rowEnd = txtData.getEndRowIndex() + 1;
@@ -506,16 +480,6 @@ public class MetabolomicsIntensityDataLoader {
 
 				if (candidateFeatures == null || candidateFeatures.size() < 1)
 					continue;
-
-				// String mass = null;
-				// if (this.massMeasurementCol != -1)
-				// mass = rowContents.get(massMeasurementCol);
-				// else if (otherMassCol != -1)
-				// mass = rowContents.get(otherMassCol);
-
-				// Double massDbl = null;
-				// try { massDbl = Double.parseDouble(mass); }
-				// catch (Exception e) { continue; }
 
 				FeatureFromFile targetFeature = null;
 				for (int i = 0; i < candidateFeatures.size(); i++) {

@@ -22,6 +22,7 @@
 package edu.umich.med.mrc2.batchmatch.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -151,6 +152,9 @@ public class BatchMatchMainWindow  extends JFrame
 		if(command.equals(BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND.getName()))
 			saveAndCloseProject();
 		
+		if(command.equals(BMActionCommands.GO_TO_EXPERIMENT_FOLDER_COMMAND.getName()))
+			goToProjectFolder();
+		
 		if(command.equals(BMActionCommands.GLOBAL_SETTINGS_COMMAND.getName()))
 			adjustGlobalSettings();
 		
@@ -164,6 +168,23 @@ public class BatchMatchMainWindow  extends JFrame
 			runBatchMatch();
 	}
 	
+	private void goToProjectFolder() {
+
+		File expDir = null;
+		if (BatchMatch.getCurrentProject() != null) 			
+			expDir = BatchMatch.getCurrentProject().getProjectFile().getParentFile();
+		
+		if(expDir != null && expDir.exists()) {
+			
+			try {
+				Desktop.getDesktop().open(expDir);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
+
 	private void runBatchMatch() {
 
 		//	Validate inputs, update parameters and save the project

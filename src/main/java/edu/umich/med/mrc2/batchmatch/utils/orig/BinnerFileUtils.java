@@ -22,7 +22,13 @@ public class BinnerFileUtils {
 	}
 
 //	public static File[] getFiles()
-	public static File getFile(String title, int load_save, String extension, String description, String startFile) {
+	public static File getFile(
+			String title, 
+			int load_save, 
+			String extension, 
+			String description, 
+			String startFile) {
+		
 		JFileChooser chooser = new JFileChooser();
 		if (startFile != null) {
 			File f = new File(startFile);

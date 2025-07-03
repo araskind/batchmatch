@@ -43,7 +43,7 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 	private JProgressBar progBar;
 	private JButton inputFileButton;
 	private TitledBorder inputFileWrapBorder;
-	private String initialDirectory;
+	private File initialDirectory;
 
 	private Boolean rsdPctMissingPreCalculated = false;
 
@@ -80,7 +80,7 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 		setupPanel(null);
 	}
 
-	public void setupPanel(String initialDirectory) {
+	public void setupPanel(File initialDirectory) {
 
 		this.initialDirectory = initialDirectory;
 		initializeArrays();
@@ -105,6 +105,7 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 	}
 
 	private void setupInputFilePanel() {
+		
 		JPanel inputFilePanel = new JPanel();
 		inputFilePanel.setLayout(new BoxLayout(inputFilePanel, BoxLayout.X_AXIS));
 		inputFilePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -123,11 +124,14 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 		inputFileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				File file = BinnerFileUtils.getFile("Select Metabolite Data Input File", BinnerFileUtils.LOAD,
-						fileExtension, fileDescription, initialDirectory);
+				File file = BinnerFileUtils.getFile(
+						"Select Metabolite Data Input File", 
+						BinnerFileUtils.LOAD,
+						fileExtension, 
+						fileDescription, 
+						initialDirectory.getAbsolutePath());
 
 				handleFileSelection(file);
-
 			}
 		});
 
@@ -144,16 +148,10 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 		inputFileWrapBorder.setTitleColor(BinnerConstants.TITLE_COLOR);
 		inputFileWrapPanel.setBorder(inputFileWrapBorder);
 		inputFileWrapPanel.add(inputFilePanel);
-		// inputFileWrapPanel.add(inputFileProgPanel);
 	}
-
-	public void handleFileNameSelection(String fileName) {
-
-		File file = new File(fileName);
-		handleFileSelection(file);
-	}
-
+	
 	private void handleFileSelection(File file) {
+		
 		if (file != null) {
 
 			inputFileComboBox.removeAllItems();
@@ -163,12 +161,12 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 
 			if (preReadData)
 				loadDataInWorkerThread();
+			
 			updateInterfaceForNewFileSelection(file.getName());
 		}
 	}
 
-	public void handleFileNameSelection2(String filename) {
-		File file = new File(filename);
+	public void handleFileSelection2(File file) {
 
 		if (file != null) {
 
@@ -185,6 +183,7 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 	}
 
 	private void loadDataInWorkerThread() {
+		
 		SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
 			@Override
 			public Boolean doInBackground() {
@@ -240,17 +239,20 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 		worker.execute();
 	}
 
-	// System.out
-
+	/**
+	 * Reads Binner4batchMatch output file into PostProcessDataSet object
+	 * 
+	 * @loadedData PostProcessDataSet 
+	 */
 	public void loadFeatureData() {
 
 		progPanel.setVisible(true);
 
-		File inputFile = new File(currentBatchFile.getPath());
+		//	File inputFile = new File(currentBatchFile.getPath());
 
 		TextFile rawTextData = new TextFile();
 		try {
-			rawTextData.open(inputFile);
+			rawTextData.open(currentBatchFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return; // false;
@@ -284,7 +286,7 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 	}
 
 	public String getFileFullPath() {
-		return currentBatchFile != null ? currentBatchFile.getPath() : "";
+		return currentBatchFile != null ? currentBatchFile.getAbsolutePath() : "";
 	}
 
 	public String getTitle() {
@@ -309,11 +311,11 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 		this.loadedData = null;
 	}
 
-	public String getInitialDirectory() {
+	public File getInitialDirectory() {
 		return initialDirectory;
 	}
 
-	public void setInitialDirectory(String initialDirectory) {
+	public void setInitialDirectory(File initialDirectory) {
 		this.initialDirectory = initialDirectory;
 	}
 
@@ -326,5 +328,4 @@ public abstract class BinnerBatchFileLoaderPanel extends StickySettingsPanel {
 	}
 
 	protected abstract Boolean updateInterfaceForNewFileSelection(String fileName);
-//	protected abstract Boolean screenFileNames(String fileName);
 }

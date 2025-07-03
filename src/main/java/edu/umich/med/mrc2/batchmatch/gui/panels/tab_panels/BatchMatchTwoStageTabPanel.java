@@ -6,6 +6,8 @@ package edu.umich.med.mrc2.batchmatch.gui.panels.tab_panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -70,8 +72,8 @@ public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 			@Override
 			protected void updateInterfaceForNewSelection() {
 				batchMatchReportToConvertPanel
-						.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectoryPath());
-				// batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectoryPath());
+						.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectory());
+				// batchFileListLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectory());
 			}
 		};
 
@@ -90,7 +92,7 @@ public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 		batchMatchReportToConvertPanel.setupPanel();
 		batchMatchReportToConvertPanel.setMinTargetBatch(1);
 		batchMatchReportToConvertPanel.setMaxTargetBatch(5);
-		batchMatchReportToConvertPanel.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectoryPath());
+		batchMatchReportToConvertPanel.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectory());
 
 		pairwiseReportToMapPanel = new BatchMatchCSVReportLoaderPanel(
 				"Select Pair/Set-wise BatchMatch Report To Derive Batch Set Mapping") {
@@ -103,13 +105,13 @@ public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 			}
 		};
 		pairwiseReportToMapPanel.setupPanel();
-		pairwiseReportToMapPanel.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectoryPath());
+		pairwiseReportToMapPanel.setInitialDirectoryForChooser(outputDirectoryPanel.getOutputDirectory());
 		pairwiseReportToMapPanel.setMinTargetBatch(1);
 		pairwiseReportToMapPanel.setMaxTargetBatch(2);
 
 		dataSetMappingLoaderPanel = new DataSetMappingLoaderPanel("Select Data Set Mapping", null);
 		dataSetMappingLoaderPanel.setupPanel();
-		dataSetMappingLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectoryPath());
+		dataSetMappingLoaderPanel.setInitialDirectory(outputDirectoryPanel.getOutputDirectory());
 
 		outputFileNameTagPanel = new OutputFileNameTagPanel("Summarize");
 		outputFileNameTagPanel.setupPanel();
@@ -304,7 +306,7 @@ public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 
 		String confirmDirMsg = "Are you sure that you want to write your report to "
 				+ BinnerConstants.LINE_SEPARATOR + BinnerConstants.LINE_SEPARATOR
-				+ outputDirectoryPanel.getOutputDirectoryPath() + "?" + BinnerConstants.LINE_SEPARATOR;
+				+ outputDirectoryPanel.getOutputDirectory() + "?" + BinnerConstants.LINE_SEPARATOR;
 
 		int answer = JOptionPane.showConfirmDialog(null, confirmDirMsg, "Confirm report location ",
 				JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -317,29 +319,31 @@ public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 			// Load full data
 			PostProcessDataSet dataToMap = batchMatchReportToConvertPanel.getLoadedData();
 
-			Map<Integer, Map<Integer, FeatureInfoForMatchGroupMapping>> dataSetMapping = this.dataSetMappingLoaderPanel
-					.grabFreshDataSetMapping();
+			Map<Integer, Map<Integer, FeatureInfoForMatchGroupMapping>> dataSetMapping = 
+					this.dataSetMappingLoaderPanel.grabFreshDataSetMapping();
 
 			TwoStageAnalysisEngine.translateFromDataSetMapping(dataSetMapping, dataToMap);
 
-			String outputFileName = outputDirectoryPanel.getOutputDirectoryPath() + BatchMatchConstants.FILE_SEPARATOR
-					+ outputFileNameTagPanel.getFileNameTag() + ".csv";
+//			String outputFileName = outputDirectoryPanel.getOutputDirectory() + BatchMatchConstants.FILE_SEPARATOR
+//					+ outputFileNameTagPanel.getFileNameTag() + ".csv";
+			
+			File outputFile = Paths.get(outputDirectoryPanel.getOutputDirectory().getAbsolutePath(), 
+					outputFileNameTagPanel.getFileNameTag() + ".csv").toFile();
 			BatchMatchExpandedFeatureCSVWriter csvWriter = new BatchMatchExpandedFeatureCSVWriter(null);
-			csvWriter.writeExpandedFeatureSheet(outputFileName, dataToMap);
+			csvWriter.writeExpandedFeatureSheet(outputFile, dataToMap);
 		}
 
 		if (reportTypePanel.createDataSetMapping()) {
+			
 			pairwiseReportToMapPanel.setInterpretMiscCols(true);
 			pairwiseReportToMapPanel.getFileFullPath();
 			PostProcessDataSet data = pairwiseReportToMapPanel.getLoadedData(); // (pairwiseReportToMapPanel.getFileFullPath());
-			String mapFileName = outputDirectoryPanel.getOutputDirectoryPath() + BatchMatchConstants.FILE_SEPARATOR
+			String mapFileName = outputDirectoryPanel.getOutputDirectory() + BatchMatchConstants.FILE_SEPARATOR
 					+ outputFileNameTagPanel.getFileNameTag() + ".csv";
 			TwoStageAnalysisEngine.createStageTwoDataSetMapping(data, mapFileName);
 		}
-
-		// disambiguate
-
 		if (reportTypePanel.createMockData()) {
+			
 			PostProcessDataSet data = pairwiseReportToMapPanel.getLoadedData();
 			// first identify complete match groups
 
@@ -350,6 +354,7 @@ public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 	}
 
 	private Boolean allFilesImported() {
+		
 		if (batchMatchReportToConvertPanel.getLoadedData() == null) // && !reportTypePanel.filterBinnerInput())
 			return true;
 		// else if (reportTypePanel.createCollapsed())
@@ -365,5 +370,4 @@ public class BatchMatchTwoStageTabPanel extends StickySettingsPanel {
 	public void setSharedAnalysisSettings(SharedAnalysisSettings sharedAnalysisSettings) {
 		this.sharedAnalysisSettings = sharedAnalysisSettings;
 	}
-
 }

@@ -9,6 +9,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +28,13 @@ public class AnchorFileWriter {
 		this(true);
 	}
 
-	public AnchorFileWriter(Boolean writeDiffs) {
+	public AnchorFileWriter(boolean writeDiffs) {
 		this.writeDiffs = writeDiffs;
 	}
 
-	public void outputFileList(String outputDirectory, List<String> fileNames) {
+	public void outputFileList(
+			File outputDirectory, 
+			List<String> fileNames) {
 
 		List<Integer> fileIndices = new ArrayList<Integer>();
 		for (int i = 0; i < fileNames.size(); i++)
@@ -40,23 +43,32 @@ public class AnchorFileWriter {
 		outputFileList(outputDirectory, fileNames, fileIndices);
 	}
 
-	public void outputFileList(String outputDirectory, List<String> fileNames, List<Integer> fileIndices) {
+	public void outputFileList(
+			File outputDirectory, 
+			List<String> fileNames, 
+			List<Integer> fileIndices) {
 		outputFileList(outputDirectory, fileNames, fileIndices, "lattice_list.csv");
 	}
 
-	public void outputFileList(String outputDirectory, Map<Integer, String> updatedAnchorFileNameMap, String fileName) {
+	public void outputFileList(
+			File outputDirectory, 
+			Map<Integer, File> updatedAnchorFileNameMap, 
+			String fileName) {
 
 		List<Integer> fileIndices = ListUtils.makeListFromCollection(updatedAnchorFileNameMap.keySet());
 		Collections.sort(fileIndices);
 
 		List<String> newFileNames = new ArrayList<String>();
 		for (int i = 0; i < fileIndices.size(); i++)
-			newFileNames.add(updatedAnchorFileNameMap.get(fileIndices.get(i)));
+			newFileNames.add(updatedAnchorFileNameMap.get(fileIndices.get(i)).getAbsolutePath());
 
 		outputFileList(outputDirectory, newFileNames, fileIndices, fileName);
 	}
 
-	public void outputFileList(String outputDirectory, List<String> fileNames, List<Integer> fileIndices,
+	public void outputFileList(
+			File outputDirectory, 
+			List<String> fileNames, 
+			List<Integer> fileIndices, 
 			String fileName) {
 
 		Collections.sort(fileIndices);
@@ -70,15 +82,15 @@ public class AnchorFileWriter {
 		outputFileListByTag(outputDirectory, fileNames, fileTags, fileName);
 	}
 
-	public void outputFileListByTag(String outputDirectory, List<String> fileNames, List<String> fileTags,
+	public void outputFileListByTag(
+			File outputDirectory, 
+			List<String> fileNames, 
+			List<String> fileTags,
 			String fileName) {
 
-		String outputFileName = outputDirectory + BatchMatchConstants.FILE_SEPARATOR + fileName;
-
-		BufferedOutputStream bos = null;
-		try {
-			bos = new BufferedOutputStream(new FileOutputStream(new File(outputFileName)));
-
+		File outputFile = Paths.get(outputDirectory.getAbsolutePath(), fileName).toFile();
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))){
+			
 			if (fileNames.size() != fileTags.size())
 				throw new IOException("Error while writing new lattice file list");
 
@@ -87,42 +99,65 @@ public class AnchorFileWriter {
 
 				bos.write((line + BatchMatchConstants.LINE_SEPARATOR).getBytes());
 			}
-			bos.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
 	}
 
-	public String outputResults(String fileNameSuffix, List<RtPair> rtPairs, String outputDirectory,
-			String fileNamePrefix, String batch1Tag, String batch2Tag) {
+	public File outputResults(
+			String fileNameSuffix, 
+			List<RtPair> rtPairs, 
+			File outputDirectory,
+			String fileNamePrefix, 
+			String batch1Tag, 
+			String batch2Tag) {
 
-		return outputResults(fileNameSuffix, rtPairs, outputDirectory, fileNamePrefix, batch1Tag, batch2Tag, false);
+		return outputResults(
+				fileNameSuffix, rtPairs, outputDirectory, 
+				fileNamePrefix, batch1Tag, batch2Tag, false);
 	}
 
-	public String outputResults(String fileNameSuffix, List<RtPair> rtPairs, String outputDirectory,
-			String fileNamePrefix, String batch1Tag, String batch2Tag, Boolean writingMasses) {
+	public File outputResults(
+			String fileNameSuffix, 
+			List<RtPair> rtPairs, 
+			File outputDirectory,
+			String fileNamePrefix, 
+			String batch1Tag, 
+			String batch2Tag, 
+			Boolean writingMasses) {
+		
+		File outputFile = 
+				Paths.get(outputDirectory.getAbsolutePath(), 
+						String.format("%s_%s.csv", fileNamePrefix, fileNameSuffix)).toFile();
 
-		String outputFileName = outputDirectory + BatchMatchConstants.FILE_SEPARATOR
-				+ String.format("%s_%s.csv", fileNamePrefix, fileNameSuffix);
-
-		outputResults(outputFileName, rtPairs, batch1Tag, batch2Tag);
-		return outputFileName;
+		outputResults(outputFile, rtPairs, batch1Tag, batch2Tag);
+		
+		return outputFile;
 	}
 
-	public void outputResults(String outputFileName, List<RtPair> rtPairs) {
-		outputResults(outputFileName, rtPairs, "Batch01", "Batch02");
+	public void outputResults(
+			File outputFile, 
+			List<RtPair> rtPairs) {
+		outputResults(outputFile, rtPairs, "Batch01", "Batch02");
 	}
 
-	public void outputResults(String outputFileName, List<RtPair> rtPairs, String batch1Tag, String batch2Tag) {
-		outputResults(outputFileName, rtPairs, batch1Tag, batch2Tag, false);
+	public void outputResults(
+			File outputFile, 
+			List<RtPair> rtPairs, 
+			String batch1Tag, 
+			String batch2Tag) {
+		outputResults(outputFile, rtPairs, batch1Tag, batch2Tag, false);
 	}
 
-	public void outputResults(String outputFileName, List<RtPair> rtPairs, String batch1Tag, String batch2Tag,
+	public void outputResults(
+			File outputFile, 
+			List<RtPair> rtPairs, 
+			String batch1Tag, 
+			String batch2Tag,
 			Boolean writingMasses) {
 
-		BufferedOutputStream bos = null;
-		try {
-			bos = new BufferedOutputStream(new FileOutputStream(new File(outputFileName)));
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))){
+			
 			if (batch1Tag != null && batch2Tag != null)
 				bos.write((String.format("%s, %s", batch1Tag, batch2Tag) + BatchMatchConstants.LINE_SEPARATOR)
 						.getBytes());
@@ -149,13 +184,6 @@ public class AnchorFileWriter {
 
 				}
 			}
-
-			// List<RtPair> addedPairs = null;
-			// if (maxX < absMaxX)
-			// addedPairs = fillInEnds(maxX, absMaxX, projMin, projMax, bos);
-
-			// rtPairs.addAll(addedPairs);
-
 			Collections.sort(rtPairs, new RtPairComparator()); // , keyType, valueType)
 			for (RtPair rtPair : rtPairs) {
 				String line = String.format("%6.4f, %6.4f", rtPair.getRt1(), rtPair.getRt2());
@@ -168,13 +196,16 @@ public class AnchorFileWriter {
 				String line = String.format("%6.4f, %6.4f, %6.4f", 100.0, 100.0, 0.0);
 				bos.write((line + BatchMatchConstants.LINE_SEPARATOR).getBytes());
 			}
-			bos.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
 	}
 
-	private List<RtPair> fillInEnds(Double startX, Double lastSimulatedX, Double projMin, Double projMax,
+	/**
+	private List<RtPair> fillInEnds(
+			Double startX, 
+			Double lastSimulatedX, 
+			Double projMin, Double projMax,
 			BufferedOutputStream bos) throws IOException {
 
 		List<RtPair> addList = new ArrayList<RtPair>();
@@ -213,8 +244,14 @@ public class AnchorFileWriter {
 		return addList;
 	}
 
-	public void outputResultsWithTagsToFile(String fileName, List<Double> pairTags, List<RtPair> rtPairs,
-			String outputDirectory, String batch1Tag, String batch2Tag, Boolean printDiagnostics) {
+	public void outputResultsWithTagsToFile(
+			String fileName, 
+			List<Double> pairTags, 
+			List<RtPair> rtPairs,
+			String outputDirectory, 
+			String batch1Tag, 
+			String batch2Tag, 
+			Boolean printDiagnostics) {
 
 		String outputFileName = outputDirectory + BatchMatchConstants.FILE_SEPARATOR + fileName;
 
@@ -260,4 +297,5 @@ public class AnchorFileWriter {
 			ioe.printStackTrace();
 		}
 	}
+	*/
 }

@@ -25,21 +25,30 @@ import edu.umich.med.mrc2.batchmatch.utils.orig.StringUtils;
 public class PostProcessDataSet {
 
 	private List<FeatureFromFile> features;
-	private List<String> orderedExtraLibFileHeaders, orderedNonStandardHeaders, orderedIntensityHeaders;
+	private List<String> orderedExtraLibFileHeaders; 
+	private List<String> orderedNonStandardHeaders;
+	private List<String> orderedIntensityHeaders;
 	private List<String> derivedSampleNames;
 	private Map<String, String> derivedNameToHeaderMap;
 	private Map<String, Double> featureNameToOldRtMap;
-	private Boolean rsdPctMissPrecalculated = false;
+	private boolean rsdPctMissPrecalculated = false;
 	private Map<String, List<String>> redundantFeatureMap;
 
 	private Integer maxPossibleMatchCt;
 	private Map<Integer, Integer> rawFeatureCtsByBatch;
-	private Boolean posMode, ifPrincipalIons;
-	private String sourceReport, libFileSource, dataSetLabel;
+	private boolean posMode;
+	private boolean ifPrincipalIons;
+	private String sourceReport;
+	private String libFileSource;
+	private String dataSetLabel;
 
-	private Map<Integer, Double> avgRtsByMatchGrp = null, avgOldRtsByMatchGrp = null, avgMassesByMatchGrp = null;
-	private Map<Integer, Double> minRtsByMatchGrp = null, minMassesByMatchGrp = null;
-	private Map<Integer, Double> maxRtsByMatchGrp = null, maxMassesByMatchGrp = null;
+	private Map<Integer, Double> avgRtsByMatchGrp = null;
+	private Map<Integer, Double> avgOldRtsByMatchGrp = null;
+	private Map<Integer, Double> avgMassesByMatchGrp = null;
+	private Map<Integer, Double> minRtsByMatchGrp = null;
+	private Map<Integer, Double> minMassesByMatchGrp = null;
+	private Map<Integer, Double> maxRtsByMatchGrp = null;
+	private Map<Integer, Double> maxMassesByMatchGrp = null;
 	private Map<Integer, Double> avgMedIntensityByMatchGrp = null;
 	private Map<Integer, Integer> grpSizeByMatchGrp = null;
 	private Map<Integer, List<String>> colsForRSDByBatch = null;
@@ -60,11 +69,14 @@ public class PostProcessDataSet {
 
 		rawFeatureCtsByBatch = null;
 
-		posMode = null;
-		ifPrincipalIons = null;
+		posMode = false;
+		ifPrincipalIons = false;
 		sourceReport = libFileSource = "";
 	}
 	
+	/**
+	 * Add batch number to feature name
+	 */
 	public void updateNamesForBatch() {
 		for (FeatureFromFile f : features) {
 			if (!f.getName().endsWith("-" + f.getBatchIdx()))
@@ -72,6 +84,9 @@ public class PostProcessDataSet {
 		}
 	}
 
+	/**
+	 * Add mz and batch number to feature name
+	 */
 	public void updateNamesForBatchAndMZ() {
 		for (FeatureFromFile f : features) {
 			if (!f.getName().endsWith("-" + f.getBatchIdx())) {
@@ -81,7 +96,12 @@ public class PostProcessDataSet {
 		}
 	}
 
+	/**
+	 * Clone object
+	 * @return
+	 */
 	public PostProcessDataSet makeDeepCopy() {
+		
 		PostProcessDataSet destData = new PostProcessDataSet();
 
 		if (this.features == null) {
@@ -189,7 +209,7 @@ public class PostProcessDataSet {
 			destData.avgRtsByMatchGrp = null;
 		} else {
 			Map<Integer, Double> avgRtsByRedundancyGrp = new HashMap<Integer, Double>();
-			for (Integer key : this.avgRtsByMatchGrp.keySet()) {
+			for (int key : this.avgRtsByMatchGrp.keySet()) {
 				avgRtsByRedundancyGrp.put(key, this.avgRtsByMatchGrp.get(key));
 			}
 			destData.avgRtsByMatchGrp = avgRtsByRedundancyGrp;
@@ -199,7 +219,7 @@ public class PostProcessDataSet {
 			destData.avgOldRtsByMatchGrp = null;
 		} else {
 			Map<Integer, Double> avgOldRtsByRedundancyGrp = new HashMap<Integer, Double>();
-			for (Integer key : this.avgOldRtsByMatchGrp.keySet()) {
+			for (int key : this.avgOldRtsByMatchGrp.keySet()) {
 				avgOldRtsByRedundancyGrp.put(key, this.avgOldRtsByMatchGrp.get(key));
 			}
 			destData.avgOldRtsByMatchGrp = avgOldRtsByRedundancyGrp;
@@ -209,7 +229,7 @@ public class PostProcessDataSet {
 			destData.avgMassesByMatchGrp = null;
 		} else {
 			Map<Integer, Double> avgPutMassesByRedundancyGrp = new HashMap<Integer, Double>();
-			for (Integer key : this.avgMassesByMatchGrp.keySet()) {
+			for (int key : this.avgMassesByMatchGrp.keySet()) {
 				avgPutMassesByRedundancyGrp.put(key, this.avgMassesByMatchGrp.get(key));
 			}
 			destData.avgMassesByMatchGrp = avgPutMassesByRedundancyGrp;
@@ -219,7 +239,7 @@ public class PostProcessDataSet {
 			destData.minRtsByMatchGrp = null;
 		} else {
 			Map<Integer, Double> minRtsByRedundancyGrp = new HashMap<Integer, Double>();
-			for (Integer key : this.minRtsByMatchGrp.keySet()) {
+			for (int key : this.minRtsByMatchGrp.keySet()) {
 				minRtsByRedundancyGrp.put(key, this.minRtsByMatchGrp.get(key));
 			}
 			destData.minRtsByMatchGrp = minRtsByRedundancyGrp;
@@ -229,7 +249,7 @@ public class PostProcessDataSet {
 			destData.minMassesByMatchGrp = null;
 		} else {
 			Map<Integer, Double> minMassesByRedundancyGrp = new HashMap<Integer, Double>();
-			for (Integer key : this.minMassesByMatchGrp.keySet()) {
+			for (int key : this.minMassesByMatchGrp.keySet()) {
 				minMassesByRedundancyGrp.put(key, this.minMassesByMatchGrp.get(key));
 			}
 			destData.minMassesByMatchGrp = minMassesByRedundancyGrp;
@@ -239,7 +259,7 @@ public class PostProcessDataSet {
 			destData.maxRtsByMatchGrp = null;
 		} else {
 			Map<Integer, Double> maxRtsByRedundancyGrp = new HashMap<Integer, Double>();
-			for (Integer key : this.maxRtsByMatchGrp.keySet()) {
+			for (int key : this.maxRtsByMatchGrp.keySet()) {
 				maxRtsByRedundancyGrp.put(key, this.maxRtsByMatchGrp.get(key));
 			}
 			destData.maxRtsByMatchGrp = maxRtsByRedundancyGrp;
@@ -249,7 +269,7 @@ public class PostProcessDataSet {
 			destData.maxMassesByMatchGrp = null;
 		} else {
 			Map<Integer, Double> maxMassesByRedundancyGrp = new HashMap<Integer, Double>();
-			for (Integer key : this.maxMassesByMatchGrp.keySet()) {
+			for (int key : this.maxMassesByMatchGrp.keySet()) {
 				maxMassesByRedundancyGrp.put(key, this.maxMassesByMatchGrp.get(key));
 			}
 			destData.maxMassesByMatchGrp = maxMassesByRedundancyGrp;
@@ -259,7 +279,7 @@ public class PostProcessDataSet {
 			destData.grpSizeByMatchGrp = null;
 		} else {
 			Map<Integer, Integer> grpSizeByRedundancyGrp = new HashMap<Integer, Integer>();
-			for (Integer key : this.grpSizeByMatchGrp.keySet()) {
+			for (int key : this.grpSizeByMatchGrp.keySet()) {
 				grpSizeByRedundancyGrp.put(key, this.grpSizeByMatchGrp.get(key));
 			}
 			destData.grpSizeByMatchGrp = grpSizeByRedundancyGrp;
@@ -269,7 +289,7 @@ public class PostProcessDataSet {
 
 		if (this.rawFeatureCtsByBatch != null) {
 			destData.rawFeatureCtsByBatch = new HashMap<Integer, Integer>();
-			for (Integer key : this.rawFeatureCtsByBatch.keySet())
+			for (int key : this.rawFeatureCtsByBatch.keySet())
 				destData.rawFeatureCtsByBatch.put(key, this.rawFeatureCtsByBatch.get(key));
 		}
 
@@ -277,7 +297,7 @@ public class PostProcessDataSet {
 			destData.colsForRSDByBatch = null;
 		} else {
 			Map<Integer, List<String>> newColsForRSDByBatch = new HashMap<Integer, List<String>>();
-			for (Integer key : this.colsForRSDByBatch.keySet()) {
+			for (int key : this.colsForRSDByBatch.keySet()) {
 				List<String> newColNames = new ArrayList<String>();
 				for (int i = 0; i < this.colsForRSDByBatch.get(key).size(); i++)
 					newColNames.add(this.colsForRSDByBatch.get(key).get(i));
@@ -305,6 +325,7 @@ public class PostProcessDataSet {
 
 		Map<Integer, List<FeatureFromFile>> featuresByRedundancyGrpMap = new HashMap<Integer, List<FeatureFromFile>>();
 		for (FeatureFromFile feature : features) {
+			
 			if (!featuresByRedundancyGrpMap.containsKey(feature.getRedundancyGroup()))
 				featuresByRedundancyGrpMap.put(feature.getRedundancyGroup(), new ArrayList<FeatureFromFile>());
 
@@ -313,7 +334,14 @@ public class PostProcessDataSet {
 		return featuresByRedundancyGrpMap;
 	}
 
-	public Map<String, List<Integer>> buildMatchGroupToBatchIdsMap(Boolean uniqueBatchIds) {
+	/**
+	 * Summarize which batches are represented in which feature redundancy group
+	 * Map key - redundancy group name
+	 * Map value - list of batch numbers
+	 * @param uniqueBatchIds - not clear why it is necessary
+	 * @return
+	 */
+	public Map<String, List<Integer>> buildMatchGroupToBatchIdsMap(boolean uniqueBatchIds) {
 
 		Map<String, List<Integer>> featureMatchGroupToBatchIdsMap = new HashMap<String, List<Integer>>();
 
@@ -337,47 +365,51 @@ public class PostProcessDataSet {
 		return featureMatchGroupToBatchIdsMap;
 	}
 
+	/**
+	 * Get ordered list of all batches present in the data set
+	 * @return
+	 */
 	public List<Integer> getSortedUniqueBatchIndices() {
 
 		Map<Integer, String> batchIdsMap = new HashMap<Integer, String>();
 
 		for (FeatureFromFile feature : getFeatures()) {
 
-			if (feature.getBatchIdx() == null)
-				continue;
-			if (feature.getRedundancyGroup() == null)
+			if (feature.getBatchIdx() == null || feature.getRedundancyGroup() == null)
 				continue;
 
 			if (!batchIdsMap.containsKey(feature.getBatchIdx()))
 				batchIdsMap.put(feature.getBatchIdx(), null);
 		}
-
 		List<Integer> sortedBatchIds = ListUtils.makeListFromCollection(batchIdsMap.keySet());
-
 		Collections.sort(sortedBatchIds);
-
 		return sortedBatchIds;
 	}
 
 	public Integer getLastBatchIdx() {
+		
 		List<Integer> batchList = getSortedUniqueBatchIndices();
-
 		if (!batchList.isEmpty())
 			return batchList.get(batchList.size() - 1);
 		
 		return 0;
 	}
 
+	/**
+	 * Map match group number to the RT span for this group 
+	 * (width of RT window, not actual RT range)
+	 * 
+	 * @return
+	 */
 	public Map<Integer, Double> buildMatchGroupToRtRangeMap() {
 
 		Map<Integer, List<Double>> matchGroupToFeatureRtsMap = new HashMap<Integer, List<Double>>();
 
 		Integer group = null;
+		
 		for (FeatureFromFile feature : getFeatures()) {
-			if (feature.getBatchIdx() == null)
-				continue;
-
-			if (feature.getRedundancyGroup() == null)
+			
+			if (feature.getBatchIdx() == null || feature.getRedundancyGroup() == null)
 				continue;
 
 			group = feature.getRedundancyGroup();
@@ -386,15 +418,18 @@ public class PostProcessDataSet {
 
 			matchGroupToFeatureRtsMap.get(group).add(feature.getRT());
 		}
-
 		Map<Integer, Double> matchGrpToRtRangeMap = new HashMap<Integer, Double>();
-		for (Integer matchGrp : matchGroupToFeatureRtsMap.keySet()) {
+		for (int matchGrp : matchGroupToFeatureRtsMap.keySet()) {
+			
 			List<Double> values = matchGroupToFeatureRtsMap.get(matchGrp);
-			Double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+			double min = Double.MAX_VALUE;
+			double max = Double.MIN_VALUE;
 
 			for (int i = 0; i < values.size(); i++) {
+				
 				if (values.get(i) < min)
 					min = values.get(i);
+				
 				if (values.get(i) > max)
 					max = values.get(i);
 			}
@@ -403,6 +438,13 @@ public class PostProcessDataSet {
 		return matchGrpToRtRangeMap;
 	}
 
+	/**
+	 * Summarize which feature names are represented in which feature redundancy group
+	 * Map key - redundancy group name
+	 * Map value - list of batch numbers
+	 * @param uniqueBatchIds - not clear why it is necessary
+	 * @return
+	 */
 	public Map<String, List<String>> buildMatchGroupToFeatureNamesMap(boolean uniqueBatchIds) {
 
 		Map<String, List<String>> redundancyGroupToFeatureNamesMap = new HashMap<String, List<String>>();
@@ -421,21 +463,27 @@ public class PostProcessDataSet {
 
 			List<String> existingIds = redundancyGroupToFeatureNamesMap.get(name);
 
+			// ERROR! should be contains(feature.getName().trim())
+			//	Not clear if it has any impact on the results though
 			if (!uniqueBatchIds || !existingIds.contains(feature.getBatchIdx()))
 				redundancyGroupToFeatureNamesMap.get(name).add(feature.getName().trim());
 		}
 		return redundancyGroupToFeatureNamesMap;
 	}
 
+	
+	/**
+	 * Map redundancy group (number converted to string) to batch/RT pairs for features in the group
+	 * @return
+	 */
 	private Map<String, List<String>> buildDetailedRtsByRedundancyGroupMap() {
+		
 		Map<String, Map<Integer, List<Double>>> rawMapForGroupRts = new HashMap<String, Map<Integer, List<Double>>>();
 		String currGrp;
-		FeatureFromFile feature;
 		Collections.sort(features, new FeatureByBatchComparator());
 
-		for (int f = 0; f < features.size(); f++) {
+		for (FeatureFromFile feature : features) {
 
-			feature = features.get(f);
 			if (feature.getRedundancyGroup() == null)
 				continue;
 
@@ -485,7 +533,7 @@ public class PostProcessDataSet {
 		return mapForGroupRts;
 	}
 
-	public void buildAvgRtMassByMatchGrpMap(Boolean rtsOnly) {
+	public void buildAvgRtMassByMatchGrpMap(boolean rtsOnly) {
 
 		Map<Integer, List<Double>> rtsByRedundancyGrp = new HashMap<Integer, List<Double>>();
 		Map<Integer, List<Double>> oldRtsByRedundancyGrp = new HashMap<Integer, List<Double>>();
@@ -533,7 +581,7 @@ public class PostProcessDataSet {
 		maxMassesByMatchGrp = new HashMap<Integer, Double>();
 
 		double avg, max = -1000000.0, min = Double.MAX_VALUE;
-		for (Integer grp : rtsByRedundancyGrp.keySet()) {
+		for (int grp : rtsByRedundancyGrp.keySet()) {
 			avg = 0.0;
 			max = -1000000.0;
 			min = Double.MAX_VALUE;
@@ -555,7 +603,7 @@ public class PostProcessDataSet {
 
 		if (!rtsOnly) {
 
-			for (Integer grp : oldRtsByRedundancyGrp.keySet()) {
+			for (int grp : oldRtsByRedundancyGrp.keySet()) {
 				avg = 0.0;
 				for (Double oldrt : oldRtsByRedundancyGrp.get(grp))
 					avg += oldrt;
@@ -565,7 +613,7 @@ public class PostProcessDataSet {
 				avgOldRtsByMatchGrp.put(grp, avg);
 			}
 
-			for (Integer grp : massesByRedundancyGrp.keySet()) {
+			for (int grp : massesByRedundancyGrp.keySet()) {
 				avg = 0.0;
 				max = -1000000.0;
 				min = Double.MAX_VALUE;
@@ -586,7 +634,7 @@ public class PostProcessDataSet {
 
 			int nNullInt = 0;
 			;
-			for (Integer grp : medIntensityByRedundancyGrp.keySet()) {
+			for (int grp : medIntensityByRedundancyGrp.keySet()) {
 				avg = 0.0;
 
 				for (Double medInt : medIntensityByRedundancyGrp.get(grp)) {
@@ -600,7 +648,7 @@ public class PostProcessDataSet {
 				Median median = new Median();
 
 				int k = 0;
-				Boolean foundDbl = false;
+				boolean foundDbl = false;
 				for (int i = 0; i < medIntensityByRedundancyGrp.get(grp).size(); i++) {
 
 					Double value = null;
@@ -635,7 +683,7 @@ public class PostProcessDataSet {
 	}
 
 	public void identifyMatchedFeatures(Integer annealingStep, double stretchFactor, double massTol, double rtTol,
-			Boolean dupsAcrossType) {
+			boolean dupsAcrossType) {
 		
 		int maxMatchGrp = getMaxRedundancyGroup(); // ensurePutativeMasses(imputeMassFromH);
 
@@ -651,13 +699,13 @@ public class PostProcessDataSet {
 	}
 
 	private void identifyMatchedFeaturesByAvg(Map<Integer, List<FeatureFromFile>> map, int maxRedundancyGrp,
-			double massTol, double rtTol, Boolean combineGroups) {
+			double massTol, double rtTol, boolean combineGroups) {
 
 		Collections.sort(features, new FeatureByMassAndRtComparator());
 
 		Double massTolToUse = massTol, highMassCutoff = 700.0, highMassTolCutoff = .019, massTolMultiplier = 1.5;
 
-		Boolean noDups = true;
+		boolean noDups = true;
 
 		Double mass1, mass2, rt1, rt2;
 		FeatureFromFile feature1, feature2;
@@ -695,7 +743,7 @@ public class PostProcessDataSet {
 				grp1 = feature1.getRedundancyGroup();
 				grp2 = feature2.getRedundancyGroup();
 
-				Boolean newGroup = (grp1 == null && grp2 == null);
+				boolean newGroup = (grp1 == null && grp2 == null);
 
 				if (newGroup && noDups)
 					if (feature1.getBatchIdx().equals(feature2.getBatchIdx()))
@@ -713,7 +761,7 @@ public class PostProcessDataSet {
 				if (Math.abs(rt1 - rt2) > rtTol)
 					continue;
 
-				Boolean printMsg = false; // i >= printLower && i <= printUpper;
+				boolean printMsg = false; // i >= printLower && i <= printUpper;
 
 				if (!redundantFeatureMap.containsKey(feature1.getName()))
 					redundantFeatureMap.put(feature1.getName(), new ArrayList<String>());
@@ -840,8 +888,8 @@ public class PostProcessDataSet {
 		return derivedSampleNames;
 	}
 
-	public Map<Integer, List<FeatureFromFile>> grabFeatureByGroupMap(Boolean removeAmbiguous,
-			Boolean removeUnambiguous) {
+	public Map<Integer, List<FeatureFromFile>> grabFeatureByGroupMap(boolean removeAmbiguous,
+			boolean removeUnambiguous) {
 
 		Map<Integer, List<FeatureFromFile>> featuresByGroupMap = new HashMap<Integer, List<FeatureFromFile>>();
 
@@ -860,7 +908,7 @@ public class PostProcessDataSet {
 			return featuresByGroupMap;
 
 		Map<Integer, List<FeatureFromFile>> filteredFeaturesByGroupMap = new HashMap<Integer, List<FeatureFromFile>>();
-		for (Integer group : featuresByGroupMap.keySet()) {
+		for (int group : featuresByGroupMap.keySet()) {
 
 			List<FeatureFromFile> groupList = featuresByGroupMap.get(group);
 
@@ -883,7 +931,7 @@ public class PostProcessDataSet {
 		List<FeatureFromFile> ambiguousMatchedFeatures = new ArrayList<FeatureFromFile>();
 		Map<Integer, List<FeatureFromFile>> sortedAmbigousMatchedFeaturesMap = new HashMap<Integer, List<FeatureFromFile>>();
 
-		for (Integer grp : ambigousMatchedFeaturesMap.keySet()) {
+		for (int grp : ambigousMatchedFeaturesMap.keySet()) {
 			List<FeatureFromFile> grpFeatures = ambigousMatchedFeaturesMap.get(grp);
 			Double avgOldRT = 0.0;
 			for (int i = 0; i < grpFeatures.size(); i++)
@@ -925,7 +973,7 @@ public class PostProcessDataSet {
 		Collections.sort(features, new FeatureByMassAndRtComparator());
 
 		double currOldRt, currRt;
-		for (Integer group : featuresByGroupMap.keySet()) {
+		for (int group : featuresByGroupMap.keySet()) {
 
 			List<FeatureFromFile> groupList = featuresByGroupMap.get(group);
 			if (groupList.size() <= groupList.get(0).getnMatchReplicates())
@@ -1000,7 +1048,7 @@ public class PostProcessDataSet {
 		Map<Integer, List<FeatureFromFile>> ambiguousFeaturesMap = new HashMap<Integer, List<FeatureFromFile>>();
 		Map<Integer, List<FeatureFromFile>> newUnambiguousFeaturesMap = new HashMap<Integer, List<FeatureFromFile>>();
 
-		for (Integer group : featuresByGroupMap.keySet()) {
+		for (int group : featuresByGroupMap.keySet()) {
 
 			List<FeatureFromFile> groupList = featuresByGroupMap.get(group);
 			if (groupList.size() <= groupList.get(0).getnMatchReplicates())
@@ -1009,7 +1057,7 @@ public class PostProcessDataSet {
 			ambiguousFeaturesMap.put(group, groupList);
 		}
 
-		for (Integer group : ambiguousFeaturesMap.keySet()) {
+		for (int group : ambiguousFeaturesMap.keySet()) {
 
 			List<FeatureFromFile> groupList = ambiguousFeaturesMap.get(group);
 			if (groupList.size() > groupList.get(0).getnMatchReplicates() + 1)
@@ -1057,7 +1105,7 @@ public class PostProcessDataSet {
 		Map<Integer, List<FeatureFromFile>> featuresByAmbiguousGroupMap = new HashMap<Integer, List<FeatureFromFile>>();
 		Collections.sort(features, new FeatureByMassAndRtComparator());
 
-		for (Integer group : featuresByGroupMap.keySet()) {
+		for (int group : featuresByGroupMap.keySet()) {
 
 			List<FeatureFromFile> groupList = featuresByGroupMap.get(group);
 			if (groupList.size() <= groupList.get(0).getnMatchReplicates())
@@ -1104,7 +1152,7 @@ public class PostProcessDataSet {
 		return targetBatch;
 	}
 
-	private Boolean isTargetBatchCorrectForNameFormat(Integer targetBatch, Boolean printDiagnostics) {
+	private boolean isTargetBatchCorrectForNameFormat(Integer targetBatch, boolean printDiagnostics) {
 
 		Map<Integer, List<FeatureFromFile>> featuresByBatchMap = this.grabFeaturesByBatchMap();
 		if (featuresByBatchMap.get(targetBatch) == null || featuresByBatchMap.get(targetBatch).size() < 1) {
@@ -1223,7 +1271,7 @@ public class PostProcessDataSet {
 			Median median = new Median();
 
 			int k = 0;
-			Boolean foundDbl = false;
+			boolean foundDbl = false;
 			for (int i = 0; i < valuesForKey.size(); i++) {
 
 				Double value = null;
@@ -1260,8 +1308,8 @@ public class PostProcessDataSet {
 	}
 
 	public void initializeHeaders(List<FeatureFromFile> features, List<String> orderedNonStandardHeaders,
-			List<String> orderedIntensityHeaders, List<String> orderedExtraLibFileHeaders, Boolean posMode,
-			Boolean ifPrincipalIons, String sourceReport, String libFileSource, Map<String, String> derivedNameMap) {
+			List<String> orderedIntensityHeaders, List<String> orderedExtraLibFileHeaders, boolean posMode,
+			boolean ifPrincipalIons, String sourceReport, String libFileSource, Map<String, String> derivedNameMap) {
 
 		this.features = features;
 
@@ -1375,7 +1423,7 @@ public class PostProcessDataSet {
 		List<Integer> nFilterdFeaturesByBatch = this.getZeroPaddedFilteredFeaturesByBatchCts();
 
 		Integer nTotalFilteredFeatures = 0;
-		for (Integer ct : nFilterdFeaturesByBatch)
+		for (int ct : nFilterdFeaturesByBatch)
 			nTotalFilteredFeatures += ct;
 
 		return nTotalFilteredFeatures;
@@ -1386,7 +1434,7 @@ public class PostProcessDataSet {
 			return 0;
 
 		Integer nTotalRawFeatures = 0;
-		for (Integer key : this.rawFeatureCtsByBatch.keySet())
+		for (int key : this.rawFeatureCtsByBatch.keySet())
 			nTotalRawFeatures += rawFeatureCtsByBatch.get(key);
 
 		return nTotalRawFeatures;
@@ -1399,7 +1447,7 @@ public class PostProcessDataSet {
 		int maxCt = rawFeatureCts.get(rawFeatureCts.size() - 1);
 
 		List<Integer> zeroPaddedRawFeatureCts = new ArrayList<Integer>();
-		for (Integer i = 0; i < maxCt + 1; i++) {
+		for (int i = 0; i < maxCt + 1; i++) {
 			Integer ct = 0;
 			if (rawFeatureCtsByBatch.containsKey(i))
 				ct = rawFeatureCtsByBatch.get(i);
@@ -1446,7 +1494,7 @@ public class PostProcessDataSet {
 
 		Map<Integer, Integer> ctByBatchMap = getFeatureCtsByBatchMap(); // new HashMap<Integer, Integer>();
 
-		for (Integer ct : ctByBatchMap.values()) {
+		for (int ct : ctByBatchMap.values()) {
 			if (ct < minCt)
 				minCt = ct;
 		}
@@ -1465,11 +1513,11 @@ public class PostProcessDataSet {
 		
 
 		List<String> colsForRSD = new ArrayList<String>();
-		for (Integer batchNo : colsForRSDByBatch.keySet())
+		for (int batchNo : colsForRSDByBatch.keySet())
 			colsForRSD.addAll(colsForRSDByBatch.get(batchNo));
 
 		calculateRSDsFromSampleList(colsForRSD, null);
-		for (Integer batchNo : colsForRSDByBatch.keySet()) 
+		for (int batchNo : colsForRSDByBatch.keySet()) 
 			calculateRSDsFromSampleList(colsForRSDByBatch.get(batchNo), batchNo);
 		
 	}
@@ -1549,11 +1597,11 @@ public class PostProcessDataSet {
 		}
 	}
 
-	public Boolean getRsdPctMissPrecalculated() {
+	public boolean getRsdPctMissPrecalculated() {
 		return rsdPctMissPrecalculated;
 	}
 
-	public void setRsdPctMissPrecalculated(Boolean rsdPctMissPrecalculated) {
+	public void setRsdPctMissPrecalculated(boolean rsdPctMissPrecalculated) {
 		this.rsdPctMissPrecalculated = rsdPctMissPrecalculated;
 	}
 
@@ -1645,19 +1693,19 @@ public class PostProcessDataSet {
 		this.orderedIntensityHeaders = orderedIntensityHeaders;
 	}
 
-	public Boolean getPosMode() {
+	public boolean getPosMode() {
 		return posMode;
 	}
 
-	public void setPosMode(Boolean posMode) {
+	public void setPosMode(boolean posMode) {
 		this.posMode = posMode;
 	}
 
-	public Boolean getIfPrincipalIons() {
+	public boolean getIfPrincipalIons() {
 		return ifPrincipalIons;
 	}
 
-	public void setIfPrincipalIons(Boolean ifPrincipalIons) {
+	public void setIfPrincipalIons(boolean ifPrincipalIons) {
 		this.ifPrincipalIons = ifPrincipalIons;
 	}
 

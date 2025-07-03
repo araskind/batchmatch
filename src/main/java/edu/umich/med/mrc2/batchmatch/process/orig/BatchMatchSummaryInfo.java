@@ -5,6 +5,7 @@
 
 package edu.umich.med.mrc2.batchmatch.process.orig;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,13 +15,15 @@ public class BatchMatchSummaryInfo {
 
 	private String mergeFilePath = "";
 	private String rawDataFileListPath = "";
-	private Map<Integer, String> batchFileMap = new HashMap<Integer, String>();
+	private Map<Integer, File> batchFileMap = new HashMap<Integer, File>();
 
 	private String titleWithVersion = "";
-//	private Integer nFilteredFeatures = null, nCollapsedFeatures = null;
-	private Integer nSamples = null, nControls = null, nBatches = null;
-
-	private Integer nTotalRawFeatures = null, nTotalFilteredFeatures = null, nTotalCollapsedFeatures = null;
+	private Integer nSamples = null;
+	private Integer nControls = null;
+	private Integer nBatches = null;
+	private Integer nTotalRawFeatures = null;
+	private Integer nTotalFilteredFeatures = null;
+	private Integer nTotalCollapsedFeatures = null;
 
 	private List<Integer> nRawFeaturesByBatch = new ArrayList<Integer>();
 	private List<Integer> nFilteredFeaturesByBatch = new ArrayList<Integer>();
@@ -68,6 +71,7 @@ public class BatchMatchSummaryInfo {
 	}
 
 	public void initializeNBatches(int nBatches) {
+		
 		this.nBatches = nBatches;
 		this.nFilteredFeaturesByBatch = new ArrayList<Integer>();
 		this.nBatchSamples = new ArrayList<Integer>();
@@ -106,14 +110,6 @@ public class BatchMatchSummaryInfo {
 		this.nSamples = nSamples;
 	}
 
-	public Integer getnControls() {
-		return nControls;
-	}
-
-	public void setnControls(Integer nControls) {
-		this.nControls = nControls;
-	}
-
 	public Integer getnBatches() {
 		return nBatches;
 	}
@@ -134,14 +130,6 @@ public class BatchMatchSummaryInfo {
 		this.nTotalFilteredFeatures = nTotalFilteredFeatures;
 	}
 
-	public Integer getnTotalCollapsedFeatures() {
-		return nTotalCollapsedFeatures;
-	}
-
-	public void setnTotalCollapsedFeatures(Integer nTotalCollapsedFeatures) {
-		this.nTotalCollapsedFeatures = nTotalCollapsedFeatures;
-	}
-
 	public List<Integer> getnFilteredFeaturesByBatch() {
 		return nFilteredFeaturesByBatch;
 	}
@@ -150,11 +138,11 @@ public class BatchMatchSummaryInfo {
 		return nBatchSamples;
 	}
 
-	public Map<Integer, String> getBatchFileMap() {
+	public Map<Integer, File> getBatchFileMap() {
 		return batchFileMap;
 	}
 
-	public void setBatchFileMap(Map<Integer, String> batchFileMap) {
+	public void setBatchFileMap(Map<Integer, File> batchFileMap) {
 		this.batchFileMap = batchFileMap;
 	}
 

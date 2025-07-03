@@ -43,15 +43,17 @@ public abstract class BatchMatchCSVReportLoaderPanel extends StickySettingsPanel
 	private JButton inputFileButton;
 	private TitledBorder inputFileWrapBorder;
 
-	private Boolean rsdPctMissingPreCalculated = false;
+	private boolean rsdPctMissingPreCalculated = false;
 	private File currentBatchFile;
 	private PostProcessDataSet loadedData = null;
 	private String panelTitle = "Select Batch Data File (must be .csv)";
-	private String fileExtension = "csv", fileDescription = "Comma-Separated Value Files";
-	private Integer minTargetBatch = -1, maxTargetBatch = -1;
+	private String fileExtension = "csv";
+	private String fileDescription = "Comma-Separated Value Files";
+	private int minTargetBatch = -1;
+	private int maxTargetBatch = -1;
 
-	private String initialDirectoryForChooser = null;
-	private Boolean interpretMiscCols = true;
+	private File initialDirectoryForChooser = null;
+	private boolean interpretMiscCols = true;
 
 	public BatchMatchCSVReportLoaderPanel() {
 		this("");
@@ -112,17 +114,17 @@ public abstract class BatchMatchCSVReportLoaderPanel extends StickySettingsPanel
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				File file = BinnerFileUtils.getFile("Select Metabolite Data Input File", BinnerFileUtils.LOAD,
-						fileExtension, fileDescription, initialDirectoryForChooser);
+						fileExtension, fileDescription, initialDirectoryForChooser.getAbsolutePath());
 
 				if (file != null) {
 
 					inputFileComboBox.removeAllItems();
 					inputFileComboBox.insertItemAt(file, 0);
 					inputFileComboBox.setSelectedIndex(0);
-					currentBatchFile = (File) inputFileComboBox.getSelectedItem();
+					currentBatchFile = file;
 
-					for (int i = 0; i < 1000; i++)
-						i++;
+//					for (int i = 0; i < 1000; i++)
+//						i++;
 					/*
 					 * if (!screenFileNames(fileData.getName())) { currentBatchFile = new
 					 * File(); inputFileComboBox.removeAllItems(); File = new File();
@@ -305,7 +307,7 @@ public abstract class BatchMatchCSVReportLoaderPanel extends StickySettingsPanel
 		return this.maxTargetBatch;
 	}
 
-	public void setInitialDirectoryForChooser(String dir) {
+	public void setInitialDirectoryForChooser(File dir) {
 		this.initialDirectoryForChooser = dir;
 	}
 
@@ -320,5 +322,9 @@ public abstract class BatchMatchCSVReportLoaderPanel extends StickySettingsPanel
 	protected abstract Boolean updateInterfaceForNewFileSelection(String fileName, Integer minBatchNo,
 			Integer maxBatchNo);
 	// protected abstract Boolean screenFileNames(String fileName);
+
+	public File getCurrentBatchFile() {
+		return currentBatchFile;
+	}
 
 }

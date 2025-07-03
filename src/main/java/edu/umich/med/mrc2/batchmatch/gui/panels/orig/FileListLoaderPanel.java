@@ -34,20 +34,20 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 
 	private static final long serialVersionUID = 6082733604962176299L;
 
-	private JComboBox<File> inputFileComboBox;
-	private JPanel inputFileWrapPanel;
-	private JProgressBar inputFileProgBar;
-	private TextFile physicalMapData = null;
-	private File currentBatchFile;
-	private JButton inputFileButton;
-	private Boolean readOrder;
-	private String initialDirectory = null;
+	protected JComboBox<File> inputFileComboBox;
+	protected JPanel inputFileWrapPanel;
+	protected JProgressBar inputFileProgBar;
+	protected TextFile physicalMapData = null;
+	protected File currentBatchFile;
+	protected JButton inputFileButton;
+	protected Boolean readOrder;
+	protected File initialDirectory = null;
 
-	private List<Integer> fileOrderList;
-	private Map<Integer, Integer> fileOrderMap;
-	private Map<Integer, String> batchFileMap = null;
-	private String panelTitle = "Select Batch File Map File (must be .csv)";
-	private SharedAnalysisSettings sharedAnalysisSettings = null;
+	protected List<Integer> fileOrderList;
+	protected Map<Integer, Integer> fileOrderMap;
+	protected Map<Integer, File> batchFileMap = null;
+	protected String panelTitle = "Select Batch File Map File (must be .csv)";
+	protected SharedAnalysisSettings sharedAnalysisSettings = null;
 
 	protected String openingMessage = null;
 
@@ -80,7 +80,7 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 		setupPanel(null);
 	}
 
-	public void setupPanel(String initialDirectory) {
+	public void setupPanel(File initialDirectory) {
 
 		this.initialDirectory = initialDirectory;
 		initializeArrays();
@@ -114,7 +114,7 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				File file = BinnerFileUtils.getFile("Select Batch File Map File", BinnerFileUtils.LOAD, "csv",
-						"Comma-Separated Value Files", initialDirectory);
+						"Comma-Separated Value Files", initialDirectory.getAbsolutePath());
 
 				if (file != null) {
 
@@ -172,7 +172,7 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 		return true;
 	}
 
-	private Map<Integer, String> buildBatchFileMap() {
+	private Map<Integer, File> buildBatchFileMap() {
 
 		// Reminder set only
 		// Boolean readOrder = sharedAnalysisSettings.isReadFileOrder();
@@ -186,7 +186,7 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 		}
 
 		// System.out
-		batchFileMap = new HashMap<Integer, String>();
+		batchFileMap = new HashMap<Integer, File>();
 		fileOrderList = new ArrayList<Integer>();
 		fileOrderMap = new HashMap<Integer, Integer>();
 
@@ -195,12 +195,9 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 			String errMsg = "Error: Batch file list must specify a batch number and "
 					+ BinnerConstants.LINE_SEPARATOR + "a batch file for each source .  " + "Row " + (i + 1)
 					+ " starting with " + physicalMapData.getString(i, 0) + " contains an invalid entry.    ";
-			;
-
 			try {
 
 				Integer batchNo = physicalMapData.getInteger(i, 0);
-
 				if (batchNo == null)
 					continue;
 
@@ -218,12 +215,19 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 
 				if (batchNo == null)
 					batchNo = 14;
-				batchFileMap.put(batchNo, fileName);
+				
+				File dataFile = new File(fileName);
+				if(!dataFile.exists()) {
+					String msg = "Data file \"" + dataFile.getAbsolutePath() + "\" for batch " + batchNo + " does not exist";
+					JOptionPane.showMessageDialog(null, msg);
+					return null;
+				}				
+				batchFileMap.put(batchNo, new File(fileName));
 				System.out.println("Batch " + batchNo + " " + fileName);
 				continue;
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
-
 			if (!StringUtils.isEmptyOrNull(errMsg)) {
 				JOptionPane.showMessageDialog(null, errMsg);
 				return null;
@@ -233,11 +237,11 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 		return batchFileMap;
 	}
 
-	public String getInitialDirectory() {
+	public File getInitialDirectory() {
 		return initialDirectory;
 	}
 
-	public void setInitialDirectory(String initialDirectory) {
+	public void setInitialDirectory(File initialDirectory) {
 		this.initialDirectory = initialDirectory;
 	}
 
@@ -245,9 +249,11 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 		return currentBatchFile != null ? currentBatchFile.getName() : "";
 	}
 
-	public Map<Integer, String> grabBatchFileMap() {
+	public Map<Integer, File> grabBatchFileMap() {
+		
 		if (batchFileMap == null || batchFileMap.size() < 1)
 			buildBatchFileMap();
+		
 		return batchFileMap;
 	}
 
@@ -256,9 +262,9 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 		return this.fileOrderList;
 	}
 
-	public Map<Integer, String> grabBatchFileMapSegment(int firstNEntries) {
+	public Map<Integer, File> grabBatchFileMapSegment(int firstNEntries) {
 		grabFileOrderMap();
-		Map<Integer, String> orderedMap = new HashMap<Integer, String>();
+		Map<Integer, File> orderedMap = new HashMap<Integer, File>();
 		for (int i = 0; i < firstNEntries; i++) {
 			Integer key = i;
 			orderedMap.put(fileOrderMap.get(key), batchFileMap.get(fileOrderMap.get(key)));
@@ -281,7 +287,7 @@ public abstract class FileListLoaderPanel extends StickySettingsPanel {
 		return this.fileOrderMap;
 	}
 
-	public Map<Integer, String> grabFreshBatchFileMap() {
+	public Map<Integer, File> grabFreshBatchFileMap() {
 		return grabBatchFileMap();
 	}
 

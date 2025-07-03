@@ -28,6 +28,11 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -160,14 +165,33 @@ public class BatchMatchProjectSetupPanel extends JPanel implements ActionListene
 		if (fileChooser.showOpenDialog(this.getTopLevelAncestor())) {
 			
 			File[]selectedFiles = fileChooser.getSelectedFiles();
-			if(command.equals(BMActionCommands.SELECT_BINNER_FILES_COMMAND.getName()))
+			if(command.equals(BMActionCommands.SELECT_BINNER_FILES_COMMAND.getName())) {
 				batchMatchInputTable.setBinnerFiles(selectedFiles);
+				copyMissingInputFiles(selectedFiles, BatchMatch.getCurrentProject().getBinnerFilesDirectory());
+			}
 			
-			if(command.equals(BMActionCommands.SELECT_PEAK_AREA_FILES_COMMAND.getName()))
+			if(command.equals(BMActionCommands.SELECT_PEAK_AREA_FILES_COMMAND.getName())) {
 				batchMatchInputTable.setPeakAreaFiles(selectedFiles);
+				copyMissingInputFiles(selectedFiles, BatchMatch.getCurrentProject().getRawInputFilesDirectory());
+			}
 		}
 	}
 	
+	private void copyMissingInputFiles(File[] selectedFiles, File destination) {
+
+		for(File newFile : selectedFiles) {
+			
+			Path destinationPath = Paths.get(destination.getAbsolutePath(), newFile.getName());			
+	        try {
+	            if (!Files.exists(destinationPath))
+	                Files.copy(newFile.toPath(), destinationPath, StandardCopyOption.COPY_ATTRIBUTES);
+	            
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+		}
+	}
+
 	public Collection<String>validateProjectSetup(boolean ignoreNoInput){
 	    
 	    Collection<String>errors = new ArrayList<String>();

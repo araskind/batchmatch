@@ -43,7 +43,7 @@ public class FeatureMappingLoaderPanel extends StickySettingsPanel {
 	private File currentFeatureMapFile;
 	private JButton inputFileButton;
 
-	private String initialDirectory;
+	private File initialDirectory;
 
 	private String panelTitle = "Select Feature Mapping File (must be .csv)";
 	private SharedAnalysisSettings sharedAnalysisSettings = null;
@@ -69,7 +69,7 @@ public class FeatureMappingLoaderPanel extends StickySettingsPanel {
 		setupPanel(null);
 	}
 
-	public void setupPanel(String initialDirectory) {
+	public void setupPanel(File initialDirectory) {
 		this.initialDirectory = initialDirectory;
 		initializeArrays();
 		setupInputFilePanel();
@@ -101,7 +101,7 @@ public class FeatureMappingLoaderPanel extends StickySettingsPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				File file = BinnerFileUtils.getFile("Select Feature Mappping File", BinnerFileUtils.LOAD, "csv",
-						"Comma-Separated Value Files", initialDirectory);
+						"Comma-Separated Value Files", initialDirectory.getAbsolutePath());
 
 				updateForNewFile(file);
 			}
@@ -283,11 +283,11 @@ public class FeatureMappingLoaderPanel extends StickySettingsPanel {
 		this.sharedAnalysisSettings = sharedAnalysisSettings;
 	}
 
-	public String getInitialDirectory() {
+	public File getInitialDirectory() {
 		return initialDirectory;
 	}
 
-	public void setInitialDirectory(String initialDirectory) {
+	public void setInitialDirectory(File initialDirectory) {
 		this.initialDirectory = initialDirectory;
 	}
 }

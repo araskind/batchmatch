@@ -98,11 +98,17 @@ public class RecursiveLatticeFileWriter {
 		return rtsForBatchesByMatchGroup;
 	}
 
-	public void writeLatticeSetRelativeTo(int baseIdx, String outputDirectory, PostProcessDataSet data) {
+	public void writeLatticeSetRelativeTo(
+			int baseIdx, 
+			File outputDirectory, 
+			PostProcessDataSet data) {
 		writeLatticeSetRelativeTo(baseIdx, outputDirectory, data, false);
 	}
 
-	public void writeLatticeSetRelativeTo(int baseIdx, String outputDirectory, PostProcessDataSet data,
+	public void writeLatticeSetRelativeTo(
+			int baseIdx, 
+			File outputDirectory, 
+			PostProcessDataSet data,
 			Boolean useMasses) {
 
 		Map<String, List<Double>> rtsByBatchesForCompleteMatchGroups = this.getRTsByBatchForCompleteMatchGroups(data,
@@ -171,14 +177,17 @@ public class RecursiveLatticeFileWriter {
 
 			String firstFileName = String.format("%02d", i + 1) + "_" + String.format("%02d", baseIdx + 1);
 			String fileTypeTag = useMasses ? "Mass_Lattice" : "Recursive_Lattice";
-			String completeFileName = pairWriter.outputResults(firstFileName, mapWithoutOutliers.getAsRtPairs(),
-					outputDirectory, fileTypeTag, "Batch" + String.format("%02d", i + 1),
+			File completeFile = pairWriter.outputResults(
+					firstFileName, 
+					mapWithoutOutliers.getAsRtPairs(),
+					outputDirectory, 
+					fileTypeTag, 
+					"Batch" + String.format("%02d", i + 1),
 					"Batch" + String.format("%02d", baseIdx + 1, useMasses));
 
-			fileNames.add(completeFileName);
+			fileNames.add(completeFile.getAbsolutePath());
 			fileIndices.add(i);
 		}
-
 		String fileListFile = useMasses ? "mass_lattice_list.csv" : "recursive_lattice_list.csv";
 		pairWriter.outputFileList(outputDirectory, fileNames, fileIndices, fileListFile);
 	}

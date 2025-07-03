@@ -15,26 +15,29 @@ import edu.umich.med.mrc2.batchmatch.utils.orig.StringUtils;
 
 public class FeatureFromFile extends Feature {
 
-	private String compoundName, compoundFormula;
-	private Double compoundMass, compoundRT;
-	private Double deltaMass = null, deltaRt = null;
+	private String compoundName;
+	private String compoundFormula;
+	private Double compoundMass;
+	private Double compoundRT;
+	private Double deltaMass = null;
+	private Double deltaRt = null;
 
 	private Double rsd = null;
 	private Double pctMissing = null;
-	private int putativeCharge = 1;
-	private Integer nMissingIntensityValues = null, nTotalIntensityValues = null;
+	private Integer nMissingIntensityValues = null;
+	private Integer nTotalIntensityValues = null;
 	private Integer batchIdx = null;
 
-	private Boolean fromPosMode = null;
-	private Integer matchReplicate = 0, readOrder = 0, index = 0;
-	// ct of unique batches in feature's match group, feature ct for feature's match group
-	private Integer nMatchReplicates = 22, nMatchFeatureReplicates = 1;
-	private Boolean isPossibleMatch = false;
-
-	private List<Integer> possibleMatchGroups = new ArrayList<Integer>();
+	private boolean fromPosMode = false;
+	private int matchReplicate = 0;
+	private int readOrder = 0; 
+	private int index = 0;
+	
+	private int nMatchReplicates = 22;	// Count of unique batches in feature's match group
+	private int nMatchFeatureReplicates = 1;	// Feature count for feature's match group	
 	private Integer mergedIndex = null;
 
-	private Boolean flaggedAsDuplicate = false;
+	private boolean flaggedAsDuplicate = false;
 	private String possibleRedundancies = "";
 	private Integer redundancyGroup = null;
 	private List<String> strIntensityValues = null;
@@ -53,17 +56,20 @@ public class FeatureFromFile extends Feature {
 
 	public FeatureFromFile() {
 		super();
-		addedColValues = new ArrayList<String>();
 		strIntensityValues = new ArrayList<String>();
 		additionalLibValues = new HashMap<String, String>();
 		batchwiseRSDs = new HashMap<Integer, Double>();
 		outlierIndices = new ArrayList<Integer>();
-
 		intensityValuesByHeaderMap = new HashMap<String, String>();
 		outliersByHeaderMap = new HashMap<String, String>();
 	}
 
+	/**
+	 * Clone object
+	 * @return
+	 */
 	public FeatureFromFile makeDeepCopy() {
+		
 		FeatureFromFile destFeature = new FeatureFromFile();
 
 		destFeature.compoundName = this.compoundName;
@@ -282,6 +288,7 @@ public class FeatureFromFile extends Feature {
 	}
 
 	public void initialize(FeatureFromFile feature) {
+		
 		initializeBasics(feature);
 
 		for (int i = 0; i < feature.getAddedColValues().size(); i++)
@@ -360,7 +367,7 @@ public class FeatureFromFile extends Feature {
 		setValueForHeaderTag(tagoriginal, value, false);
 	}
 
-	private void setValueForHeaderTag(String tagoriginal, String value, Boolean trustTag) {
+	private void setValueForHeaderTag(String tagoriginal, String value, boolean trustTag) {
 
 		if (StringUtils.isEmptyOrNull(tagoriginal))
 			return;
@@ -394,6 +401,7 @@ public class FeatureFromFile extends Feature {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		if(tag == null)
@@ -481,13 +489,12 @@ public class FeatureFromFile extends Feature {
 			break;
 
 		default:
-			this.getAddedColValues().add(value); // System.out.println("Added value " + value + " for feature " +
-													// getName());
+			this.getAddedColValues().add(value);
 			break;
 		}
 	}
 
-	public void setValueForBinnerHeaderTag(String tagoriginal, String value, Boolean trustTag) {
+	public void setValueForBinnerHeaderTag(String tagoriginal, String value, boolean trustTag) {
 
 		if (StringUtils.isEmptyOrNull(tagoriginal))
 			return;
@@ -521,6 +528,7 @@ public class FeatureFromFile extends Feature {
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		if(tag == null)
@@ -739,11 +747,11 @@ public class FeatureFromFile extends Feature {
 		this.featureType = featureType;
 	}
 
-	public Boolean getFromPosMode() {
+	public boolean getFromPosMode() {
 		return fromPosMode;
 	}
 
-	public void setFromPosMode(Boolean fromPosMode) {
+	public void setFromPosMode(boolean fromPosMode) {
 		this.fromPosMode = fromPosMode;
 	}
 
@@ -756,6 +764,7 @@ public class FeatureFromFile extends Feature {
 	}
 	
 	public String getValueForIntensityHeader(String intensityHeader, Map<String, String> derivedColNameMap) {
+		
 		if (StringUtils.isEmptyOrNull(intensityHeader))
 			return "";
 
@@ -768,19 +777,17 @@ public class FeatureFromFile extends Feature {
 		if (this.intensityValuesByHeaderMap.containsKey(intensityHeader)) {
 			return intensityValuesByHeaderMap.get(intensityHeader);
 		}
-
+		//	This block is really weird, what's the point of checking for getFromPosMode() 
+		//	if the same value is returned no matter what?
 		if (derivedColNameMap != null) {
-			String searchKey = intensityHeader + (this.getFromPosMode() ? "N" : "N");
+			String searchKey = intensityHeader + (this.getFromPosMode() ? "N" : "N");  
 			if (derivedColNameMap.containsKey(searchKey)) {
+				
 				String originalHeader = derivedColNameMap.get(searchKey);
 				String originalKey = StringUtils.removeSpaces(originalHeader).toLowerCase();
-				// System.out.println("In second intensity makp "+ originalHeader + " and key "
-				// + originalKey);
-
 				if (intensityValuesByHeaderMap.containsKey(originalKey))
 					return intensityValuesByHeaderMap.get(originalKey);
 			}
-
 			searchKey = intensityHeader + (this.getFromPosMode() ? "P" : "P");
 			if (derivedColNameMap.containsKey(searchKey)) {
 				String originalHeader = derivedColNameMap.get(searchKey);
@@ -795,7 +802,7 @@ public class FeatureFromFile extends Feature {
 		return "";
 	}
 
-	public Boolean valueForHeaderIsOutlier(String intensityHeader, Map<String, String> derivedColNameMap) {
+	public boolean valueForHeaderIsOutlier(String intensityHeader, Map<String, String> derivedColNameMap) {
 		if (StringUtils.isEmptyOrNull(intensityHeader))
 			return false;
 
@@ -880,11 +887,11 @@ public class FeatureFromFile extends Feature {
 		this.pctMissing = pctMissing;
 	}
 
-	public Boolean getFlaggedAsDuplicate() {
+	public boolean getFlaggedAsDuplicate() {
 		return flaggedAsDuplicate;
 	}
 
-	public void setFlaggedAsDuplicate(Boolean flaggedAsDuplicate) {
+	public void setFlaggedAsDuplicate(boolean flaggedAsDuplicate) {
 		this.flaggedAsDuplicate = flaggedAsDuplicate;
 	}
 
@@ -933,7 +940,7 @@ public class FeatureFromFile extends Feature {
 		this.batchIdx = batchIdx;
 	}
 
-	Boolean isPIWith(String carrier) {
+	boolean isPIWith(String carrier) {
 
 		if (StringUtils.isEmptyOrNull(carrier))
 			return false;

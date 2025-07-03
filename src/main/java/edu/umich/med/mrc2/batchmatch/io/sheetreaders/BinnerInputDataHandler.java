@@ -8,6 +8,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class BinnerInputDataHandler {
 		initializeHeaderTagMap();
 	}
 
-	public static void initializeHeaderTagMap() {
+	private static void initializeHeaderTagMap() {
 
 		headerTagMap = new HashMap<String, String>();
 
@@ -53,7 +54,7 @@ public class BinnerInputDataHandler {
 		headerTagMap.put("charge", "charge");
 	}
 
-	protected void initializeFoundStatus() {
+	private void initializeFoundStatus() {
 		foundFeature = false;
 		foundBinnerMass = false;
 		foundNeutralMass = false;
@@ -63,16 +64,15 @@ public class BinnerInputDataHandler {
 		foundCharge = false;
 	}
 
-	public PostProcessDataSet readFeatureDataAndFilterSalts(String fileName) {
+	public PostProcessDataSet readFeatureDataAndFilterSalts(File inputFile) {
 
-		PostProcessDataSet data = readFeatureData(fileName);
+		PostProcessDataSet data = readFeatureData(inputFile);
 		data.filterPutativeSalts(50.0, .9, 500.0, 5.0);
 		return data;
 	}
 
-	public PostProcessDataSet readFeatureData(String binnerInputFile) {
+	public PostProcessDataSet readFeatureData(File inputFile) {
 
-		File inputFile = new File(binnerInputFile);
 		TextFile rawTextData = new TextFile();
 		try {
 			rawTextData.open(inputFile);
@@ -317,13 +317,10 @@ public class BinnerInputDataHandler {
 		return true;
 	}
 
-	public void writeDataInBinnerInputFormat(PostProcessDataSet data, String outputDirectory, String fileName) {
-
-		String outputFileName = outputDirectory + BatchMatchConstants.FILE_SEPARATOR + fileName;
-
-		BufferedOutputStream bos = null;
-		try {
-			bos = new BufferedOutputStream(new FileOutputStream(new File(outputFileName)));
+	public void writeDataInBinnerInputFormat(PostProcessDataSet data, File outputDirectory, String fileName) {
+		
+		File outputFile = Paths.get(outputDirectory.getAbsolutePath(), fileName).toFile();
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))){
 
 			bos.write(String
 					.format("%s",
@@ -354,7 +351,6 @@ public class BinnerInputDataHandler {
 				sb.append(BatchMatchConstants.LINE_SEPARATOR);
 				bos.write(sb.toString().getBytes());
 			}
-			bos.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}

@@ -111,26 +111,17 @@ public class AnchorLoaderPanel extends StickySettingsPanel {
 		inputFileWrapPanel.add(inputFileProgPanel);
 	}
 
-	public void updateForNewFileName(String fileName) {
-
-		String outputFileName = fileName;
-
-		File file = new File(outputFileName);
-		updateForNewFile(file);
-	}
-
-	private void updateForNewFile(File file) {
+	public void updateForNewFile(File file) {
 
 		if (file != null) {
 
 			inputFileComboBox.removeAllItems();
 			inputFileComboBox.insertItemAt(file, 0);
 			inputFileComboBox.setSelectedIndex(0);
-			currentAnchorFile = (File) inputFileComboBox.getSelectedItem();
-
-			if (openAnchorFile()) {
-				buildAnchorMap();
-			}
+			currentAnchorFile = file;
+			
+			if (openAnchorFile())
+				buildAnchorMap();			
 		}
 	}
 

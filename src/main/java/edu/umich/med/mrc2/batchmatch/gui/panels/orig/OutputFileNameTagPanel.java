@@ -84,7 +84,7 @@ public class OutputFileNameTagPanel extends StickySettingsPanel {
 	}
 
 	public String getFileNameTag() {
-		return fileNameTagBox.getText();
+		return fileNameTagBox.getText().trim();
 	}
 
 	public void setFileNameTag(String tag) {

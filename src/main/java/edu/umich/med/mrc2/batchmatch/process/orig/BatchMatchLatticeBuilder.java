@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,28 +22,29 @@ public class BatchMatchLatticeBuilder {
 	private Double[] maxExpectedRtVal = new Double[BatchMatchConstants.N_BATCHES];
 	private Double[] maxObservedRtVal = new Double[BatchMatchConstants.N_BATCHES];
 
-	private String outputFileName;
+	private File outputFile;
 
 	public BatchMatchLatticeBuilder() {
 	}
 
 	public Boolean buildLatticeFile(
-			String file1, 
-			String file2, 
-			String outputDirectory, 
+			File file1, 
+			File file2, 
+			File outputDirectory, 
 			String batch1Label,
 			String batch2Label, 
 			Integer poolSampleSize, 
 			Integer rtToUse) {
-		List<String> fileNames = new ArrayList<String>();
-		fileNames.add(file1);
-		fileNames.add(file2);
+		List<File> fileList = new ArrayList<File>();
+		fileList.add(file1);
+		fileList.add(file2);
 
 		List<List<BatchMatchFeatureInfo>> featuresByBatch = new ArrayList<List<BatchMatchFeatureInfo>>();
 
 		for (int batchIndex = 0; batchIndex < BatchMatchConstants.N_BATCHES; batchIndex++) {
+			
 			TextFile textFile = null;
-			File file = new File(fileNames.get(batchIndex));
+			File file = fileList.get(batchIndex);
 			try {
 				textFile = new TextFile(file);
 			} catch (IOException ioe) {
@@ -101,7 +103,7 @@ public class BatchMatchLatticeBuilder {
 			
 			for (int batch2 = batch1 + 1; batch2 < BatchMatchConstants.N_BATCHES; batch2++) {
 				
-				String fileName = writeLatticeFile(
+				outputFile = writeLatticeFile(
 						batch1, 
 						batch2, 
 						batch1Label, 
@@ -110,7 +112,6 @@ public class BatchMatchLatticeBuilder {
 						outputDirectory, 
 						rtToUse, 
 						poolSampleSize);
-				this.outputFileName = fileName;
 			}
 		}
 		return true;
@@ -232,13 +233,13 @@ public class BatchMatchLatticeBuilder {
 		return featuresByIntensity;
 	}
 
-	private String writeLatticeFile(
+	private File writeLatticeFile(
 			int batch1, 
 			int batch2, 
 			String batch1Tag, 
 			String batch2Tag,
 			List<List<BatchMatchFeatureInfo>> featuresByBatch, 
-			String outputDirectory, 
+			File outputDirectory, 
 			Integer rtToUse,
 			Integer nPoolSamples) {
 		
@@ -275,8 +276,8 @@ public class BatchMatchLatticeBuilder {
 		rtPairsForLattice.add(new RtPair(100.0, 100.0));
 
 		String rtTag = batch1Features.get(0).getAppropriateRtTag(rtToUse);
-		String fileName = outputResults(batch1Tag, batch2Tag, rtPairsForLattice, outputDirectory, rtTag);
-		return fileName;
+		outputFile = outputResults(batch1Tag, batch2Tag, rtPairsForLattice, outputDirectory, rtTag);
+		return outputFile;
 	}
 
 	private Double getAppropriateMaxRt(int batch, int rtToUse) {
@@ -319,8 +320,7 @@ public class BatchMatchLatticeBuilder {
 		});
 		return features;
 	}
-
-	// crossReferenceForRTPairs(intenseBatch1ByMass, allBatch2ByMass, false, rtToUse);
+	
 	private List<RtPair> crossReferenceForRTPairs(
 			List<BatchMatchFeatureInfo> set1,
 			List<BatchMatchFeatureInfo> set2,
@@ -366,6 +366,7 @@ public class BatchMatchLatticeBuilder {
 	}
 
 	private List<RtPair> sortAndRemoveDuplicatePairs(List<RtPair> rtPairs) {
+		
 		Collections.sort(rtPairs, new Comparator<RtPair>() {
 			@Override
 			public int compare(RtPair pair1, RtPair pair2) {
@@ -373,7 +374,6 @@ public class BatchMatchLatticeBuilder {
 						.compareTo(((Double) (1000000.0 * pair2.getRt1() + pair2.getRt2()))));
 			}
 		});
-
 		for (int i = rtPairs.size() - 1; i > 0; --i) {
 			Double diff1 = Math.abs(rtPairs.get(i).getRt1() - rtPairs.get(i - 1).getRt1());
 			Double diff2 = Math.abs(rtPairs.get(i).getRt2() - rtPairs.get(i - 1).getRt2());
@@ -384,17 +384,20 @@ public class BatchMatchLatticeBuilder {
 		return rtPairs;
 	}
 
-	private String outputResults(String batch1Tag, String batch2Tag, List<RtPair> rtPairs, String outputDirectory,
+	private File outputResults(
+			String batch1Tag, 
+			String batch2Tag, 
+			List<RtPair> rtPairs, 
+			File outputDirectory,
 			String rtTag) {
 
 		String batch1Header = String.format("%2s", batch1Tag).replace(' ', '0');
 		String batch2Header = String.format("%2s", batch2Tag).replace(' ', '0');
-
-		String outputFileName = outputDirectory + BatchMatchConstants.FILE_SEPARATOR
-				+ String.format("%s_Lattice_%s_%s.csv", rtTag, batch1Tag, batch2Tag);
-		BufferedOutputStream bos = null;
-		try {
-			bos = new BufferedOutputStream(new FileOutputStream(new File(outputFileName)));
+		
+		String outputFileName = String.format("%s_Lattice_%s_%s.csv", rtTag, batch1Tag, batch2Tag);
+		outputFile = Paths.get(outputDirectory.getAbsolutePath(), outputFileName).toFile();
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outputFile))) {
+			
 			bos.write(
 					(String.format("Batch%s, Batch%s", batch1Header, batch2Header) + BatchMatchConstants.LINE_SEPARATOR)
 							.getBytes());
@@ -402,14 +405,13 @@ public class BatchMatchLatticeBuilder {
 				String line = String.format("%7.5f, %7.5f, %7.5f", rtPair.getRt1(), rtPair.getRt2(), rtPair.getDiff());
 				bos.write((line + BatchMatchConstants.LINE_SEPARATOR).getBytes());
 			}
-			bos.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
-		return outputFileName;
+		return outputFile;
 	}
 
-	public String getOutputFileName() {
-		return outputFileName;
+	public File getOutputFile() {
+		return outputFile;
 	}
 }

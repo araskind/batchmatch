@@ -42,18 +42,22 @@ public class BatchMatchDataSetSummaryCSVWriter {
 		this.cutoffForBacktrack = cutoffForBacktrack;
 	}
 
-	public Map<String, List<RtPair>> writeSummaryToFile(PostProcessDataSet data, String outputFileName,
+	public Map<String, List<RtPair>> writeSummaryToFile(
+			PostProcessDataSet data, 
+			File outputFile,
 			Integer minDesertSize) {
-		return writeSummaryToFile(data, outputFileName, minDesertSize, null);
+		
+		return writeSummaryToFile(data, outputFile, minDesertSize, null);
 	}
 
-	public Map<String, List<RtPair>> writeSummaryToFile(PostProcessDataSet data, String outputFileName,
-			Integer minDesertSize, Map<Integer, String> filesToConvertByBatchNoMap) {
+	public Map<String, List<RtPair>> writeSummaryToFile(
+			PostProcessDataSet data, 
+			File outputFile,
+			Integer minDesertSize, 
+			Map<Integer, File> filesToConvertByBatchNoMap) {
 
 		if (data == null)
 			return null;
-
-		File outputFile = new File(outputFileName);
 
 		List<Integer> batchList = data.getSortedUniqueBatchIndices();
 		Integer maxBatch = batchList.get(batchList.size() - 1);
@@ -72,25 +76,31 @@ public class BatchMatchDataSetSummaryCSVWriter {
 		sb.append("AVG MONOISOTOPIC M/Z" + ", ");
 
 		sb.append(BinnerConstants.LINE_SEPARATOR);
+		
+		//	Map of which batches are represented in which feature redundancy group
 		Map<String, List<Integer>> matchGroupToBatchIdsMap = data.buildMatchGroupToBatchIdsMap(false);
+		
+		// Map of which feature names are represented in which feature redundancy group
 		Map<String, List<String>> redundancyGroupToFeatureNamesMap = data.buildMatchGroupToFeatureNamesMap(false);
 
-		data.buildAvgRtMassByMatchGrpMap(false);
+		//	Calculate MZ, RT and intensity statistics by feature redundancy group
+		data.buildAvgRtMassByMatchGrpMap(false);		
 		Map<Integer, Double> avgRts = data.getAvgRtsByMatchGrp();
 		Map<Integer, Double> avgMasses = data.getAvgMassesByMatchGrp();
-
-		// Map<Double,List<String>> matchGroupsByAverageRtMap = new HashMap<Double,
-		// List<String>>();
+		
 		Map<Integer, List<String>> matchGroupsByAverageRtMap = new HashMap<Integer, List<String>>();
 
-		int idx = 0, fullMatches = 0, ambiguousFullMatches = 0;
+		int idx = 0;
+		int fullMatches = 0;
+		int ambiguousFullMatches = 0;
+		
 		Map<String, Integer> offByOneMatchGroups = new HashMap<String, Integer>();
 
 		for (String matchGroupName : matchGroupToBatchIdsMap.keySet()) {
 
 			List<Integer> batchIdsForGroup = matchGroupToBatchIdsMap.get(matchGroupName);
 
-			if (batchIdsForGroup.size() < 1)
+			if (batchIdsForGroup.isEmpty())
 				continue;
 
 			Collections.sort(batchIdsForGroup);
@@ -102,6 +112,8 @@ public class BatchMatchDataSetSummaryCSVWriter {
 
 			Integer fullSetSize = filesToConvertByBatchNoMap != null ? filesToConvertByBatchNoMap.keySet().size()
 					: batchIdsForGroup.size();
+			
+			//	?? Probably a table of which feature is present in which batch for a given redundancy group
 			for (int i = minBatch; i <= maxBatch; i++) {
 
 				if (!filesToConvertByBatchNoMap.containsKey(nextId)) {
@@ -134,13 +146,15 @@ public class BatchMatchDataSetSummaryCSVWriter {
 				System.out.println("Feature Ct " + (featureCt == null ? "null" : featureCt));
 				sb.append("0" + ", ");
 			}
-
+			//	Record features missing in one batch
 			if (overallCt == fullSetSize - 1 && featureCt == fullSetSize - 1) {
 				offByOneMatchGroups.put(matchGroupName, null);
 			}
-
+			//	Record unambiguous full set (all batches) matches
 			if (overallCt == batchList.size()) {
 				fullMatches++;
+				
+				//	Record ambiguous matches (more features in the group than batches)
 				if (featureCt > overallCt)
 					ambiguousFullMatches++;
 			}
@@ -151,7 +165,6 @@ public class BatchMatchDataSetSummaryCSVWriter {
 			 * avgMasses.get(redInt); } catch (Exception e) { redInt = null; rt =null; mass
 			 * = null; }
 			 */
-
 			Integer redInt = null;
 			Double rt = null, mass = null;
 			Integer integerRTKey = null;
@@ -204,15 +217,30 @@ public class BatchMatchDataSetSummaryCSVWriter {
 
 		Collections.sort(batchList);
 		if (maxBatch.equals(2) || batchList.size() == 2)
-			desertRtMassMap = grabFakeMapFromUnMatchedTargetBatchFeatures(data.getFeatures(), batchList.get(0),
-					batchList.get(1), minDesertSize);
+			desertRtMassMap = grabFakeMapFromUnMatchedTargetBatchFeatures(
+					data.getFeatures(), 
+					batchList.get(0),
+					batchList.get(1), 
+					minDesertSize);
 		else
-			desertRtMassMap = createByDesertRtMassMap(offByOneMatchGroups, matchGroupToBatchIdsMap,
-					matchGroupsByAverageRtMap, avgRts, avgMasses, minDesertSize, maxBatch, minBatch,
+			desertRtMassMap = createByDesertRtMassMap(
+					offByOneMatchGroups, 
+					matchGroupToBatchIdsMap,
+					matchGroupsByAverageRtMap, 
+					avgRts, 
+					avgMasses, 
+					minDesertSize, 
+					maxBatch, 
+					minBatch,
 					filesToConvertByBatchNoMap);
 
-		Map<String, List<RtPair>> candidateBackTrackPoints = determineCandidateBackTrackPoints(data, desertRtMassMap,
-				cutoffForBacktrack, batchList.size() == 2);
+		Map<String, List<RtPair>> candidateBackTrackPoints = 
+				determineCandidateBackTrackPoints(
+						data, 
+						desertRtMassMap,
+						cutoffForBacktrack, 
+						batchList.size() == 2);
+		
 		Map<String, List<RtPair>> backTrackedPairsByBatch = new HashMap<String, List<RtPair>>();
 
 		for (String desertKey : candidateBackTrackPoints.keySet()) {
@@ -272,26 +300,24 @@ public class BatchMatchDataSetSummaryCSVWriter {
 	}
 
 	// FIX
-	private Map<String, List<RtPair>> determineCandidateBackTrackPoints(PostProcessDataSet data,
-			Map<String, List<RtPair>> desertRtMassMap, Double massTol, Boolean inPairMode) {
+	private Map<String, List<RtPair>> determineCandidateBackTrackPoints(
+			PostProcessDataSet data,
+			Map<String, List<RtPair>> desertRtMassMap, 
+			Double massTol, 
+			Boolean inPairMode) {
 
 		Collections.sort(data.getFeatures(), new FeatureByMassComparator());
 
 		String keyFormat = "%.0f";
-
 		String valStr = String.format("%.3f", massTol);
 		System.out.println();
 		System.out.println();
 		System.out.println("After merging, at mass tolerance " + String.format("%.3f", massTol)
 				+ " the following unmatched features could be assigned to a match group. ");
-
 		System.out.println();
-		// Map<Integer, Map<String, List<FeatureFromFile>>> featuresByBatchAndMassMap =
-		// mapFeaturesByBatchAndMass(data.getFeatures(),
-		// inPairMode);//BacktrackingEngine.mapFeaturesByBatchAndMass(data.getFeatures(),
-		// inPairMode);
-		Map<Integer, Map<String, List<FeatureFromFile>>> featuresByBatchAndMassMap = BacktrackingEngine
-				.mapFeaturesByBatchAndMass(data.getFeatures(), inPairMode);
+		
+		Map<Integer, Map<String, List<FeatureFromFile>>> featuresByBatchAndMassMap = 
+				BacktrackingEngine.mapFeaturesByBatchAndMass(data.getFeatures(), inPairMode);
 
 		List<String> orderedDesertKeys = ListUtils.makeListFromCollection(desertRtMassMap.keySet());
 		Collections.sort(orderedDesertKeys);
@@ -400,23 +426,32 @@ public class BatchMatchDataSetSummaryCSVWriter {
 		return suggestedTweakPoints;
 	}
 
-	// Pair version of createByDesertRtMass Map. Needs to return map with single key
-	// "2-1" (targetBatch (2) - desert id\x for target batch (1))
-	// pointing pointing to a list with mass/rt? targets for all unclaimed batch 1
-	// features
-	private Map<String, List<RtPair>> grabFakeMapFromUnMatchedTargetBatchFeatures(List<FeatureFromFile> featuresToMap,
-			Integer targetIdx, Integer sourceIdx, Integer minDesertSize) {
-
+	/** 
+	 * Pair version of createByDesertRtMass Map. 
+	 * Needs to return map with single key:
+	 * "2-1" (targetBatch (2) - desert id\x for target batch (1))
+	 * pointing to a list with mass/rt? targets for all unclaimed batch 1 features
+	 * 
+	 * RtPair in this function is in fact RT/mass pair
+	 */
+	private Map<String, List<RtPair>> grabFakeMapFromUnMatchedTargetBatchFeatures(
+			List<FeatureFromFile> featuresToMap,
+			Integer targetIdx, 
+			Integer sourceIdx, 
+			Integer minDesertSize) {
+		
+		//	Sort features by RT
 		Collections.sort(featuresToMap, new FeatureByRtOnlyComparator());
 
 		List<RtPair> unclaimedTargetBatchMassRtPairs = new ArrayList<RtPair>();
-
-		int consecutiveCt = 0;
 		List<RtPair> candidatePairs = new ArrayList<RtPair>();
 		FeatureFromFile f = null;
-
+		int consecutiveCt = 0;
+		
 		for (int j = 0; j < featuresToMap.size(); j++) {
+			
 			f = featuresToMap.get(j);
+			
 			if (f.getRedundancyGroup() != null) {
 				if (f.getBatchIdx().equals(targetIdx)) {
 					consecutiveCt = 0;
@@ -446,18 +481,21 @@ public class BatchMatchDataSetSummaryCSVWriter {
 		return fakeDesertRtMassMapForUnclaimedTarget;
 	}
 
-	private Map<String, List<RtPair>> createByDesertRtMassMap(Map<String, Integer> offByOneMatchGroups,
-			Map<String, List<Integer>> matchGroupToBatchIdsMap, Map<Integer, List<String>> matchGroupsByAverageRtMap,
-			Map<Integer, Double> averageRtsByMatchGroupMap, Map<Integer, Double> averageMassesByMatchGroupMap,
-			Integer minDesertSize, int maxBatchId, int minBatchId, Map<Integer, String> filesToConvertByBatchNoMap) {
-
-		Map<String, List<RtPair>> desertRtMassMap = new HashMap<String, List<RtPair>>();
-		// List<Double> sortedRts =
-		// ListUtils.makeListFromCollection(matchGroupsByAverageRtMap.keySet());
+	private Map<String, List<RtPair>> createByDesertRtMassMap(
+			Map<String, Integer> offByOneMatchGroups,
+			Map<String, List<Integer>> matchGroupToBatchIdsMap, 
+			Map<Integer, List<String>> matchGroupsByAverageRtMap,
+			Map<Integer, Double> averageRtsByMatchGroupMap, 
+			Map<Integer, Double> averageMassesByMatchGroupMap,
+			Integer minDesertSize, 
+			int maxBatchId, 
+			int minBatchId, 
+			Map<Integer, File> filesToConvertByBatchNoMap) {
+		
 		List<Integer> sortedRts = ListUtils.makeListFromCollection(matchGroupsByAverageRtMap.keySet());
-
 		Collections.sort(sortedRts);
-
+		
+		Map<String, List<RtPair>> desertRtMassMap = new HashMap<String, List<RtPair>>();
 		List<String> offByOneMatchGroupsSortedByRt = new ArrayList<String>();
 
 		for (int i = 0; i < sortedRts.size(); i++) {
@@ -470,9 +508,6 @@ public class BatchMatchDataSetSummaryCSVWriter {
 				}
 			}
 		}
-		// Map<Double
-		// matchGroupToBatchIdsMap
-
 		Boolean done = false;
 		int iter = 0;
 
@@ -484,7 +519,6 @@ public class BatchMatchDataSetSummaryCSVWriter {
 			}
 
 			Integer missingBatch = null, prevMissingBatch = null, consecutiveCt = 0;
-			;
 			Double rtForRangeStart = null, rtForRangeEnd = null;
 			List<RtPair> desertPts = new ArrayList<RtPair>();
 
@@ -543,12 +577,6 @@ public class BatchMatchDataSetSummaryCSVWriter {
 									+ consecutiveCt + ". RT range: " + rtStartStr + " to " + rtEndStr);
 
 							desertRtMassMap.put(nextKey, desertPts);
-
-							// rtForLastSavedDesert = rtForRangeEnd;
-
-							// for (int k = 0; k < desertPts.size(); k++)
-							// System.out.println(nextKey + " Mass " + desertPts.get(k).getRt2() + " RT: " +
-							// desertPts.get(k).getRt1());
 						}
 						consecutiveCt = 0;
 						rtForRangeStart = rtForGroup;
@@ -558,46 +586,13 @@ public class BatchMatchDataSetSummaryCSVWriter {
 				prevMissingBatch = missingBatch;
 			}
 		}
-
-		// desertPts = new ArrayList<RtPair>();
-		/*
-		 * //printed++ for (int i = 0; i < offByOneMatchGroupsSortedByRt.size(); i++) {
-		 * 
-		 * String matchGroup = offByOneMatchGroupsSortedByRt.get(i);
-		 * 
-		 * if (matchGroup == null) continue;
-		 * 
-		 * Integer matchGroupAsInt = Integer.parseInt(matchGroup); Double rtForGroup =
-		 * averageRtsByMatchGroupMap.get(matchGroupAsInt); Double massForGroup =
-		 * averageMassesByMatchGroupMap.get(matchGroupAsInt); if (rtForGroup <=
-		 * rtForLastSavedDesert) continue;
-		 * 
-		 * desertPts.add(new RtPair(rtForGroup, massForGroup));
-		 * 
-		 * missingBatch = null;
-		 * 
-		 * List<Integer> batchesForOffByOneGroup =
-		 * matchGroupToBatchIdsMap.get(matchGroup);
-		 * Collections.sort(batchesForOffByOneGroup);
-		 * 
-		 * if (batchesForOffByOneGroup.get(0).equals(2)) missingBatch = 1; else { for
-		 * (int j = 1; j < batchesForOffByOneGroup.size(); j++) { if
-		 * (batchesForOffByOneGroup.get(j) - batchesForOffByOneGroup.get(j-1) > 1) {
-		 * missingBatch = batchesForOffByOneGroup.get(j-1) + 1; break; } } }
-		 * 
-		 * if (missingBatch == null) missingBatch = maxBatchId;
-		 * 
-		 * String nextKey = pullNextKey(desertRtMassMap, missingBatch);
-		 * desertRtMassMap.put(nextKey, desertPts); desertPts = new ArrayList<RtPair>();
-		 * 
-		 * System.out.println("Adding end point " + rtForGroup + " and mass  " +
-		 * massForGroup); }
-		 */
-
 		return desertRtMassMap;
 	}
 
-	private Integer findMissingBatch(List<Integer> batchesForGroup, Integer minBatchId, Integer maxBatchId,
+	private Integer findMissingBatch(
+			List<Integer> batchesForGroup, 
+			Integer minBatchId, 
+			Integer maxBatchId,
 			Integer skipBatchId) {
 
 		Integer missingBatch = null;
@@ -626,39 +621,6 @@ public class BatchMatchDataSetSummaryCSVWriter {
 
 		return missingBatch;
 	}
-	/*
-	 * private Map<Integer, Map<String, List<FeatureFromFile>>>
-	 * mapFeaturesByBatchAndMass(List<FeatureFromFile> featuresToMap, Boolean
-	 * unClaimedOnly) {
-	 * 
-	 * Collections.sort(featuresToMap, new FeatureByMassComparator());
-	 * 
-	 * String keyFormat = "%.0f";
-	 * 
-	 * Map<Integer, Map<String, List<FeatureFromFile>>> featuresByBatchAndMassMap =
-	 * new HashMap<Integer, Map<String, List<FeatureFromFile>>>();
-	 * 
-	 * for (FeatureFromFile f : featuresToMap) { if (unClaimedOnly &&
-	 * f.getRedundancyGroup() != null) continue;
-	 * 
-	 * Integer batchKeyForFeature = f.getBatchIdx(); if
-	 * (!featuresByBatchAndMassMap.containsKey(batchKeyForFeature))
-	 * featuresByBatchAndMassMap.put(batchKeyForFeature, new HashMap<String,
-	 * List<FeatureFromFile>>());
-	 * 
-	 * Double massKeyAsFloorDbl = Math.floor(f.getMass()); String massKeyForFeature
-	 * = String.format(keyFormat, massKeyAsFloorDbl);
-	 * 
-	 * Map<String, List<FeatureFromFile>> featuresByMassMap =
-	 * featuresByBatchAndMassMap.get(batchKeyForFeature);
-	 * 
-	 * if (!featuresByMassMap.containsKey(massKeyForFeature))
-	 * featuresByMassMap.put(massKeyForFeature, new ArrayList<FeatureFromFile>());
-	 * 
-	 * featuresByMassMap.get(massKeyForFeature).add(f);
-	 * featuresByBatchAndMassMap.put(batchKeyForFeature, featuresByMassMap); }
-	 * return featuresByBatchAndMassMap; }
-	 */
 
 	private Map<Integer, Map<String, List<FeatureFromFile>>> mapFeaturesByBatchAndMass(
 			List<FeatureFromFile> featuresToMap, Boolean unClaimedOnly) {
@@ -689,8 +651,6 @@ public class BatchMatchDataSetSummaryCSVWriter {
 
 			featuresByMassMap.get(massKeyForFeature).add(f);
 
-			// if (massKeyForFeature.equals("177") && f.getBatchIdx().equals(1))
-			// System.out.println(f);
 			featuresByBatchAndMassMap.put(batchKeyForFeature, featuresByMassMap);
 		}
 		return featuresByBatchAndMassMap;

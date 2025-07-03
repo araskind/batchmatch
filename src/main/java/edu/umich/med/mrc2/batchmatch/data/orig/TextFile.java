@@ -53,9 +53,11 @@ public class TextFile {
 		if (filterTrailing && line != null) 
 			line = line.trim();
 		
-		CSVParser commaParser = new CSVParser();
-		CSVParser tabParser = new CSVParser('\t');
+		CSVParser commaParser = new CSVParser(
+				CSVParser.DEFAULT_SEPARATOR, CSVParser.DEFAULT_QUOTE_CHARACTER, '|');
+		CSVParser tabParser = new CSVParser('\t', CSVParser.DEFAULT_QUOTE_CHARACTER, '|');
 		CSVParser parser = (tabParser.parseLine(line).length > 1) ? tabParser : commaParser;
+
 		data = new ArrayList<List<String>>();
 		while (line != null) {
 			String[] rowArray = parser.parseLine(line);

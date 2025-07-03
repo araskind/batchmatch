@@ -4,6 +4,7 @@
 ////////////////////////////////////////////////////
 package edu.umich.med.mrc2.batchmatch.gui.panels.orig;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public abstract class BatchFileListLoaderPanel extends FileListLoaderPanel {
 		if (allIntensityHeaders != null)
 			return allIntensityHeaders;
 
-		Map<Integer, String> batchFileMap = grabFreshBatchFileMap();
+		Map<Integer, File> batchFileMap = grabFreshBatchFileMap();
 		MetabolomicsIntensityDataLoader headerLoader = new MetabolomicsIntensityDataLoader();
 		allIntensityHeaders = headerLoader.preReadIntensityHeaders(batchFileMap);
 

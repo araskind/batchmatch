@@ -235,7 +235,7 @@ public class BatchMatchLatticeBuilder {
 			String mzString = fileData[i][headerMap.get(BinnerExportFields.MZ)];
 			String rtString = fileData[i][headerMap.get(BinnerExportFields.RT_OBSERVED)];
 			
-			if(mzString.isBlank()  || rtString.isBlank())
+			if(mzString.isBlank() || rtString.isBlank())
 				continue;
 			
 			BatchMatchFeatureInfo feature = new BatchMatchFeatureInfo();

@@ -10,6 +10,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -349,7 +350,7 @@ public class BatchMatchNamedUnnamedComparisonTabPanel extends StickySettingsPane
 	private Boolean createNamedLatticeSet() {
 
 		Map<String, String> batchFileTagMap = namedFileListLoaderPanel.getBatchFileMap();
-		String outputDirectory = outputDirectoryPanel.getOutputDirectoryPath();
+		File outputDirectory = outputDirectoryPanel.getOutputDirectory();
 
 		MetabolomicsTargetedDataLoader rtLoader = new MetabolomicsTargetedDataLoader();
 		Map<String, Map<String, Double>> latticeAverages = new HashMap<String, Map<String, Double>>();
@@ -424,14 +425,13 @@ public class BatchMatchNamedUnnamedComparisonTabPanel extends StickySettingsPane
 
 			List<RtPair> pairs = latticeMapRelativeToKeyed.get(fileName);
 			AnchorFileWriter writer = new AnchorFileWriter(true);
-			String fileNameBase = "Auto_Named_Lattice_" + fileTagCurrent + "_" + fileTagTarget + "_MP"; // (useControlsOnly.isSelected()
-																										// ? "_MP" :
-																										// "");
+			// (useControlsOnly.isSelected() ? "_MP" : "");
+			//	String fileNameBase = "Auto_Named_Lattice_" + fileTagCurrent + "_" + fileTagTarget + "_MP"; 
 
-			String latticeFileName = fileNameBase + ".csv";
+			String latticeFileName = "Auto_Named_Lattice_" + fileTagCurrent + "_" + fileTagTarget + "_MP.csv";
+			File latticeFile = Paths.get(outputDirectory.getAbsolutePath(), latticeFileName).toFile();
 
-			writer.outputResultsToFile(latticeFileName, matchedRtPairs, outputDirectory, currentLabel, targetLabel,
-					true);
+			writer.outputResults(latticeFile, matchedRtPairs, currentLabel, targetLabel,true);
 			completeLatticeFileNames.put(currIdx,
 					outputDirectory + BatchMatchConstants.FILE_SEPARATOR + latticeFileName);
 		}
@@ -443,7 +443,7 @@ public class BatchMatchNamedUnnamedComparisonTabPanel extends StickySettingsPane
 	private Boolean createNamedMassMap() {
 
 		Map<String, String> batchFileTagMap = namedFileListLoaderPanel.getBatchFileMap();
-		String outputDirectory = outputDirectoryPanel.getOutputDirectoryPath();
+		File outputDirectory = outputDirectoryPanel.getOutputDirectory();
 
 		MetabolomicsTargetedDataLoader rtLoader = new MetabolomicsTargetedDataLoader();
 		Map<String, Map<String, Double>> latticeMassAverages = new HashMap<String, Map<String, Double>>();
@@ -524,26 +524,27 @@ public class BatchMatchNamedUnnamedComparisonTabPanel extends StickySettingsPane
 
 			List<RtPair> pairs = latticeMapRelativeToKeyed.get(fileName);
 			AnchorFileWriter writer = new AnchorFileWriter(true);
-			String fileNameBase = "Mass_Named_Lattice_" + fileTagCurrent + "_" + fileTagTarget + "_MP"; // (useControlsOnly.isSelected()
-																										// ? "_MP" :
-																										// "");
+			// (useControlsOnly.isSelected() ? "_MP" : "");
+			//	String fileNameBase = "Mass_Named_Lattice_" + fileTagCurrent + "_" + fileTagTarget + "_MP"; 
 
-			String latticeFileName = fileNameBase + ".csv";
+			String latticeFileName = "Mass_Named_Lattice_" + fileTagCurrent + "_" + fileTagTarget + "_MP.csv";
+			File latticeFile = Paths.get(outputDirectory.getAbsolutePath(), latticeFileName).toFile();
 
-			writer.outputResultsToFile(latticeFileName, matchedMassPairs, outputDirectory, currentLabel, targetLabel,
-					true);
+			writer.outputResults(
+					latticeFile, matchedMassPairs, currentLabel, targetLabel, true);
 			// writer.outputResultsWithTagsToFile(latticeFileName,
 			// avgRtsForMatchedMassPairs, matchedMassPairs, outputDirectory, currentLabel,
 			// targetLabel, true);
-			completeLatticeFileNames.put(currIdx,
-					outputDirectory + BatchMatchConstants.FILE_SEPARATOR + latticeFileName);
+			completeLatticeFileNames.put(currIdx, latticeFile.getAbsolutePath());
 		}
-		// writeFileFile(outputDirectory, completeLatticeFileNames);
+		writeFileFile(outputDirectory, completeLatticeFileNames);
 
 		return true;
 	}
 
-	private void writeFileFile(String outputDirectory, Map<String, String> completeLatticeFileNames) {
+	private void writeFileFile(
+			File outputDirectory, 
+			Map<String, String> completeLatticeFileNames) {
 
 		List<String> indices = ListUtils.makeListFromCollection(completeLatticeFileNames.keySet());
 
@@ -580,12 +581,12 @@ public class BatchMatchNamedUnnamedComparisonTabPanel extends StickySettingsPane
 
 		Map<String, String> batchFileMap = rawFileListLoaderPanel.getBatchFileMap();
 
-		String outputDirectory = outputDirectoryPanel.getOutputDirectoryPath();
+		File outputDirectory = outputDirectoryPanel.getOutputDirectory();
 
 		String targetKey = latticeTypePanel.getTargetSelected() == null ? "0"
 				: latticeTypePanel.getTargetSelected().toString();
 		Integer poolSampleSize = poolSampleSizePanel.getIntSelected();
-		String targetedFileName = batchFileMap.get(targetKey);
+		File targetedFile = new File(batchFileMap.get(targetKey));
 
 		Integer rtToUse = BatchMatchConstants.RT_FROM_BATCH_EXPECTED; // atchMatchConstants.RT_FROM_BINNER_NAME;
 		Boolean dataWritten = false;
@@ -613,19 +614,25 @@ public class BatchMatchNamedUnnamedComparisonTabPanel extends StickySettingsPane
 		for (int i = 0; i < keyStrings.size(); i++) {
 
 			String key = keyStrings.get(i);// .toString();
-			String fileName = batchFileMap.get(key);
-			if (fileName.equals(targetedFileName))
+			File batchFile = new File(batchFileMap.get(key));
+			if (targetedFile.equals(targetedFile))
 				continue;
 
 			BatchMatchLatticeBuilder batchMatch = new BatchMatchLatticeBuilder();
 
-			dataWritten = batchMatch.buildLatticeFile(fileName, targetedFileName, outputDirectory, key,
-					targetKey.toString(), poolSampleSize, rtToUse);
+			dataWritten = batchMatch.buildLatticeFile(
+					batchFile, 
+					targetedFile, 
+					outputDirectory, 
+					key,
+					targetKey.toString(), 
+					poolSampleSize, 
+					rtToUse);
 
 			if (!dataWritten)
 				return false;
 
-			outputFileNames.add(batchMatch.getOutputFileName());
+			outputFileNames.add(batchMatch.getOutputFile().getAbsolutePath());
 			fileTags.add(key);
 		}
 

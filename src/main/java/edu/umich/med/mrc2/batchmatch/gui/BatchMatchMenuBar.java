@@ -43,6 +43,7 @@ public class BatchMatchMenuBar extends CommonMenuBar {
 	private static final Icon settingsIcon = GuiUtils.getIcon("preferences", 24);
 	private static final Icon aboutIcon = GuiUtils.getIcon("help", 24);
 	private static final Icon exitIcon = GuiUtils.getIcon("shutDown", 24);
+	private static final Icon goToExperimentFolderIcon = GuiUtils.getIcon("goToFolder", 24);	
 
 	public BatchMatchMenuBar(ActionListener listener) {
 		
@@ -56,6 +57,10 @@ public class BatchMatchMenuBar extends CommonMenuBar {
 		addItem(projectMenu, BMActionCommands.OPEN_PROJECT_COMMAND, openProjectIcon);
 		addItem(projectMenu, BMActionCommands.SAVE_PROJECT_COMMAND, saveProjectIcon);
 		addItem(projectMenu, BMActionCommands.SAVE_AND_CLOSE_PROJECT_COMMAND, closeProjectIcon);
+		
+		projectMenu.addSeparator();
+		
+		addItem(projectMenu,  BMActionCommands.GO_TO_EXPERIMENT_FOLDER_COMMAND, goToExperimentFolderIcon);
 		
 		projectMenu.addSeparator();
 		
